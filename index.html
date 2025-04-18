@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Log abandoned shopping trolleys">
+    <title>Trolley Report - Find & Report Abandoned Trolleys</title>
+<style>
+    :root {
+        --bg-color: #1a1a1a;
+        --text-color: #e0e0e0;
+        --card-bg: #2c2c2c;
+        --border-color: #444;
+        --input-bg: #333;
+        --input-text: #e0e0e0;
+        --button-bg: #007bff; /* Default primary button */
+        --button-text: #ffffff;
+        --button-hover-bg: #0056b3;
+        --button-secondary-bg: #555;
+        --button-secondary-hover-bg: #777;
+        --button-thirdly-bg: #097969;
+        --button-thirdly-hover-bg: #555;
+        --rating-active-bg: #bf9000; /* Default active button state (blue) */
+        --rating-active-text: #fff;
+        --rating-inactive-bg: #444; /* Default inactive button state (grey) */
+        --rating-inactive-text: #ccc;
+        --error-color: #dc3545;
+        --error-bg: #401010;
+        --active-border-color: #fff; /* Border for active custom buttons */
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; }
+    body { display: flex; flex-direction: column; align-items: center; padding: 5px 15px 15px 15px; background-color: var(--bg-color); color: var(--text-color); }
+    .container { width: 100%; max-width: 600px; margin: 10px auto; padding: 0px 20px 20px 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); background-color: var(--card-bg); border: 1px solid var(--border-color); }
+    header { text-align: center; margin-bottom: 5px; margin-top: 15px; }
+    h1 { font-size: 2.0em; margin: -10px 0px 0px 0px; }
+    h1 span { display: block; font-weight: normal; font-size: 0.45em; margin: -8px 0px 0px 0px; }
+    h1 icon {font-weight: normal; font-size: 0.9em; margin: -8px 0px 0px 0px; }
+    .form-group { margin-bottom: 20px; }
+    label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.95em; }
+    textarea {
+        width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 5px; font-size: 1em; background-color: var(--input-bg); color: var(--input-text);
+        min-height: 100px; resize: vertical; font-size:15px;
+    }
+    button { padding: 12px 20px; font-size: 1em; font-weight: normal; border: 0px; border-radius: 5px; cursor: pointer; transition: background-color 0.2s ease, border-color 0.2s ease; margin-right: 5px; margin-bottom: 5px; }
+    button.primary { background-color: var(--button-bg); color: var(--button-text); width: 100%; margin-top: 10px; }
+    button.primary:hover { background-color: var(--button-hover-bg); }
+    button.secondary { background-color: var(--button-secondary-bg); color: var(--button-text); padding: 8px 12px; font-size: 0.9em; }
+    button.secondary:hover { background-color: var(--button-secondary-hover-bg); }
+    button.thirdly { background-color: var(--button-thirdly-bg); color: var(--button-text); padding: 8px 12px; font-size: 0.9em; border:none;}
+    button.thirdly:hover { background-color: var(--button-thirdly-hover-bg); color: var(--button-text)}
+    button.full-width { width: 100%; }
+    #get-location-btn {
+        background-color: #17a2b8;
+        color: #ffffff;
+        border: 1px solid #117a8b;
+        padding: 12px 20px;
+        font-size: 1em;
+        border-radius: 8px;
+    }
+    #get-location-btn:hover {
+        background-color: #138496;
+        border-color: #0c5460;
+    }
+    .location-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
+    .location-group span { font-size: 0.9em; min-height: 20px; }
+    #location-display { display: none; }
+    #location-display.visible { display: block; }
+
+    /* Button Grid Layout (2 columns) */
+    .button-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+
+    /* Default button styles within the grid (Applies to conditions & non-custom brands) */
+    .button-grid button {
+        padding: 10px; /* Base padding */
+        font-size: 0.9em; text-align: center;
+        border: 0px solid var(--border-color); /* Base border */
+        background-color: var(--rating-inactive-bg); /* Default inactive (grey) */
+        color: var(--rating-inactive-text);
+        overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        font-weight: normal; /* Default font weight */
+     }
+    /* Default ACTIVE state for buttons within the grid */
+    .button-grid button.active {
+        background-color: var(--rating-active-bg); /* Default active (blue) */
+        color: var(--rating-active-text);
+        border: 0px solid var(--rating-active-bg); /* Make border match active bg */
+        padding: 10px; /* Adjust padding to account for thicker border */
+        font-weight: bold;
+     }
+
+    /* --- Brand Specific Colors --- */
+    /* Coles */
+    .button-grid button[data-value="Coles"] { background-color: #ed1c22; color: white; border-color: #ed1c22; }
+    .button-grid button[data-value="Coles"]:hover { background-color: #c8191e; border-color: #c8191e;} /* Slightly darker hover */
+    .button-grid button[data-value="Coles"].active {
+        background-color: #bf9000; /* Keep background */
+        color: white; /* Keep text */
+        border: 0px solid var(--active-border-color); /* Add distinct active border */
+        padding: 10px; /* Adjust padding */
+        font-weight: bold;
+    }
+
+    /* Woolworths */
+    .button-grid button[data-value="Woolworths"] { background-color: #54b848; color: white; border-color: #54b848; }
+    .button-grid button[data-value="Woolworths"]:hover { background-color: #47a03d; border-color: #47a03d;}
+    .button-grid button[data-value="Woolworths"].active {
+        background-color: #bf9000;
+        color: white;
+        border: 0px solid var(--active-border-color); /* Add distinct active border */
+        padding: 10px; /* Adjust padding */
+        font-weight: bold;
+    }
+
+    /* Aldi */
+    .button-grid button[data-value="Aldi"] { background-color: #00005F; color: white; border-color: #00005F; }
+    .button-grid button[data-value="Aldi"]:hover { background-color: #00004a; border-color: #00004a;}
+    .button-grid button[data-value="Aldi"].active {
+        background-color: #bf9000;
+        color: white;
+        border: 0px solid var(--active-border-color); /* Add distinct active border */
+        padding: 10px; /* Adjust padding */
+        font-weight: bold;
+    }
+
+    /* IGA */
+    .button-grid button[data-value="IGA"] { background-color: #D8C69D; color: #333333; border-color: #D8C69D; }
+    .button-grid button[data-value="IGA"]:hover { background-color: #c2b28d; border-color: #c2b28d;}
+    .button-grid button[data-value="IGA"].active {
+        background-color: #bf9000;
+        color: white;
+        border: 0px solid var(--active-border-color); /* Add distinct active border */
+        padding: 10px; /* Adjust padding */
+        font-weight: bold;
+    }
+
+    /* Kmart */
+    .button-grid button[data-value="Kmart"] { background-color: #E92A28; color: white; border-color: #E92A28; }
+    .button-grid button[data-value="Kmart"]:hover { background-color: #c72321; border-color: #c72321;}
+    .button-grid button[data-value="Kmart"].active {
+        background-color: #bf9000;
+        color: white;
+        border: 0px solid var(--active-border-color);
+        padding: 10px;
+        font-weight: bold;
+    }
+
+    /* BigW */
+    .button-grid button[data-value="BigW"] { background-color: #0046C8; color: white; border-color: #0046C8; }
+    .button-grid button[data-value="BigW"]:hover { background-color: #0037a0; border-color: #0037a0;}
+    .button-grid button[data-value="BigW"].active {
+        background-color: #bf9000;
+        color: white;
+        border: 0px solid var(--active-border-color); /* Add distinct active border */
+        padding: 10px; /* Adjust padding */
+        font-weight: bold;
+    }
+
+    /* Bunnings */
+    .button-grid button[data-value="Bunnings"] { background-color: #0d5257; color: white; border-color: #0d5257; }
+    .button-grid button[data-value="Bunnings"]:hover { background-color: #0b494e; border-color: #0b494e;}
+    .button-grid button[data-value="Bunnings"].active {
+        background-color: #bf9000;
+        color: white;
+        border: 0px solid var(--active-border-color); /* Add distinct active border */
+        padding: 10px; /* Adjust padding */
+        font-weight: bold;
+    }    
+    
+    /* --- End Brand Specific Colors --- */
+
+    /* Ensure default styles apply to non-specified brand buttons (e.g., Bunnings, Other) */
+    /* And ensure condition buttons use default active/inactive styles */
+    .condition-section .button-grid button {
+        /* Inherits default .button-grid button styles */
+    }
+     .condition-section .button-grid button.active {
+        /* Inherits default .button-grid button.active styles */
+        background-color: var(--rating-active-bg); /* Explicitly set default active blue */
+        color: var(--rating-active-text);
+        border: 0px solid var(--rating-active-bg);
+        padding: 10px; /* Match padding adjustment */
+        font-weight: bold;
+     }
+
+
+    .condition-section {
+        display: none; /* Hidden by default */
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px dashed var(--border-color);
+    }
+    .condition-section.visible {
+        display: block; /* Shown when brand is active */
+    }
+    .condition-section label { font-size: 0.9em; margin-bottom: 8px; }
+
+    #char-counter {margin-top:2px;font-size: 0.8em;}
+
+    #confirmation-message { margin-top: 20px; padding: 15px; border-radius: 5px; display: none; white-space: pre-wrap; word-wrap: break-word; font-size: 0.9em; border: 1px solid var(--border-color); background-color: var(--input-bg); color: var(--input-text); }
+    .button-group-actions { display: flex; gap: 8px; }
+    .button-group-actions button { flex: 1; padding: 10px; font-size: 0.9em; text-align: center; border: 0px solid var(--border-color); font-weight: bold; }
+    .disclaimer {font-size:12px;text-align:center;margin-top:50px; color:#777;}
+    .disclaimer a {color:#999;text-decoration:none;}    
+    
+    .error-highlight { border: 1px solid var(--error-color) !important; }
+    .error-label { color: var(--error-color) !important; }
+    .error-group { border: 1px solid var(--error-color); padding: 5px; border-radius: 4px; }
+
+    /* Media query adjustment */
+    @media (max-width: 768px) {
+        h1 span {font-size: 0.40em;}
+        .disclaimer {font-size:10px;text-align:center;margin-top:10px; color:#777;}
+        .button-grid { gap: 6px; } /* Keep 2 columns, maybe adjust gap */
+        .button-grid button { font-size: 0.85em; padding: 8px; } /* Adjust padding */
+        /* Adjust padding for active buttons too */
+        .button-grid button.active {
+            padding: 8px; /* Adjusted padding for active buttons on smaller screens */
+        }
+        .button-grid button[data-value="Coles"].active,
+        .button-grid button[data-value="Woolworths"].active,
+        .button-grid button[data-value="Aldi"].active,
+        .button-grid button[data-value="IGA"].active,
+        .button-grid button[data-value="Bunnings"].active,
+        .button-grid button[data-value="Kmart"].active,
+        .button-grid button[data-value="BigW"].active {
+            padding: 8px; /* Adjusted padding for active buttons on smaller screens */
+        }
+     .condition-section .button-grid button.active {
+        /* Inherits default .button-grid button.active styles */
+        background-color: var(--rating-active-bg); /* Explicitly set default active blue */
+        color: var(--rating-active-text);
+        border: 0px solid var(--rating-active-bg);
+        padding: 8px; /* Match padding adjustment */
+        font-weight: bold;
+     }
+    #char-counter {margin-top:0px;font-size: 0.6em;}
+    .disclaimer {font-size:9px;text-align:center;margin-top:40px; color:#777;}
+    .disclaimer a {color:#999;text-decoration:none;}
+    }
+</style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Trolley Report <icon>🛒</icon><span>Find & Report Abandoned Trolleys </span></h1>
+            </header>
+        <main>
+            <form id="trolley-form">
+
+                <section class="form-group">
+                    <label for="location">Date/Time & Location*</label>
+                    <div class="location-group">
+                        <button type="button" id="get-location-btn" class="secondary full-width">Get Date/Time & Location</button>
+                        <span id="location-display"></span>
+                    </div>
+                    <input type="hidden" id="latitude" name="latitude" required>
+                    <input type="hidden" id="longitude" name="longitude" required>
+                    <input type="hidden" id="timestamp" name="timestamp" required>
+                </section>
+
+                <section class="form-group brand-section required-group" data-group-name="brand">
+                    <label>Trolley Brand(s)*</label>
+                    <div class="button-grid">
+                        <button type="button" data-value="Coles">Coles</button>
+                        <button type="button" data-value="Woolworths">Woolworths</button>
+                        <button type="button" data-value="Aldi">Aldi</button>
+                        <button type="button" data-value="IGA">IGA</button>
+                        <button type="button" data-value="Kmart">Kmart</button>
+                        <button type="button" data-value="BigW">Big W</button>
+                        <button type="button" data-value="Bunnings">Bunnings</button> <button type="button" data-value="Other">Other</button> </div>
+                    <input type="hidden" name="brands" class="group-value">
+                </section>
+
+                <div id="condition-sections-container">
+                    <section class="form-group condition-section" data-brand="Coles">
+                        <label>Coles Trolley Condition</label>
+                        <div class="button-grid condition-buttons">
+                            <button type="button" data-value="Good Condition">Good Condition</button>
+                            <button type="button" data-value="Needs Cleaning">Needs Cleaning</button>
+                            <button type="button" data-value="Rusty Frame">Rusty Frame</button>
+                            <button type="button" data-value="Damaged Wheel(s)">Damaged Wheel(s)</button>
+                            <button type="button" data-value="Bent Frame">Bent Frame</button>
+                            <button type="button" data-value="Broken Handle">Broken Handle</button>
+                            <button type="button" data-value="Child Seat Issue">Child Seat Issue</button>
+                            <button type="button" data-value="Other Damage">Other Damage</button>
+                        </div>
+                        <input type="hidden" name="conditions[Coles]" class="group-value condition-value">
+                    </section>
+                     <section class="form-group condition-section" data-brand="Woolworths">
+                        <label>Woolworths Trolley Condition</label>
+                         <div class="button-grid condition-buttons">
+                            <button type="button" data-value="Good Condition">Good Condition</button>
+                            <button type="button" data-value="Needs Cleaning">Needs Cleaning</button>
+                            <button type="button" data-value="Rusty Frame">Rusty Frame</button>
+                            <button type="button" data-value="Damaged Wheel(s)">Damaged Wheel(s)</button>
+                            <button type="button" data-value="Bent Frame">Bent Frame</button>
+                            <button type="button" data-value="Broken Handle">Broken Handle</button>
+                            <button type="button" data-value="Child Seat Issue">Child Seat Issue</button>
+                            <button type="button" data-value="Other Damage">Other Damage</button>
+                        </div>
+                        <input type="hidden" name="conditions[Woolworths]" class="group-value condition-value">
+                    </section>
+                    <section class="form-group condition-section" data-brand="Aldi">
+                        <label>Aldi Trolley Condition</label>
+                         <div class="button-grid condition-buttons">
+                            <button type="button" data-value="Good Condition">Good Condition</button>
+                            <button type="button" data-value="Needs Cleaning">Needs Cleaning</button>
+                            <button type="button" data-value="Rusty Frame">Rusty Frame</button>
+                            <button type="button" data-value="Damaged Wheel(s)">Damaged Wheel(s)</button>
+                            <button type="button" data-value="Bent Frame">Bent Frame</button>
+                            <button type="button" data-value="Broken Handle">Broken Handle</button>
+                            <button type="button" data-value="Child Seat Issue">Child Seat Issue</button>
+                            <button type="button" data-value="Other Damage">Other Damage</button>
+                        </div>
+                        <input type="hidden" name="conditions[Aldi]" class="group-value condition-value">
+                    </section>
+                    <section class="form-group condition-section" data-brand="IGA">
+                        <label>IGA Trolley Condition</label>
+                         <div class="button-grid condition-buttons">
+                            <button type="button" data-value="Good Condition">Good Condition</button>
+                            <button type="button" data-value="Needs Cleaning">Needs Cleaning</button>
+                            <button type="button" data-value="Rusty Frame">Rusty Frame</button>
+                            <button type="button" data-value="Damaged Wheel(s)">Damaged Wheel(s)</button>
+                            <button type="button" data-value="Bent Frame">Bent Frame</button>
+                            <button type="button" data-value="Broken Handle">Broken Handle</button>
+                            <button type="button" data-value="Child Seat Issue">Child Seat Issue</button>
+                            <button type="button" data-value="Other Damage">Other Damage</button>
+                        </div>
+                        <input type="hidden" name="conditions[IGA]" class="group-value condition-value">
+                    </section>
+                    <section class="form-group condition-section" data-brand="Kmart">
+                        <label>Kmart Trolley Condition</label>
+                         <div class="button-grid condition-buttons">
+                            <button type="button" data-value="Good Condition">Good Condition</button>
+                            <button type="button" data-value="Needs Cleaning">Needs Cleaning</button>
+                            <button type="button" data-value="Rusty Frame">Rusty Frame</button>
+                            <button type="button" data-value="Damaged Wheel(s)">Damaged Wheel(s)</button>
+                            <button type="button" data-value="Bent Frame">Bent Frame</button>
+                            <button type="button" data-value="Broken Handle">Broken Handle</button>
+                            <button type="button" data-value="Child Seat Issue">Child Seat Issue</button>
+                            <button type="button" data-value="Other Damage">Other Damage</button>
+                        </div>
+                        <input type="hidden" name="conditions[Kmart]" class="group-value condition-value">
+                    </section>
+                    <section class="form-group condition-section" data-brand="BigW">
+                        <label>Big W Trolley Condition</label>
+                        <div class="button-grid condition-buttons">
+                            <button type="button" data-value="Good Condition">Good Condition</button>
+                            <button type="button" data-value="Needs Cleaning">Needs Cleaning</button>
+                            <button type="button" data-value="Rusty Frame">Rusty Frame</button>
+                            <button type="button" data-value="Damaged Wheel(s)">Damaged Wheel(s)</button>
+                            <button type="button" data-value="Bent Frame">Bent Frame</button>
+                            <button type="button" data-value="Broken Handle">Broken Handle</button>
+                            <button type="button" data-value="Child Seat Issue">Child Seat Issue</button>
+                            <button type="button" data-value="Other Damage">Other Damage</button>
+                        </div>
+                        <input type="hidden" name="conditions[BigW]" class="group-value condition-value">
+                    </section>
+                    <section class="form-group condition-section" data-brand="Bunnings">
+                        <label>Bunnings Trolley Condition</label>
+                         <div class="button-grid condition-buttons">
+                            <button type="button" data-value="Good Condition">Good Condition</button>
+                            <button type="button" data-value="Needs Cleaning">Needs Cleaning</button>
+                            <button type="button" data-value="Rusty Frame">Rusty Frame</button>
+                            <button type="button" data-value="Damaged Wheel(s)">Damaged Wheel(s)</button>
+                            <button type="button" data-value="Bent Frame">Bent Frame</button>
+                            <button type="button" data-value="Broken Handle">Broken Handle</button>
+                            <button type="button" data-value="Child Seat Issue">Child Seat Issue</button>
+                            <button type="button" data-value="Other Damage">Other Damage</button>
+                        </div>
+                        <input type="hidden" name="conditions[Bunnings]" class="group-value condition-value">
+                    </section>
+                    <section class="form-group condition-section" data-brand="Other">
+                        <label>Other Trolley Condition</label>
+                         <div class="button-grid condition-buttons">
+                            <button type="button" data-value="Good Condition">Good Condition</button>
+                            <button type="button" data-value="Needs Cleaning">Needs Cleaning</button>
+                            <button type="button" data-value="Rusty Frame">Rusty Frame</button>
+                            <button type="button" data-value="Damaged Wheel(s)">Damaged Wheel(s)</button>
+                            <button type="button" data-value="Bent Frame">Bent Frame</button>
+                            <button type="button" data-value="Broken Handle">Broken Handle</button>
+                            <button type="button" data-value="Child Seat Issue">Child Seat Issue</button>
+                            <button type="button" data-value="Other Damage">Other Damage</button>
+                        </div>
+                        <input type="hidden" name="conditions[Other]" class="group-value condition-value">
+                    </section>
+                     </div>
+
+                <section class="form-group">
+                    <label for="comments">Additional Comments</label>
+                    <textarea id="comments" name="comments" placeholder="Any other details..." maxlength="200"></textarea>
+                    <div id="char-counter" style="color: var(--text-color);">200 characters remaining</div>
+                </section>
+
+                <div class="button-group-actions">
+                    <button type="button" id="reset-form-btn" class="secondary">Reset</button>
+                    <button type="button" id="see-logs-btn" class="thirdly" onclick="window.location.href='view_logs.php'">See List</button>
+                </div>
+                <button type="submit" class="primary">Submit Now</button>
+            </form>
+            <div id="confirmation-message"></div>
+            <p class="disclaimer">Not affilliated with/endorsed by any shopping trolley brand.<br /><a href="/trolley/privacy.html" target="_blank">Privacy</a> &bull; <a href="/trolley/terms.html" target="_blank">Terms</a> &bull; <a href="/trolley/faq.html" target="_blank">FAQs</a> &bull; <a href="https://sandgroper.net" target="_blank">Apps</a></p>
+        </main>
+    </div>
+<script>
+    // JavaScript remains the same as the previous version
+    document.addEventListener('DOMContentLoaded', () => {
+        const trolleyForm = document.getElementById('trolley-form');
+        const resetFormBtn = document.getElementById('reset-form-btn');
+        const getLocationBtn = document.getElementById('get-location-btn');
+        const locationDisplay = document.getElementById('location-display');
+        const latInput = document.getElementById('latitude');
+        const lonInput = document.getElementById('longitude');
+        const timestampInput = document.getElementById('timestamp');
+        const confirmationMessage = document.getElementById('confirmation-message');
+        const commentsTextarea = document.getElementById('comments');
+        const charCounter = document.getElementById('char-counter');
+        const conditionSectionsContainer = document.getElementById('condition-sections-container');
+        const brandSection = document.querySelector('.brand-section');
+        const brandButtons = brandSection.querySelectorAll('.button-grid button');
+        const brandHiddenInput = brandSection.querySelector('.group-value');
+
+        const maxChars = 200; // Character limit for comments
+
+        // Update character counter
+        charCounter.textContent = `${maxChars} characters remaining`;
+        commentsTextarea.addEventListener('input', () => {
+            const remaining = maxChars - commentsTextarea.value.length;
+            charCounter.textContent = `${remaining} characters remaining`;
+            charCounter.style.color = remaining < 10 ? 'var(--error-color)' : 'var(--text-color)';
+        });
+
+        // --- Cookie functions for submission limiting (optional, reused) ---
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+            return null;
+        }
+
+        function setCookie(name, value, hours) {
+            const date = new Date();
+            date.setTime(date.getTime() + (hours * 60 * 60 * 1000));
+            const expires = `expires=${date.toUTCString()}`;
+            document.cookie = `${name}=${value};${expires};path=/;SameSite=Lax`; // Added SameSite
+        }
+
+        function checkSubmissionLimit() {
+            const submissions = getCookie('trolley_submissions'); // Unique cookie name
+            const timestamp = getCookie('trolley_first_submission');
+            const now = Date.now();
+            const twelveHours = 12 * 60 * 60 * 1000;
+
+            if (!submissions || !timestamp || (now - parseInt(timestamp) > twelveHours)) {
+                setCookie('trolley_submissions', '1', 12);
+                setCookie('trolley_first_submission', now.toString(), 12); // Store as string
+                return true;
+            } else {
+                const count = parseInt(submissions);
+                if (count < 10) { // Adjusted limit if needed
+                    setCookie('trolley_submissions', (count + 1).toString(), 12);
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        }
+        // --- End Cookie functions ---
+
+
+        // --- Location Handling ---
+        function formatTimestampForInput(date) {
+            // Format consistently, e.g., YYYY-MM-DDTHH:mm:ss
+            const pad = (n) => n < 10 ? '0' + n : n;
+            return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+        }
+
+         function formatTimestampForDisplay(date) {
+            // More user-friendly format for display
+            return date.toLocaleString('en-AU', {
+                timeZone: 'Australia/Perth', // Use appropriate timezone
+                dateStyle: 'short',
+                timeStyle: 'short',
+                hour12: true
+            });
+         }
+
+        getLocationBtn.addEventListener('click', () => {
+            const now = new Date();
+            const displayTime = formatTimestampForDisplay(now);
+            const inputTime = formatTimestampForInput(now); // Use consistent format for backend
+            timestampInput.value = inputTime; // Store consistent format
+            locationDisplay.innerHTML = `Time: ${displayTime}<br />Lat: ---, Lon: ---`;
+            locationDisplay.classList.add('visible');
+            // Clear previous coords
+            latInput.value = '';
+            lonInput.value = '';
+
+             // Clear potential error highlight
+            getLocationBtn.parentElement.classList.remove('error-group');
+            const label = getLocationBtn.parentElement.previousElementSibling;
+            if (label) label.classList.remove('error-label');
+
+
+            if (!navigator.geolocation) {
+                locationDisplay.innerHTML = `Time: ${displayTime}<br />Lat: ---, Lon: --- (Geolocation not supported)`;
+                timestampInput.value = inputTime; // Still set time
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const lat = position.coords.latitude.toFixed(6);
+                    const lon = position.coords.longitude.toFixed(6);
+                    latInput.value = lat;
+                    lonInput.value = lon;
+                    timestampInput.value = inputTime; // Ensure timestamp is set
+                    locationDisplay.innerHTML = `Time: ${displayTime}<br />Lat: ${lat}, Lon: ${lon}`;
+                },
+                (error) => {
+                    let message = 'Lat: ---, Lon: --- (';
+                    switch (error.code) {
+                        case error.PERMISSION_DENIED: message += "Permission denied)"; break;
+                        case error.POSITION_UNAVAILABLE: message += "Location unavailable)"; break;
+                        case error.TIMEOUT: message += "Request timed out)"; break;
+                        default: message += "Unknown error)"; break;
+                    }
+                    locationDisplay.innerHTML = `Time: ${displayTime}<br />${message}`;
+                    timestampInput.value = inputTime; // Still set time
+                    // Keep lat/lon empty to trigger validation later if needed
+                    latInput.value = '';
+                    lonInput.value = '';
+                },
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+            );
+        });
+
+        // --- Button Group Handling (Brands and Conditions) ---
+        function handleMultiSelectGroup(groupElement) {
+            const buttons = groupElement.querySelectorAll('.button-grid button');
+            const hiddenInput = groupElement.querySelector('.group-value');
+
+            buttons.forEach(button => {
+                button.addEventListener('click', () => {
+                    button.classList.toggle('active');
+                    updateGroupValue(groupElement);
+
+                     // If this is a brand button, toggle the corresponding condition section
+                    if (groupElement.classList.contains('brand-section')) {
+                        toggleConditionSectionVisibility(button.dataset.value, button.classList.contains('active'));
+                    }
+                     // Clear potential error highlight on interaction
+                    groupElement.classList.remove('error-group');
+                    const label = groupElement.querySelector('label');
+                    if (label) label.classList.remove('error-label');
+                });
+            });
+        }
+
+        function updateGroupValue(groupElement) {
+            const hiddenInput = groupElement.querySelector('.group-value');
+            const selectedValues = Array.from(groupElement.querySelectorAll('.button-grid button.active'))
+                .map(btn => btn.dataset.value);
+            hiddenInput.value = JSON.stringify(selectedValues); // Store as JSON array string
+        }
+
+        function toggleConditionSectionVisibility(brandValue, isActive) {
+             const conditionSection = conditionSectionsContainer.querySelector(`.condition-section[data-brand="${brandValue}"]`);
+             if (conditionSection) {
+                conditionSection.classList.toggle('visible', isActive);
+                // If hiding, deactivate and clear condition buttons within it
+                if (!isActive) {
+                    conditionSection.querySelectorAll('.button-grid button.active').forEach(btn => btn.classList.remove('active'));
+                    updateGroupValue(conditionSection); // Clear the hidden input value
+                }
+            }
+        }
+
+        // Initialize brand selection handling
+        handleMultiSelectGroup(brandSection);
+
+        // Initialize condition selection handling for all condition sections
+        conditionSectionsContainer.querySelectorAll('.condition-section').forEach(section => {
+            handleMultiSelectGroup(section);
+        });
+
+
+        // --- Form Reset ---
+        resetFormBtn.addEventListener('click', () => {
+            if (confirm("Are you sure you want to reset the form? All entered data will be lost.")) {
+                window.location.reload(); // Easiest way to ensure clean reset
+            }
+        });
+
+        function resetFormSilently() { // Alternative if reload is not desired
+             trolleyForm.reset();
+             locationDisplay.textContent = '';
+             locationDisplay.classList.remove('visible');
+             document.querySelectorAll('.button-grid button.active').forEach(btn => btn.classList.remove('active'));
+             document.querySelectorAll('.group-value').forEach(input => input.value = '');
+             document.querySelectorAll('.condition-section.visible').forEach(section => section.classList.remove('visible'));
+             confirmationMessage.style.display = 'none';
+             confirmationMessage.textContent = '';
+             // Clear all error styles
+             trolleyForm.querySelectorAll('.error-highlight').forEach(el => el.classList.remove('error-highlight'));
+             trolleyForm.querySelectorAll('.error-label').forEach(el => el.classList.remove('error-label'));
+             trolleyForm.querySelectorAll('.error-group').forEach(el => el.classList.remove('error-group'));
+             charCounter.textContent = `${maxChars} characters remaining`;
+             charCounter.style.color = 'var(--text-color)';
+        }
+
+
+        // --- Form Submission ---
+        trolleyForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            confirmationMessage.style.display = 'none';
+            confirmationMessage.textContent = '';
+            confirmationMessage.style.color = 'var(--text-color)'; // Reset color
+            confirmationMessage.style.borderColor = 'var(--border-color)';
+            confirmationMessage.style.backgroundColor = 'var(--input-bg)';
+
+
+            // --- Submission Limit Check ---
+            if (!checkSubmissionLimit()) {
+                confirmationMessage.textContent = 'Submission limit reached (10 per 12 hours). Please try again later.';
+                confirmationMessage.style.color = 'var(--error-color)';
+                confirmationMessage.style.borderColor = 'var(--error-color)';
+                confirmationMessage.style.backgroundColor = 'var(--error-bg)';
+                confirmationMessage.style.display = 'block';
+                return;
+            }
+
+
+            // --- Validation ---
+            let isValid = true;
+            // Clear previous errors
+            trolleyForm.querySelectorAll('.error-highlight').forEach(el => el.classList.remove('error-highlight'));
+            trolleyForm.querySelectorAll('.error-label').forEach(el => el.classList.remove('error-label'));
+            trolleyForm.querySelectorAll('.error-group').forEach(el => el.classList.remove('error-group'));
+
+
+            // Check location
+            if (!latInput.value || !lonInput.value || !timestampInput.value || locationDisplay.textContent.includes('---')) {
+                isValid = false;
+                const locationGroup = getLocationBtn.parentElement;
+                locationGroup.classList.add('error-group');
+                const label = locationGroup.previousElementSibling;
+                 if (label) label.classList.add('error-label');
+            }
+
+            // Check Brand selection
+            if (!brandHiddenInput.value || brandHiddenInput.value === '[]') {
+                 isValid = false;
+                 brandSection.classList.add('error-group');
+                 const label = brandSection.querySelector('label');
+                 if (label) label.classList.add('error-label');
+            }
+
+             // Check required fields general (though hidden inputs manage main data)
+            // This is more for visual indication if something failed strangely
+             trolleyForm.querySelectorAll('[required]').forEach(field => {
+                 if (!field.value.trim()) {
+                     isValid = false;
+                     // Attempt to find associated visible element or group to highlight
+                     const parentGroup = field.closest('.form-group');
+                     if (parentGroup) {
+                         parentGroup.classList.add('error-group');
+                         const label = parentGroup.querySelector('label');
+                         if (label) label.classList.add('error-label');
+                     }
+                 }
+             });
+
+
+            if (!isValid) {
+                confirmationMessage.textContent = 'Please ensure location is captured and at least one brand is selected.';
+                confirmationMessage.style.color = 'var(--error-color)';
+                confirmationMessage.style.borderColor = 'var(--error-color)';
+                confirmationMessage.style.backgroundColor = 'var(--error-bg)';
+                confirmationMessage.style.display = 'block';
+                window.scrollTo(0, 0); // Scroll to top to see messages
+                return;
+            }
+
+            // --- Prepare Data ---
+            const formData = new FormData(trolleyForm);
+            const logData = {};
+            const conditionsData = {};
+
+            formData.forEach((value, key) => {
+                if (!value) return; // Skip empty values
+
+                if (key === 'brands') {
+                    try {
+                        logData[key] = JSON.parse(value); // Parse brand JSON string
+                    } catch (e) { logData[key] = []; console.error("Error parsing brands");}
+                } else if (key.startsWith('conditions[')) {
+                    const brandMatch = key.match(/conditions\[(.*?)\]/);
+                    if (brandMatch && brandMatch[1]) {
+                        const brandName = brandMatch[1];
+                         try {
+                            const conditionValues = JSON.parse(value);
+                            if (conditionValues.length > 0) { // Only include if conditions were selected for this brand
+                                conditionsData[brandName] = conditionValues;
+                            }
+                        } catch (e) { console.error(`Error parsing conditions for ${brandName}`); }
+                    }
+                } else {
+                    logData[key] = value; // Standard fields like lat, lon, timestamp, comments
+                }
+            });
+
+            // Add the structured conditions data
+            logData.conditions = conditionsData;
+
+            // Add client submission timestamp (using display format for simplicity here)
+             logData.clientSubmissionTimestamp = formatTimestampForDisplay(new Date());
+
+            // --- Send Data ---
+            const submitButton = trolleyForm.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton.textContent;
+            submitButton.textContent = 'Submitting...';
+            submitButton.disabled = true;
+
+            try {
+                const response = await fetch('log_trolley.php', { // Updated endpoint
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(logData),
+                });
+                const result = await response.json();
+
+                if (response.ok && result.status === 'success') {
+                    confirmationMessage.textContent = 'Log submitted successfully! The form will reset shortly.';
+                    confirmationMessage.style.color = 'var(--text-color)'; // Use default colors for success
+                    confirmationMessage.style.borderColor = 'var(--border-color)';
+                    confirmationMessage.style.backgroundColor = '#103010'; // Success background
+                    confirmationMessage.style.display = 'block';
+                    setTimeout(() => {
+                        // window.location.reload(); // Option 1: Reload page
+                        resetFormSilently(); // Option 2: Reset form without reload
+                    }, 2500); // Longer delay to read message
+                } else {
+                    throw new Error(result.message || 'Could not submit log.');
+                }
+            } catch (error) {
+                console.error("Submission Error:", error);
+                confirmationMessage.textContent = `Error: ${error.message}. Could not connect or save data. Please try again.`;
+                confirmationMessage.style.color = 'var(--error-color)';
+                confirmationMessage.style.borderColor = 'var(--error-color)';
+                confirmationMessage.style.backgroundColor = 'var(--error-bg)';
+                confirmationMessage.style.display = 'block';
+            } finally {
+                submitButton.textContent = originalButtonText;
+                submitButton.disabled = false;
+                confirmationMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

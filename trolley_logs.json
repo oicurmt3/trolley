@@ -1,0 +1,65 @@
+[
+    {
+        "latitude": "-32.038275",
+        "longitude": "115.909398",
+        "timestamp": "2025-04-12T20:10:23",
+        "brands": [
+            "Woolworths"
+        ],
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "clientSubmissionTimestamp": "12/4/25, 8:10 pm",
+        "serverTimestampUTC": "2025-04-12T12:10:30+00:00",
+        "ipAddress": "45.248.78.30"
+    },
+    {
+        "latitude": "-32.017536",
+        "longitude": "115.934718",
+        "timestamp": "2025-04-17T17:34:46",
+        "brands": [
+            "Woolworths"
+        ],
+        "comments": "Ampol petrol station ",
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "clientSubmissionTimestamp": "17/4/25, 5:35 pm",
+        "serverTimestampUTC": "2025-04-17T09:35:16+00:00",
+        "ipAddress": "103.107.197.94"
+    },
+    {
+        "latitude": "-32.020444",
+        "longitude": "115.937609",
+        "timestamp": "2025-04-17T17:36:22",
+        "brands": [
+            "Coles"
+        ],
+        "comments": "Near Albany HWY ",
+        "conditions": {
+            "Coles": [
+                "Good Condition"
+            ]
+        },
+        "clientSubmissionTimestamp": "17/4/25, 5:36 pm",
+        "serverTimestampUTC": "2025-04-17T09:36:39+00:00",
+        "ipAddress": "103.107.197.94"
+    },
+    {
+        "latitude": "-32.025722",
+        "longitude": "115.942414",
+        "timestamp": "2025-04-17T17:39:12",
+        "brands": [
+            "Coles"
+        ],
+        "comments": "Beside the hwy",
+        "conditions": [],
+        "clientSubmissionTimestamp": "17/4/25, 5:39 pm",
+        "serverTimestampUTC": "2025-04-17T09:39:34+00:00",
+        "ipAddress": "103.107.197.94"
+    }
+]

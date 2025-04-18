@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ - Trolley Report</title>
+     <style>
+        /* Styles copied from index.html for consistency */
+        :root {
+            --bg-color: #1a1a1a;
+            --text-color: #e0e0e0;
+            --card-bg: #2c2c2c;
+            --border-color: #444;
+            --input-bg: #333;
+            --input-text: #e0e0e0;
+            --button-bg: #007bff;
+            --button-text: #ffffff;
+            --button-hover-bg: #0056b3;
+            --button-secondary-bg: #555;
+            --button-secondary-hover-bg: #777;
+            --error-color: #dc3545;
+            --link-color: #00aaff; /* Example link color */
+            --link-hover-color: #0077cc; /* Example link hover color */
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; }
+        body { display: flex; flex-direction: column; align-items: center; padding: 15px; background-color: var(--bg-color); color: var(--text-color); }
+        .container { width: 100%; max-width: 800px; /* Adjusted max-width for content pages */ margin: 20px auto; padding: 20px 30px 30px 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); background-color: var(--card-bg); border: 1px solid var(--border-color); }
+
+        /* Content page specific styles */
+        h1 { color: var(--text-color); margin-top: 0.5em; margin-bottom: 1em; font-size: 2em; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;}
+        p { margin-bottom: 1em; }
+        a { color: var(--link-color); text-decoration: none; }
+        a:hover { color: var(--link-hover-color); text-decoration: underline; }
+        hr { border: 0; border-top: 1px solid var(--border-color); margin: 2em 0; }
+        .back-link { display: inline-block; margin-top: 20px; padding: 10px 15px; background-color: var(--button-secondary-bg); color: var(--button-text); border-radius: 5px; text-decoration: none; transition: background-color 0.2s ease; }
+        .back-link:hover { background-color: var(--button-secondary-hover-bg); text-decoration: none; color: var(--button-text); }
+
+        /* FAQ specific styles */
+        .faq-item { margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
+        .faq-item:last-child { border-bottom: none; }
+        .faq-question { font-weight: bold; color: var(--text-color); font-size: 1.1em; margin-bottom: 0.5em; }
+        .faq-answer { margin-top: 5px; margin-left: 0; /* Removed indent for dark theme */ padding-left: 5px; border-left: 3px solid var(--button-bg); /* Add a visual indicator */ }
+
+        /* Basic responsiveness */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .container { padding: 15px; margin: 10px auto; }
+            h1 { font-size: 1.6em; }
+            .faq-question { font-size: 1.05em; }
+            .faq-answer { padding-left: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Frequently Asked Questions (FAQ)</h1>
+
+        <div class="faq-item">
+            <p class="faq-question">Q: What is the purpose of this website?</p>
+            <p class="faq-answer">A: This website allows members of the public to report the location and condition of shopping trolleys they believe have been abandoned. The goal is to create a publicly viewable log of these reports.</p>
+        </div>
+
+        <div class="faq-item">
+            <p class="faq-question">Q: Is this an official service run by the supermarkets or the local council?</p>
+            <p class="faq-answer">A: No. This is an independent, unofficial service. It is not affiliated with, endorsed by, or operated by Coles, Woolworths, Aldi, IGA, Kmart, Big W, Bunnings, any other retailer, or any local council.</p>
+        </div>
+
+        <div class="faq-item">
+            <p class="faq-question">Q: Does reporting a trolley here guarantee it will be collected?</p>
+            <p class="faq-answer">A: No. Submitting a report here simply adds it to the public log on this website. It does not automatically notify the trolley owner or collection services. For official collection, you usually need to contact the relevant retailer directly or use their specific reporting channels (like Trolley Tracker, if applicable).</p>
+        </div>
+
+        <div class="faq-item">
+            <p class="faq-question">Q: What information is collected when I make a report?</p>
+            <p class="faq-answer">A: We collect the location (latitude/longitude), timestamp, selected trolley brand(s), selected condition(s), and any comments you add. Your IP address is also logged by the server for security. Please see our <a href="privacy.html">Privacy Policy</a> for full details.</p>
+        </div>
+
+        <div class="faq-item">
+            <p class="faq-question">Q: Is the information I submit made public?</p>
+            <p class="faq-answer">A: Yes. The location, timestamp, brand(s), condition(s), and comments you submit are displayed on the public "See Logs" page. Your IP address is not displayed publicly. Do not submit any information you aren't comfortable sharing publicly.</p>
+        </div>
+
+        <div class="faq-item">
+            <p class="faq-question">Q: How accurate is the location shown on the map?</p>
+            <p class="faq-answer">A: The location accuracy depends entirely on your device's GPS signal and settings at the time you press the "Get Date/Time & Location" button. We cannot guarantee the accuracy.</p>
+        </div>
+
+         <div class="faq-item">
+            <p class="faq-question">Q: Can I remove a log I submitted?</p>
+            <p class="faq-answer">A: There is no automated way to remove logs. If you submitted a log containing sensitive personal information by mistake, please contact us via [Your Contact Method] with details of the log (e.g., approximate time and location), and we will review the request. See our <a href="privacy.html">Privacy Policy</a> for more details.</p>
+        </div>
+
+        <div class="faq-item">
+            <p class="faq-question">Q: Who do I contact if I have questions or issues?</p>
+            <p class="faq-answer">A: Please contact us via info@sandgroper.net .</p>
+        </div>
+
+        <hr>
+        <a href="index.html" class="back-link">Back to Trolley Report Form</a>
+    </div>
+</body>
+</html>

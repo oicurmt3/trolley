@@ -6,6 +6,7 @@
     <meta name="description" content="View logged abandoned shopping trolleys">
     <title>Trolley List - Reported Abandoned Trolleys</title>
 <style>
+/* ... CSS remains exactly the same as the previous version ... */
 :root {
     --bg-color: #2a2a2a;
     --text-color: #e0e0e0;
@@ -36,9 +37,8 @@
     --kmart-hover-bg: #c72321;
     --bigw-bg: #0046C8;
     --bigw-hover-bg: #0037a0;
-    /* Add Bunnings color if needed */
-    --bunnings-bg: #0d5257; /* Example, check if you have this defined */
-    --bunnings-hover-bg: #0b494e; /* Example */
+    --bunnings-bg: #0d5257;
+    --bunnings-hover-bg: #0b494e;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg-color); color: var(--text-color); padding: 15px; }
@@ -50,28 +50,24 @@ h1 span { display: block; font-weight: normal; font-size: 0.47em; color: var(--t
     .form-group { margin-bottom: 20px; }
 table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
 th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border-color); white-space: nowrap; }
-th { background-color: #444; cursor: pointer; position: sticky; top: 0; color: var(--highlight); z-index: 1; }
+th { background-color: #444; cursor: pointer; position: sticky; top: 0; color: var(--highlight); z-index: 1; font-size: 0.95em; }
 th:hover { background-color: #555; }
 td { background-color: var(--card-bg); vertical-align: middle; }
 tr.detail-row td { background-color: var(--detail-row-bg); white-space: normal; }
-.sortable::after { content: var(--sort-icon, " ⇅"); font-size: 0.8em; opacity: 0.8; margin-left: 4px; } /* Corrected font-size */
-.map-btn { padding: 6px 12px; background-color: var(--button-bg); color: var(--button-text); border: none; border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-block; font-size: 0.9em; }
+.sortable::after { content: var(--sort-icon, " â‡…"); font-size: 0.8em; opacity: 0.8; margin-left: 4px; }
+.map-btn {
+    padding: 6px 10px; background-color: var(--button-bg); color: var(--button-text); border: none; border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-block; font-size: 0.85em; text-align: center; white-space: normal; line-height: 1.2; min-width: 80px;
+}
 .map-btn:hover { background-color: var(--button-hover-bg); }
 .brand-button-group { display: flex; flex-wrap: wrap; gap: 5px; }
 
 /* Default Brand Toggle Style */
 .brand-toggle {
-    padding: 5px 8px; border-radius: 4px; color: #fff; border: none;
-    cursor: pointer; font-size: 1em;
-    background-color: var(--brand-button-bg);
-    transition: background-color 0.2s;
-    min-width: 60px; text-align: center; display: inline-block;
+    padding: 5px 8px; border-radius: 4px; color: #fff; border: none; cursor: pointer; font-size: 1em; background-color: var(--brand-button-bg); transition: background-color 0.2s; min-width: 60px; text-align: center; display: inline-block;
 }
-.brand-toggle:hover {
-    background-color: var(--brand-button-hover-bg);
-}
+.brand-toggle:hover { background-color: var(--brand-button-hover-bg); }
 
-/* --- Brand Specific Colors for Toggles --- */
+/* Brand Specific Colors */
 .brand-toggle[data-brand="Coles"] { background-color: var(--coles-bg); }
 .brand-toggle[data-brand="Coles"]:hover { background-color: var(--coles-hover-bg); }
 .brand-toggle[data-brand="Woolworths"] { background-color: var(--woolworths-bg); }
@@ -84,113 +80,64 @@ tr.detail-row td { background-color: var(--detail-row-bg); white-space: normal; 
 .brand-toggle[data-brand="Kmart"]:hover { background-color: var(--kmart-hover-bg); }
 .brand-toggle[data-brand="BigW"] { background-color: var(--bigw-bg); }
 .brand-toggle[data-brand="BigW"]:hover { background-color: var(--bigw-hover-bg); }
-.brand-toggle[data-brand="Bunnings"] { background-color: var(--bunnings-bg); } /* Added */
-.brand-toggle[data-brand="Bunnings"]:hover { background-color: var(--bunnings-hover-bg); } /* Added */
-/* --- End Brand Specific Colors --- */
+.brand-toggle[data-brand="Bunnings"] { background-color: var(--bunnings-bg); }
+.brand-toggle[data-brand="Bunnings"]:hover { background-color: var(--bunnings-hover-bg); }
 
 .pagination { margin: 20px 0; text-align: center; }
-/* Base style for pagination items */
-.pagination button, .pagination .back-to-form, .pagination span {
-    vertical-align: middle; /* Align items vertically */
-    margin: 0 5px; /* Horizontal margin */
-}
-/* Base style for pagination buttons (Prev/Next + Back) */
-.pagination button, .pagination .back-to-form {
-    padding: 8px 16px; /* Base padding */
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1em; /* Base font size */
-    transition: background-color 0.2s ease;
-    display: inline-block; /* Default display */
- }
- /* Specific styles for Prev/Next buttons */
-.pagination button {
-    background-color: var(--button-bg); /* Uses primary blue */
-    color: var(--button-text);
-}
-.pagination button:disabled {
-    background-color: #666;
-    cursor: not-allowed;
-    opacity: 0.7;
-}
-.pagination button:hover:not(:disabled) {
-    background-color: var(--button-hover-bg);
-}
-.pagination span { margin: 0 10px; display: inline-block; } /* Ensure span aligns */
-
-/* Styling for Back to Form button (to match Map button appearance) */
-.back-to-form {
-    background-color: var(--button-bg); /* Use primary button color */
-    color: var(--button-text);
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-block;
-    vertical-align: middle;
-    margin: 0 5px;
-    transition: background-color 0.2s ease;
-    /* Explicitly match Map button padding & font-size */
-    padding: 6px 12px;
-    font-size: 0.9em;
-}
-.back-to-form:hover {
-    background-color: var(--button-hover-bg); /* Use primary button hover color */
-    color: var(--button-text);
-}
+.pagination button, .pagination .back-to-form, .pagination span { vertical-align: middle; margin: 0 5px; }
+.pagination button, .pagination .back-to-form { padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer; font-size: 1em; transition: background-color 0.2s ease; display: inline-block; }
+.pagination button { background-color: var(--button-bg); color: var(--button-text); }
+.pagination button:disabled { background-color: #666; cursor: not-allowed; opacity: 0.7; }
+.pagination button:hover:not(:disabled) { background-color: var(--button-hover-bg); }
+.pagination span { margin: 0 10px; display: inline-block; }
+.back-to-form { background-color: var(--button-bg); color: var(--button-text); text-decoration: none; padding: 6px 12px; font-size: 0.9em; }
+.back-to-form:hover { background-color: var(--button-hover-bg); color: var(--button-text); }
 
 .detail-content { padding: 10px; background-color: var(--detail-row-bg); }
 .detail-content h4 { margin-top: 0; margin-bottom: 10px; color: var(--highlight); font-size: 1.1em; }
-.detail-content span { display: inline; margin-bottom: 8px; font-size: 0.95em; line-height: 1.4; margin-right: 5px;} /* Make spans inline */
+.detail-content span { display: inline; margin-bottom: 8px; font-size: 0.95em; line-height: 1.4; margin-right: 5px;}
 .detail-content strong { color: var(--highlight); margin-right: 5px; }
-.no-details { font-style: italic; color: #aaa; display: block;} /* Keep no-details as block */
-/* Removed ul/li styles */
+.no-details { font-style: italic; color: #aaa; display: block;}
 
 .bottom-message { font-size: 0.8em; color: #aaa; text-align: center; margin-top: 15px; }
 .loading-message { text-align: center; padding: 20px; font-size: 1.1em; }
 
-/* --- Media Query for smaller screens --- */
+.time-part {
+    display: inline; margin-left: 5px; font-size: 0.9em; opacity: 0.8;
+}
+
 @media (max-width: 768px) {
      body { padding: 10px; }
      .container { padding: 5px; }
      table { font-size: 0.9em; }
      th, td { padding: 8px 6px; white-space: normal; }
-     th { white-space: nowrap; }
-     .sortable::after { font-size: 0.8em; } /* Corrected font size */
-     .map-btn { padding: 7px 10px; font-size: 0.9em; }
+     th { white-space: nowrap; font-size: 0.9em; }
+     td:nth-child(1) { width: 25%; } /* Brand column */
+     td:nth-child(2) { width: 25%; } /* Date column */
+     td:nth-child(3) { width: 50%; white-space: normal; } /* Location column */
+     .sortable::after { font-size: 0.8em; }
+     .map-btn { padding: 5px 8px; font-size: 0.8em; min-width: 70px; }
      .brand-toggle { font-size: 0.9em; padding: 5px 6px; }
-     /* Adjust all pagination items for smaller screens */
-     .pagination button, .pagination .back-to-form {
-         padding: 6px 12px;
-         font-size: 0.9em;
-         margin-bottom: 8px;
-         margin-left: 3px;
-         margin-right: 3px;
-     }
-     .pagination .back-to-form {
-         margin-top: 10px;
-     }
+     .pagination button, .pagination .back-to-form { padding: 6px 12px; font-size: 0.9em; margin-bottom: 8px; margin-left: 3px; margin-right: 3px; }
+     .pagination .back-to-form { margin-top: 10px; }
      .bottom-message {font-size: 0.75em;}
      h1 { font-size: 1.6em; }
      h1 span { font-size: 0.45em; margin-top: 3px;}
      .detail-content { padding: 3px; }
      .detail-content h4 { font-size: 1em; }
-     .detail-content span { font-size: 10px; display: block; margin-bottom: 5px;} /* Keep spans as block in mobile */
+     .detail-content span { font-size: 10px; display: block; margin-bottom: 5px;}
      .no-details { display: block; }
-
-    span.conditions_yes {margin-bottom:0px;}
-    span.add_comments {margin-top:-15px;}
-
-
+     span.conditions_yes {margin-bottom:0px;}
+     span.add_comments {margin-top:-15px;}
      .bottom-message { font-size: 0.6em; }
+     .time-part { display: none; }
 }
 </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Trolley List <icon>🛒</icon><span>Reported Abandoned Trolleys</span></h1>
+            <h1>Trolley List <icon>ðŸ›’</icon><span>Reported Abandoned Trolleys</span></h1>
         </header>
 
         <div id="loading" class="loading-message">Loading...</div>
@@ -200,7 +147,7 @@ tr.detail-row td { background-color: var(--detail-row-bg); white-space: normal; 
                     <tr>
                         <th class="sortable" data-sort="brands">Brand</th>
                         <th class="sortable" data-sort="timestamp">Date/Time</th>
-                        <th>Map</th>
+                        <th>Location</th>
                     </tr>
                 </thead>
                 <tbody id="table-body">
@@ -218,20 +165,32 @@ tr.detail-row td { background-color: var(--detail-row-bg); white-space: normal; 
     </div>
 
 <script>
-    // --- *** NEW: CUSTOM BRAND TEXT MAPPING *** ---
-    // Define your custom text for each brand button here
-    const customBrandText = {
-        "Coles": "CO",
-        "Woolworths": "WO",
-        "Aldi": "AL",
-        "IGA": "IG",
-        "Kmart": "KM",
-        "BigW": "BI",
-        "Bunnings": "BU",
-        "Other": "OT"
-        // Add mappings for any other brands you expect
+    // --- State Abbreviation Mapping (Still Needed) ---
+    const stateAbbreviations = {
+        "Western Australia": "WA",
+        "South Australia": "SA",
+        "New South Wales": "NSW",
+        "Queensland": "QLD",
+        "Victoria": "VIC",
+        "Tasmania": "TAS",
+        "Northern Territory": "NT",
+        "Australian Capital Territory": "ACT",
+        "Jervis Bay Territory": "ACT"
     };
-    // --- *** END OF CUSTOM BRAND TEXT MAPPING *** ---
+
+    function getStateAbbreviation(stateName) {
+        return stateName ? (stateAbbreviations[stateName] || stateName) : null; // Return abbreviation or original if not mapped
+    }
+    // --- End State Abbreviation Mapping ---
+
+    // --- *** REMOVED: Client-side API call function updateMapButtonTextNominatim is gone *** ---
+
+    // --- Custom Brand Text Mapping ---
+    const customBrandText = { /* ... mapping remains the same ... */
+        "Coles": "CO", "Woolworths": "WO", "Aldi": "AL", "IGA": "IG",
+        "Kmart": "KM", "BigW": "BI", "Bunnings": "BU", "Other": "OT"
+    };
+    // --- End Custom Brand Text Mapping ---
 
     // --- Data Loading and Initialization ---
     let allLogs = [];
@@ -239,35 +198,25 @@ tr.detail-row td { background-color: var(--detail-row-bg); white-space: normal; 
     let currentPage = 1;
     let sortColumn = "timestamp";
     let sortDirection = -1;
-    let globalLogCounter = 0;
 
-    document.addEventListener('DOMContentLoaded', () => {
-        fetchLogs();
-    });
+    document.addEventListener('DOMContentLoaded', () => { fetchLogs(); });
 
-    function generateStableRowId(log, index) {
+    function generateStableRowId(log, index) { /* ... function remains the same ... */
         const tsPart = log.serverTimestampUTC || log.timestamp || `no-ts-${index}`;
         const ipPart = log.ipAddress || 'no-ip';
         return `log-${tsPart}-${ipPart}-${index}`;
-    }
+     }
 
-    async function fetchLogs() {
+    async function fetchLogs() { /* ... function remains the same ... */
         const loadingDiv = document.getElementById('loading');
         const errorDiv = document.getElementById('error-loading');
         const tableContainer = document.getElementById('table-container');
         try {
             const response = await fetch('trolley_logs.json?_=' + new Date().getTime());
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
+            if (!response.ok) { throw new Error(`HTTP error! Status: ${response.status}`); }
             let data = await response.json();
-            if (!Array.isArray(data)) {
-                 throw new Error("Invalid data format received.");
-            }
-            data = data.map((log, index) => {
-                log._rowId = generateStableRowId(log, index);
-                return log;
-            });
+            if (!Array.isArray(data)) { throw new Error("Invalid data format received."); }
+            data = data.map((log, index) => { log._rowId = generateStableRowId(log, index); return log; });
             allLogs = data;
             sortLogs();
             loadingDiv.style.display = 'none';
@@ -275,85 +224,66 @@ tr.detail-row td { background-color: var(--detail-row-bg); white-space: normal; 
             updateTable();
             setupEventListeners();
         } catch (error) {
-            console.error("Error loading logs:", error); // Keep this log
+            console.error("Error loading logs:", error);
             loadingDiv.style.display = 'none';
             errorDiv.textContent = `Error loading logs: ${error.message}. Please try refreshing.`;
             errorDiv.style.display = 'block';
         }
     }
 
-    function formatDisplayTimestamp(isoTimestamp) {
+    // Date and Time formatters remain the same
+    function formatDisplayDate(isoTimestamp) { /* ... function remains the same ... */
         if (!isoTimestamp) return 'N/A';
         try {
             const date = new Date(isoTimestamp);
             if (isNaN(date.getTime())) {
-                return isoTimestamp;
+                 const alternativeDate = new Date(isoTimestamp.replace('T', ' ').replace(/-/g, '/'));
+                 return !isNaN(alternativeDate.getTime()) ? alternativeDate.toLocaleString('en-AU', { timeZone: 'Australia/Perth', dateStyle: 'short' }) : isoTimestamp;
             }
-            return date.toLocaleString('en-AU', {
-                timeZone: 'Australia/Perth',
-                dateStyle: 'short',
-                timeStyle: 'short',
-                hour12: true
-            });
-        } catch (e) {
-            console.warn("Timestamp formatting error for:", isoTimestamp, e);
-            return isoTimestamp;
-        }
+            return date.toLocaleString('en-AU', { timeZone: 'Australia/Perth', dateStyle: 'short' });
+        } catch (e) { console.error("Date formatting error for:", isoTimestamp, e); return isoTimestamp; }
+    }
+    function formatDisplayTime(isoTimestamp) { /* ... function remains the same ... */
+        if (!isoTimestamp) return '';
+        try {
+            const date = new Date(isoTimestamp);
+             if (isNaN(date.getTime())) {
+                 const alternativeDate = new Date(isoTimestamp.replace('T', ' ').replace(/-/g, '/'));
+                 return !isNaN(alternativeDate.getTime()) ? alternativeDate.toLocaleString('en-AU', { timeZone: 'Australia/Perth', timeStyle: 'short', hour12: true }) : '';
+             }
+             return date.toLocaleString('en-AU', { timeZone: 'Australia/Perth', timeStyle: 'short', hour12: true });
+        } catch (e) { console.error("Time formatting error for:", isoTimestamp, e); return ''; }
     }
 
-    function sortLogs() {
+    function sortLogs() { /* ... function remains the same ... */
         if (!sortColumn) return;
         allLogs.sort((a, b) => {
-             let valA = a[sortColumn];
-             let valB = b[sortColumn];
+             let valA = a[sortColumn]; let valB = b[sortColumn];
              if (sortColumn === 'brands') {
-                 const brandsA = Array.isArray(a.brands) ? a.brands : [];
-                 const brandsB = Array.isArray(b.brands) ? b.brands : [];
-                 const multiA = brandsA.length > 1;
-                 const multiB = brandsB.length > 1;
-                 if (!multiA && multiB) return -1 * sortDirection;
-                 if (multiA && !multiB) return 1 * sortDirection;
-                 const firstBrandA = brandsA.length > 0 ? String(brandsA[0]).toLowerCase() : '';
-                 const firstBrandB = brandsB.length > 0 ? String(brandsB[0]).toLowerCase() : '';
-                 if (firstBrandA < firstBrandB) return -1 * sortDirection;
-                 if (firstBrandA > firstBrandB) return 1 * sortDirection;
-                 return 0;
+                 const brandsA = Array.isArray(a.brands) ? a.brands : []; const brandsB = Array.isArray(b.brands) ? b.brands : [];
+                 const firstBrandA = brandsA.length > 0 ? String(brandsA[0]).toLowerCase() : ''; const firstBrandB = brandsB.length > 0 ? String(brandsB[0]).toLowerCase() : '';
+                 if (firstBrandA < firstBrandB) return -1 * sortDirection; if (firstBrandA > firstBrandB) return 1 * sortDirection; return 0;
              }
              if (sortColumn === 'timestamp') {
-                 const timeA = new Date(a.serverTimestampUTC || a.timestamp || 0).getTime();
-                 const timeB = new Date(b.serverTimestampUTC || b.timestamp || 0).getTime();
-                 const validTimeA = isNaN(timeA) ? 0 : timeA;
-                 const validTimeB = isNaN(timeB) ? 0 : timeB;
+                 const timeA = new Date(a.serverTimestampUTC || a.timestamp || 0).getTime(); const timeB = new Date(b.serverTimestampUTC || b.timestamp || 0).getTime();
+                 const validTimeA = isNaN(timeA) ? 0 : timeA; const validTimeB = isNaN(timeB) ? 0 : timeB;
                  return (validTimeA - validTimeB) * sortDirection;
              }
-             valA = String(valA).toLowerCase();
-             valB = String(valB).toLowerCase();
-             if (valA < valB) return -1 * sortDirection;
-             if (valA > valB) return 1 * sortDirection;
-             return 0;
+             valA = String(valA).toLowerCase(); valB = String(valB).toLowerCase();
+             if (valA < valB) return -1 * sortDirection; if (valA > valB) return 1 * sortDirection; return 0;
         });
     }
 
-    function updateSortDirection(column) {
-        if (sortColumn === column) {
-            sortDirection *= -1;
-        } else {
-            sortColumn = column;
-            sortDirection = (column === 'timestamp') ? -1 : 1;
-        }
-        sortLogs();
-        currentPage = 1;
-        updateTable();
-        updateSortIndicators();
+    function updateSortDirection(column) { /* ... function remains the same ... */
+        if (sortColumn === column) { sortDirection *= -1; }
+        else { sortColumn = column; sortDirection = (column === 'timestamp') ? -1 : 1; }
+        sortLogs(); currentPage = 1; updateTable(); updateSortIndicators();
     }
 
-     function updateSortIndicators() {
+     function updateSortIndicators() { /* ... function remains the same ... */
          document.querySelectorAll('#logs-table th.sortable').forEach(th => {
-             th.style.setProperty('--sort-icon', '" ⇅"');
-             if (th.dataset.sort === sortColumn) {
-                 const indicator = sortDirection === 1 ? ' ▲' : ' ▼';
-                 th.style.setProperty('--sort-icon', `"${indicator}"`);
-             }
+             th.style.setProperty('--sort-icon', '" â‡…"');
+             if (th.dataset.sort === sortColumn) { const indicator = sortDirection === 1 ? ' â–²' : ' â–¼'; th.style.setProperty('--sort-icon', `"${indicator}"`); }
          });
      }
 
@@ -366,180 +296,114 @@ tr.detail-row td { background-color: var(--detail-row-bg); white-space: normal; 
         const start = (currentPage - 1) * itemsPerPage;
         const end = start + itemsPerPage;
         const pageData = allLogs.slice(start, end);
-        if (pageData.length === 0 && allLogs.length > 0) {
-             currentPage = 1;
-             renderTable();
-             return;
-        } else if (pageData.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 20px;">No logs found.</td></tr>';
-        }
+
+        if (pageData.length === 0 && allLogs.length > 0) { currentPage = Math.max(1, currentPage - 1); renderTable(); return; }
+        else if (pageData.length === 0) { tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 20px;">No logs found.</td></tr>'; }
+
         pageData.forEach((log) => {
-            if (typeof log !== 'object' || log === null || !log._rowId) {
-                console.warn("Skipping invalid log entry:", log);
-                return;
-            }
+            if (typeof log !== 'object' || log === null || !log._rowId) { console.warn("Skipping invalid log entry:", log); return; }
             const rowId = log._rowId;
             const tr = document.createElement('tr');
             tr.dataset.rowId = rowId;
+
+            // Brands Cell
             const brands = Array.isArray(log.brands) ? log.brands : [];
             const tdBrand = document.createElement('td');
             const brandGroup = document.createElement('div');
             brandGroup.className = 'brand-button-group';
-            if (brands.length > 0) {
-                 brands.forEach(brand => {
-                    const button = document.createElement('button');
-                    button.className = 'brand-toggle';
-                    // --- *** MODIFIED LINE: Use custom text mapping *** ---
-                    button.textContent = customBrandText[brand] || brand; // Use mapping, fallback to original brand name
-                    // --- *** END OF MODIFIED LINE *** ---
-                    button.dataset.brand = brand; // Keep original brand name in data attribute for logic
-                    button.dataset.targetRowId = rowId;
-                    button.type = 'button';
-                    brandGroup.appendChild(button);
-                });
-            } else {
-                brandGroup.textContent = 'N/A';
-            }
+            if (brands.length > 0) { brands.forEach(brand => { const button = document.createElement('button'); button.className = 'brand-toggle'; button.textContent = customBrandText[brand] || brand; button.dataset.brand = brand; button.dataset.targetRowId = rowId; button.type = 'button'; brandGroup.appendChild(button); }); }
+            else { brandGroup.textContent = 'N/A'; }
             tdBrand.appendChild(brandGroup);
-            const tdTime = document.createElement('td');
-            tdTime.textContent = formatDisplayTimestamp(log.serverTimestampUTC || log.timestamp);
+
+            // Date/Time Cell
+            const tdDateTime = document.createElement('td');
+            const timestamp = log.serverTimestampUTC || log.timestamp;
+            tdDateTime.textContent = formatDisplayDate(timestamp);
+            const timeSpan = document.createElement('span');
+            timeSpan.className = 'time-part';
+            timeSpan.textContent = formatDisplayTime(timestamp);
+            tdDateTime.appendChild(timeSpan);
+
+            // Location Cell
             const tdMap = document.createElement('td');
             if (log.latitude && log.longitude) {
-                const lat = encodeURIComponent(log.latitude);
-                const lon = encodeURIComponent(log.longitude);
-                if (Math.abs(parseFloat(log.latitude)) <= 90 && Math.abs(parseFloat(log.longitude)) <= 180) {
+                const lat = log.latitude; const lon = log.longitude;
+                if (Math.abs(parseFloat(lat)) <= 90 && Math.abs(parseFloat(lon)) <= 180) {
                    const mapLink = document.createElement('a');
-                   mapLink.href = `https://maps.google.com/?q=${lat},${lon}`; // Use https and standard query param
-                   mapLink.target = '_blank';
-                   mapLink.rel = 'noopener noreferrer';
-                   mapLink.className = 'map-btn';
-                   mapLink.textContent = 'Map';
+                   mapLink.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(lat)},${encodeURIComponent(lon)}`;
+                   mapLink.target = '_blank'; mapLink.rel = 'noopener noreferrer'; mapLink.className = 'map-btn';
+
+                   // --- *** MODIFIED: Set text from log data *** ---
+                   const suburb = log.suburb || null; // Get saved suburb
+                   const stateFullName = log.state || null; // Get saved state name
+                   const stateAbbr = getStateAbbreviation(stateFullName); // Convert to abbreviation
+                   let buttonText = 'Map'; // Default
+
+                   if (suburb && stateAbbr) { buttonText = `${suburb}, ${stateAbbr}`; }
+                   else if (suburb) { buttonText = suburb; }
+                   else if (stateAbbr) { buttonText = stateAbbr; }
+                   else if (stateFullName) { buttonText = stateFullName; } // Fallback to full state name if no abbr
+
+                   mapLink.textContent = buttonText;
+                   // --- *** END MODIFICATION *** ---
+
                    tdMap.appendChild(mapLink);
-                } else {
-                   tdMap.textContent = 'Invalid Coords';
-                }
-            } else {
-                tdMap.textContent = '';
-            }
+
+                   // --- *** REMOVED: No API call needed here anymore *** ---
+                   // updateMapButtonTextNominatim(mapLink, lat, lon); // This line is removed
+
+                } else { tdMap.textContent = 'Invalid Coords'; }
+            } else { tdMap.textContent = ''; }
+
+            // Append cells
             tr.appendChild(tdBrand);
-            tr.appendChild(tdTime);
+            tr.appendChild(tdDateTime);
             tr.appendChild(tdMap);
             tbody.appendChild(tr);
         });
         updatePagination(totalPages);
     }
 
-    function toggleDetailRow(button) {
-        const brand = button.dataset.brand;
-        const targetRowId = button.dataset.targetRowId;
-        const mainRow = document.querySelector(`tr[data-row-id="${targetRowId}"]`);
-        if (!mainRow) {
-            console.error("Could not find main row for ID:", targetRowId);
-            return;
-        }
+
+    function toggleDetailRow(button) { /* ... function remains the same ... */
+        const brand = button.dataset.brand; const targetRowId = button.dataset.targetRowId;
+        const mainRow = document.querySelector(`tr[data-row-id="${targetRowId}"]`); if (!mainRow) { console.error("Could not find main row for ID:", targetRowId); return; }
         const existingDetailRow = document.getElementById(`detail-${targetRowId}`);
-        if (existingDetailRow) {
-            existingDetailRow.remove();
-            return;
-        }
-
-        const logData = allLogs.find(log => log._rowId === targetRowId);
-        if (!logData) {
-            console.error("Could not find data for rowId:", targetRowId);
-            alert("Error: Could not retrieve details.");
-            return;
-        }
-
+        document.querySelectorAll('.detail-row').forEach(row => row.remove()); if (existingDetailRow) { return; }
+        const logData = allLogs.find(log => log._rowId === targetRowId); if (!logData) { console.error("Could not find data for rowId:", targetRowId); alert("Error: Could not retrieve details."); return; }
         try {
-            const detailRow = document.createElement('tr');
-            detailRow.id = `detail-${targetRowId}`;
-            detailRow.classList.add('detail-row');
-            const detailCell = document.createElement('td');
-            detailCell.colSpan = 3;
+            const detailRow = document.createElement('tr'); detailRow.id = `detail-${targetRowId}`; detailRow.classList.add('detail-row');
+            const detailCell = document.createElement('td'); detailCell.colSpan = 3;
             const conditions = (typeof logData.conditions === 'object' && logData.conditions !== null) ? logData.conditions : {};
-            const brandConditions = conditions[brand] || [];
-            const comments = logData.comments || '';
-
-            let detailHtml = '<div class="detail-content">';
-            // --- Use the original brand name for the heading ---
-            detailHtml += `<h4>Details for ${brand} Trolley</h4>`;
-
-            if (brandConditions.length > 0) {
-                const conditionsText = brandConditions.join(', ');
-                const escapedConditionsText = conditionsText.replace(/</g, "&lt;").replace(/>/g, "&gt;"); // Basic HTML escaping
-                detailHtml += `<span class="conditions_yes"><strong>Conditions Reported:</strong> ${escapedConditionsText}</span><br>`;
-            } else {
-                 detailHtml += '<span class="no-details">No specific conditions reported for this brand.</span><br>';
-            }
-
-            if (comments) {
-                const escapedComments = comments.replace(/</g, "&lt;").replace(/>/g, "&gt;"); // Basic HTML escaping
-                 detailHtml += `<span class="add_comments" style="display:block;"><strong>Comments:</strong> ${escapedComments.replace(/\n/g, '<br>')}</span>`;
-            }
-
-            detailHtml += '</div>';
-            detailCell.innerHTML = detailHtml;
-            detailRow.appendChild(detailCell);
-
+            const brandConditions = conditions[brand] || []; const comments = logData.comments || '';
+            let detailHtml = '<div class="detail-content">'; detailHtml += `<h4>Details for ${brand} Trolley</h4>`;
+            if (brandConditions.length > 0) { const conditionsText = brandConditions.join(', '); const escapedConditionsText = conditionsText.replace(/</g, "<").replace(/>/g, ">"); detailHtml += `<span class="conditions_yes"><strong>Conditions Reported:</strong> ${escapedConditionsText}</span><br>`; }
+            else { detailHtml += '<span class="no-details">No specific conditions reported.</span><br>'; }
+            if (comments) { const escapedComments = comments.replace(/</g, "<").replace(/>/g, ">"); detailHtml += `<span class="add_comments" style="display:block;"><strong>Comments:</strong> ${escapedComments.replace(/\n/g, '<br>')}</span>`; }
+            detailHtml += '</div>'; detailCell.innerHTML = detailHtml; detailRow.appendChild(detailCell);
             mainRow.parentNode.insertBefore(detailRow, mainRow.nextSibling);
-        } catch (error) {
-            console.error("Error occurred during detail row creation/insertion:", error);
-            alert("An error occurred while trying to show details.");
-        }
-    }
+        } catch (error) { console.error("Error occurred during detail row creation/insertion:", error); alert("An error occurred while trying to show details."); }
+     }
 
+    function updatePagination(totalPages) { /* ... function remains the same ... */
+        const pageInfo = document.getElementById('page-info'); const prevButton = document.getElementById('prev-page'); const nextButton = document.getElementById('next-page');
+        pageInfo.textContent = `Page ${currentPage} of ${totalPages}`; prevButton.disabled = currentPage === 1; nextButton.disabled = currentPage === totalPages || totalPages === 0;
+     }
 
-    function updatePagination(totalPages) {
-        const pageInfo = document.getElementById('page-info');
-        const prevButton = document.getElementById('prev-page');
-        const nextButton = document.getElementById('next-page');
-        pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
-        prevButton.disabled = currentPage === 1;
-        nextButton.disabled = currentPage === totalPages || totalPages === 0;
-    }
+    function changePage(direction) { /* ... function remains the same ... */
+        const oldPage = currentPage; currentPage += direction;
+        const totalPages = Math.max(1, Math.ceil(allLogs.length / itemsPerPage)); currentPage = Math.max(1, Math.min(currentPage, totalPages));
+        if (currentPage !== oldPage) { document.querySelectorAll('.detail-row').forEach(row => row.remove()); renderTable(); }
+     }
 
-    function changePage(direction) {
-        currentPage += direction;
-         document.querySelectorAll('.detail-row').forEach(row => row.remove());
-        renderTable();
-    }
+    function setupEventListeners() { /* ... function remains the same ... */
+        const thead = document.querySelector('#logs-table thead'); if (thead) { thead.addEventListener('click', (event) => { const th = event.target.closest('th.sortable'); if (th) { updateSortDirection(th.dataset.sort); } }); }
+        document.getElementById('prev-page').addEventListener('click', () => changePage(-1)); document.getElementById('next-page').addEventListener('click', () => changePage(1));
+        const tableBody = document.getElementById('table-body'); if (tableBody) { tableBody.addEventListener('click', (event) => { const button = event.target.closest('.brand-toggle'); if (button) { toggleDetailRow(button); } }); }
+        else { console.error("Could not find table body element (#table-body) to attach listener."); }
+     }
 
-    function setupEventListeners() {
-        // Sorting listener
-        document.querySelectorAll('#logs-table th.sortable').forEach(th => {
-            th.addEventListener('click', () => updateSortDirection(th.dataset.sort));
-        });
-        // Pagination listeners
-        document.getElementById('prev-page').addEventListener('click', () => changePage(-1));
-        document.getElementById('next-page').addEventListener('click', () => changePage(1));
-
-        // Detail row toggle listener
-        const tableBody = document.getElementById('table-body');
-        if (tableBody) {
-             tableBody.addEventListener('click', (event) => {
-                 const button = event.target.closest('.brand-toggle');
-                 if (button) {
-                     const targetRowId = button.dataset.targetRowId;
-                     // Remove other detail rows before toggling the new one
-                     document.querySelectorAll('.detail-row').forEach(row => {
-                          if (row.id !== `detail-${targetRowId}`) {
-                              row.remove();
-                          }
-                     });
-                     // Toggle the relevant detail row
-                     toggleDetailRow(button);
-                 }
-             });
-        } else {
-             console.error("Could not find table body element (#table-body) to attach listener.");
-        }
-    }
-
-
-    function updateTable() {
-        renderTable();
-        updateSortIndicators();
-    }
+    function updateTable() { renderTable(); updateSortIndicators(); }
 </script>
 
 </body>

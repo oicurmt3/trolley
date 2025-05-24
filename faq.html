@@ -33,6 +33,7 @@
         a { color: var(--link-color); text-decoration: none; }
         a:hover { color: var(--link-hover-color); text-decoration: underline; }
         hr { border: 0; border-top: 1px solid var(--border-color); margin: 2em 0; }
+        .warning { color: #ffcc00; /* Yellow warning color for dark theme */ font-weight: bold; }
         .back-link { display: inline-block; margin-top: 20px; padding: 10px 15px; background-color: var(--button-secondary-bg); color: var(--button-text); border-radius: 5px; text-decoration: none; transition: background-color 0.2s ease; }
         .back-link:hover { background-color: var(--button-secondary-hover-bg); text-decoration: none; color: var(--button-text); }
 
@@ -58,7 +59,7 @@
 
         <div class="faq-item">
             <p class="faq-question">Q: What is the purpose of this website?</p>
-            <p class="faq-answer">A: This website allows members of the public to report the location and condition of shopping trolleys they believe have been abandoned. The goal is to create a publicly viewable log of these reports.</p>
+            <p class="faq-answer">A: This website allows members of the public to report the location and condition of shopping trolleys they believe have been abandoned. The goal is to create a publicly viewable log and map of these reports. After submitting a report, users also have the option to generate an email pre-filled with the report details to send to the relevant trolley brand owner(s) and/or the local council (LGA) responsible for the area where the trolley was found.</p>
         </div>
 
         <div class="faq-item">
@@ -68,28 +69,39 @@
 
         <div class="faq-item">
             <p class="faq-question">Q: Does reporting a trolley here guarantee it will be collected?</p>
-            <p class="faq-answer">A: No. Submitting a report here simply adds it to the public log on this website. It does not automatically notify the trolley owner or collection services. For official collection, you usually need to contact the relevant retailer directly or use their specific reporting channels (like Trolley Tracker, if applicable).</p>
+            <p class="faq-answer">A: No. Submitting a report here adds it to the public log and map on this website. While the service provides an option to email the report details to brand owners or local councils, this does not guarantee collection. For official collection, you may still need to contact the relevant retailer directly or use their specific reporting channels (like Trolley Tracker, if applicable).</p>
         </div>
 
         <div class="faq-item">
             <p class="faq-question">Q: What information is collected when I make a report?</p>
-            <p class="faq-answer">A: We collect the location (latitude/longitude), timestamp, selected trolley brand(s), selected condition(s), and any comments you add. Your IP address is also logged by the server for security. Please see our <a href="privacy.html">Privacy Policy</a> for full details.</p>
+            <p class="faq-answer">A: We collect the location (latitude/longitude) and timestamp from your device when you click "Get Trolley Location". When you submit the report, we also collect the selected trolley brand(s), selected condition(s) for each brand, and any comments you add. Your IP address is logged by the server for security and diagnostic purposes. The system also attempts to determine the suburb, state, and Local Government Area (LGA) based on the GPS coordinates through reverse geocoding. This location information is then used to help identify the relevant LGA email address for the optional email prompt. Please see our <a href="privacy.html">Privacy Policy</a> for full details.</p>
         </div>
 
         <div class="faq-item">
             <p class="faq-question">Q: Is the information I submit made public?</p>
-            <p class="faq-answer">A: Yes. The location, timestamp, brand(s), condition(s), and comments you submit are displayed on the public "See Logs" page. Your IP address is not displayed publicly. Do not submit any information you aren't comfortable sharing publicly.</p>
+            <p class="faq-answer">A: Yes. The location (latitude/longitude), derived suburb and state, timestamp, brand(s), condition(s), and comments you submit are displayed on the public "List" page (`view_logs.php`) and "Map" pages (`map_view.html` and brand-specific maps). Your IP address is not displayed publicly. If you choose to use the email prompt feature, the report details (excluding your IP address) will be shared with the selected brand owner(s) and/or LGA. <span class="warning"><strong>IMPORTANT:</strong> The form gets your location when you click the "Get Trolley Location" button, so do not submit the form from your home or any location you aren't comfortable sharing publicly.</span></p>
         </div>
 
         <div class="faq-item">
-            <p class="faq-question">Q: How accurate is the location shown on the map?</p>
-            <p class="faq-answer">A: The location accuracy depends entirely on your device's GPS signal and settings at the time you press the "Get Date/Time & Location" button. We cannot guarantee the accuracy.</p>
+            <p class="faq-question">Q: How does the "Email This Report" feature work?</p>
+            <p class="faq-answer">A: After you successfully submit a trolley report, a modal will appear asking if you'd like to email the report. If you choose to proceed, the system will provide options to send an email to the reported trolley brand(s) and/or the relevant Local Government Area (LGA). The email will be pre-filled with the details of your report, such as location, brands, conditions, and comments. You will need to use your own email client to send the email. The accuracy of the brand or LGA email addresses is not guaranteed.</p>
+        </div>
+
+        <div class="faq-item">
+            <p class="faq-question">Q: How accurate is the location shown on the map and in the logs?</p>
+            <p class="faq-answer">A: The GPS location accuracy (latitude/longitude) depends entirely on your device's GPS signal and settings at the time you press the "Get Trolley Location" button. The suburb, state, and LGA information are determined by reverse geocoding the GPS coordinates, and its accuracy depends on the third-party geocoding service (Nominatim/OpenStreetMap). We cannot guarantee the accuracy of either the GPS or the derived location details.</p>
         </div>
 
          <div class="faq-item">
             <p class="faq-question">Q: Can I remove a log I submitted?</p>
-            <p class="faq-answer">A: There is no automated way to remove logs. If you submitted a log containing sensitive personal information by mistake, please contact us via [Your Contact Method] with details of the log (e.g., approximate time and location), and we will review the request. See our <a href="privacy.html">Privacy Policy</a> for more details.</p>
+            <p class="faq-answer">A: There is no automated way to remove logs. If you submitted a log containing sensitive personal information by mistake, please contact us via info@sandgroper.net with details of the log (e.g., approximate date, time, and location), and we will review the request. See our <a href="privacy.html">Privacy Policy</a> for more details.</p>
         </div>
+
+        <div class="faq-item">
+            <p class="faq-question">Q: Why do you limit submissions to 20 per 12 hours?</p>
+            <p class="faq-answer">A: The submission limit (tracked by cookies `trolley_submissions_v2` and `trolley_first_submission_v2`) is in place to prevent abuse and ensure fair usage of the service. This helps maintain the integrity of the data and the availability of the service for all users.</p>
+        </div>
+
 
         <div class="faq-item">
             <p class="faq-question">Q: Who do I contact if I have questions or issues?</p>

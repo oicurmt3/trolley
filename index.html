@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Log abandoned shopping trolleys">
+    <meta name="description" content="Report Abandoned Shopping Trolleys (it only take 3 taps)">
     <title>Trolley Report - Find & Report Abandoned Trolleys</title>
 <style>
     :root {
@@ -20,24 +20,41 @@
         --button-secondary-hover-bg: #777;
         --button-thirdly-bg: #097969;
         --button-thirdly-hover-bg: #555;
-        --rating-active-bg: #bf9000; /* Default active button state (blue) */
+        --rating-active-bg: #bf9000;
         --rating-active-text: #fff;
-        --rating-inactive-bg: #444; /* Default inactive button state (grey) */
+        --rating-inactive-bg: #444;
         --rating-inactive-text: #ccc;
         --error-color: #dc3545;
         --error-bg: #401010;
-        --active-border-color: #fff; /* Border for active custom buttons */
+        --active-border-color: #fff;
+
+        /* Modal styles */
+        --modal-bg: rgba(0, 0, 0, 0.7);
+        --modal-content-bg: var(--card-bg);
+        --modal-header-bg: #333;
+        --modal-button-action-bg: #28a745; /* Green for 'Yes' or 'Email Brand' */
+        --modal-button-action-hover-bg: #218838;
+        --modal-button-lga-bg: #17a2b8; /* Info Blue for LGA */
+        --modal-button-lga-hover-bg: #138496;
+        --modal-button-close-bg: var(--button-secondary-bg); /* Grey for 'No' or 'Close' */
+        --modal-button-close-hover-bg: var(--button-secondary-hover-bg);
+        --copy-button-bg: #6c757d;
+        --copy-button-hover-bg: #5a6268;
+        --modal-button-spacing: 10px;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; }
-    body { display: flex; flex-direction: column; align-items: center; padding: 5px 15px 15px 15px; background-color: var(--bg-color); color: var(--text-color); }
-    .container { width: 100%; max-width: 600px; margin: 10px auto; padding: 0px 20px 20px 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); background-color: var(--card-bg); border: 1px solid var(--border-color); }
+    body { display: flex; flex-direction: column; align-items: center; padding: 5px 5px 15px 5px; background-color: var(--bg-color); color: var(--text-color); }
+    .container { width: 100%; max-width: 600px; margin: 10px auto; padding: 0px 10px 20px 10px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); background-color: var(--card-bg); border: 1px solid var(--border-color); }
     header { text-align: center; margin-bottom: 5px; margin-top: 15px; }
     h1 { font-size: 2.0em; margin: -10px 0px 0px 0px; }
     h1 span { display: block; font-weight: normal; font-size: 0.45em; margin: -8px 0px 0px 0px; }
     h1 icon {font-weight: normal; font-size: 0.9em; margin: -8px 0px 0px 0px; }
     .form-group { margin-bottom: 20px; }
     label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.95em; }
+    p.notice {font-size: 1em;color:#fc9992;padding-bottom:2px;}
+    p.notice2 {font-size: 1em;color:#fc9992;padding-bottom:2px;}
+    span.latlon {color:#fc9992;}
     textarea {
         width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 5px; font-size: 1em; background-color: var(--input-bg); color: var(--input-text);
         min-height: 100px; resize: vertical; font-size:15px;
@@ -51,7 +68,7 @@
     button.thirdly:hover { background-color: var(--button-thirdly-hover-bg); color: var(--button-text)}
     button.full-width { width: 100%; }
     #get-location-btn {
-        background-color: #17a2b8;
+        background-color: #0f6978;
         color: #ffffff;
         border: 1px solid #117a8b;
         padding: 12px 20px;
@@ -59,7 +76,7 @@
         border-radius: 8px;
     }
     #get-location-btn:hover {
-        background-color: #138496;
+        background-color: #0d5c69;
         border-color: #0c5460;
     }
     .location-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
@@ -67,176 +84,195 @@
     #location-display { display: none; }
     #location-display.visible { display: block; }
 
-    /* Button Grid Layout (2 columns) */
     .button-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-
-    /* Default button styles within the grid (Applies to conditions & non-custom brands) */
     .button-grid button {
-        padding: 10px; /* Base padding */
-        font-size: 0.9em; text-align: center;
-        border: 0px solid var(--border-color); /* Base border */
-        background-color: var(--rating-inactive-bg); /* Default inactive (grey) */
+        padding: 10px; font-size: 0.9em; text-align: center;
+        border: 0px solid var(--border-color);
+        background-color: var(--rating-inactive-bg);
         color: var(--rating-inactive-text);
         overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-        font-weight: normal; /* Default font weight */
+        font-weight: normal;
      }
-    /* Default ACTIVE state for buttons within the grid */
     .button-grid button.active {
-        background-color: var(--rating-active-bg); /* Default active (blue) */
+        background-color: var(--rating-active-bg);
         color: var(--rating-active-text);
-        border: 0px solid var(--rating-active-bg); /* Make border match active bg */
-        padding: 10px; /* Adjust padding to account for thicker border */
+        border: 0px solid var(--rating-active-bg);
+        padding: 10px;
         font-weight: bold;
      }
 
-    /* --- Brand Specific Colors --- */
-    /* Coles */
     .button-grid button[data-value="Coles"] { background-color: #ed1c22; color: white; border-color: #ed1c22; }
-    .button-grid button[data-value="Coles"]:hover { background-color: #c8191e; border-color: #c8191e;} /* Slightly darker hover */
+    .button-grid button[data-value="Coles"]:hover { background-color: #c8191e; border-color: #c8191e;}
     .button-grid button[data-value="Coles"].active {
-        background-color: #bf9000; /* Keep background */
-        color: white; /* Keep text */
-        border: 0px solid var(--active-border-color); /* Add distinct active border */
-        padding: 10px; /* Adjust padding */
-        font-weight: bold;
+        background-color: #bf9000; color: white;
+        border: 0px solid var(--active-border-color); padding: 10px; font-weight: bold;
     }
-
-    /* Woolworths */
     .button-grid button[data-value="Woolworths"] { background-color: #54b848; color: white; border-color: #54b848; }
     .button-grid button[data-value="Woolworths"]:hover { background-color: #47a03d; border-color: #47a03d;}
     .button-grid button[data-value="Woolworths"].active {
-        background-color: #bf9000;
-        color: white;
-        border: 0px solid var(--active-border-color); /* Add distinct active border */
-        padding: 10px; /* Adjust padding */
-        font-weight: bold;
+        background-color: #bf9000; color: white;
+        border: 0px solid var(--active-border-color); padding: 10px; font-weight: bold;
     }
-
-    /* Aldi */
     .button-grid button[data-value="Aldi"] { background-color: #00005F; color: white; border-color: #00005F; }
     .button-grid button[data-value="Aldi"]:hover { background-color: #00004a; border-color: #00004a;}
     .button-grid button[data-value="Aldi"].active {
-        background-color: #bf9000;
-        color: white;
-        border: 0px solid var(--active-border-color); /* Add distinct active border */
-        padding: 10px; /* Adjust padding */
-        font-weight: bold;
+        background-color: #bf9000; color: white;
+        border: 0px solid var(--active-border-color); padding: 10px; font-weight: bold;
     }
-
-    /* IGA */
     .button-grid button[data-value="IGA"] { background-color: #D8C69D; color: #333333; border-color: #D8C69D; }
     .button-grid button[data-value="IGA"]:hover { background-color: #c2b28d; border-color: #c2b28d;}
     .button-grid button[data-value="IGA"].active {
-        background-color: #bf9000;
-        color: white;
-        border: 0px solid var(--active-border-color); /* Add distinct active border */
-        padding: 10px; /* Adjust padding */
-        font-weight: bold;
+        background-color: #bf9000; color: white;
+        border: 0px solid var(--active-border-color); padding: 10px; font-weight: bold;
     }
-
-    /* Kmart */
     .button-grid button[data-value="Kmart"] { background-color: #E92A28; color: white; border-color: #E92A28; }
     .button-grid button[data-value="Kmart"]:hover { background-color: #c72321; border-color: #c72321;}
     .button-grid button[data-value="Kmart"].active {
-        background-color: #bf9000;
-        color: white;
-        border: 0px solid var(--active-border-color);
-        padding: 10px;
-        font-weight: bold;
+        background-color: #bf9000; color: white;
+        border: 0px solid var(--active-border-color); padding: 10px; font-weight: bold;
     }
-
-    /* BigW */
     .button-grid button[data-value="BigW"] { background-color: #0046C8; color: white; border-color: #0046C8; }
     .button-grid button[data-value="BigW"]:hover { background-color: #0037a0; border-color: #0037a0;}
     .button-grid button[data-value="BigW"].active {
-        background-color: #bf9000;
-        color: white;
-        border: 0px solid var(--active-border-color); /* Add distinct active border */
-        padding: 10px; /* Adjust padding */
-        font-weight: bold;
+        background-color: #bf9000; color: white;
+        border: 0px solid var(--active-border-color); padding: 10px; font-weight: bold;
     }
-
-    /* Bunnings */
     .button-grid button[data-value="Bunnings"] { background-color: #0d5257; color: white; border-color: #0d5257; }
     .button-grid button[data-value="Bunnings"]:hover { background-color: #0b494e; border-color: #0b494e;}
     .button-grid button[data-value="Bunnings"].active {
-        background-color: #bf9000;
-        color: white;
-        border: 0px solid var(--active-border-color); /* Add distinct active border */
-        padding: 10px; /* Adjust padding */
-        font-weight: bold;
-    }    
-    
-    /* --- End Brand Specific Colors --- */
-
-    /* Ensure default styles apply to non-specified brand buttons (e.g., Bunnings, Other) */
-    /* And ensure condition buttons use default active/inactive styles */
-    .condition-section .button-grid button {
-        /* Inherits default .button-grid button styles */
+        background-color: #bf9000; color: white;
+        border: 0px solid var(--active-border-color); padding: 10px; font-weight: bold;
     }
-     .condition-section .button-grid button.active {
-        /* Inherits default .button-grid button.active styles */
-        background-color: var(--rating-active-bg); /* Explicitly set default active blue */
-        color: var(--rating-active-text);
-        border: 0px solid var(--rating-active-bg);
-        padding: 10px; /* Match padding adjustment */
-        font-weight: bold;
+
+    .condition-section .button-grid button.active {
+        background-color: var(--rating-active-bg); color: var(--rating-active-text);
+        border: 0px solid var(--rating-active-bg); padding: 10px; font-weight: bold;
      }
-
-
-    .condition-section {
-        display: none; /* Hidden by default */
-        margin-top: 15px;
-        padding-top: 15px;
-        border-top: 1px dashed var(--border-color);
-    }
-    .condition-section.visible {
-        display: block; /* Shown when brand is active */
-    }
+    .condition-section { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border-color); }
+    .condition-section.visible { display: block; }
     .condition-section label { font-size: 0.9em; margin-bottom: 8px; }
-
-    #char-counter {margin-top:2px;font-size: 0.8em;}
-
+    #char-counter {margin-top:2px;font-size: 0.8em;margin-bottom:-20px;}
     #confirmation-message { margin-top: 20px; padding: 15px; border-radius: 5px; display: none; white-space: pre-wrap; word-wrap: break-word; font-size: 0.9em; border: 1px solid var(--border-color); background-color: var(--input-bg); color: var(--input-text); }
-    .button-group-actions { display: flex; gap: 8px; }
+    .button-group-actions { display: flex; gap: 8px; margin-top:10px; }
     .button-group-actions button { flex: 1; padding: 10px; font-size: 0.9em; text-align: center; border: 0px solid var(--border-color); font-weight: bold; }
-    .disclaimer {font-size:12px;text-align:center;margin-top:50px; color:#777;}
-    .disclaimer a {color:#999;text-decoration:none;}    
-    
+    .disclaimer {font-size:12px;text-align:center;margin-top:40px; color:#777;}
+    .disclaimer a {color:#888;text-decoration:none;}
     .error-highlight { border: 1px solid var(--error-color) !important; }
     .error-label { color: var(--error-color) !important; }
     .error-group { border: 1px solid var(--error-color); padding: 5px; border-radius: 4px; }
 
-    /* Media query adjustment */
+    /* Modal Styles */
+    .modal {
+        display: none; position: fixed; z-index: 1001; left: 0; top: 0;
+        width: 100%; height: 100%; overflow: auto; background-color: var(--modal-bg);
+        padding-top: 60px;
+    }
+    .modal-content {
+        background-color: var(--modal-content-bg); margin: 5% auto; padding: 25px;
+        border: 1px solid var(--border-color); border-radius: 8px; width: 80%;
+        max-width: 550px; color: var(--text-color); position: relative;
+    }
+    .modal-header {
+        padding: 10px 15px;
+        border-bottom: 1px solid var(--border-color);
+        border-radius: 8px 8px 0 0;
+        margin: -25px -25px 15px -25px;
+        background-color: var(--modal-header-bg);
+    }
+    .modal-header h2 { margin: 0; font-size: 1.2em; text-align: center;}
+    .modal-body { padding: 0; }
+    .modal-body > p {
+        text-align: center;
+        margin-bottom: 15px;
+    }
+    .close-button {
+        color: var(--text-color); float: right; font-size: 28px; font-weight: bold;
+        position: absolute; top: 10px; right: 20px;
+    }
+    .close-button:hover, .close-button:focus { color: #bbb; text-decoration: none; cursor: pointer; }
+
+    #trolley-submission-summary-modal p { margin-bottom: 8px; font-size: 0.9em; text-align: left; }
+    #trolley-submission-summary-modal strong { color: var(--highlight); } /* Assuming you have a --highlight var */
+
+    #email-options-container-modal { margin-top: 15px; margin-bottom: 15px; } /* New container for both brand and LGA options */
+    #email-options-container-modal h3 { /* Styling for subheadings like "Brand Owners" or "Local Council" */
+        font-size: 1em;
+        color: var(--text-color);
+        margin-top: 15px;
+        margin-bottom: 5px;
+        padding-bottom: 3px;
+        border-bottom: 1px solid var(--border-color);
+    }
+    #email-options-container-modal button {
+        display: block; width: 100%;
+        color: var(--button-text);
+        padding: 10px; margin-bottom: 10px;
+        font-size: 0.95em;
+    }
+    #email-options-container-modal button.brand-email-btn { /* Specific style for brand buttons */
+        background-color: var(--modal-button-action-bg);
+    }
+    #email-options-container-modal button.brand-email-btn:hover {
+        background-color: var(--modal-button-action-hover-bg);
+    }
+    #email-options-container-modal button.lga-email-btn { /* Specific style for LGA buttons */
+        background-color: var(--modal-button-lga-bg);
+    }
+    #email-options-container-modal button.lga-email-btn:hover {
+        background-color: var(--modal-button-lga-hover-bg);
+    }
+
+
+    #manual-email-copy-area-modal { display: none; margin-top:15px; text-align:left; }
+    #manual-email-copy-area-modal h3 { font-size: 1.1em; margin-bottom:10px; color: var(--text-color); text-align: center; }
+    #manual-email-copy-area-modal p { font-size: 0.9em; margin-bottom:10px; text-align: center;}
+    #manual-email-copy-area-modal strong { color: var(--text-color); }
+    #manual-email-copy-area-modal textarea {
+        width: calc(100% - 70px);
+        padding: 8px; margin-top: 5px; margin-bottom: 10px;
+        border: 1px solid var(--border-color); border-radius: 5px; font-size: 0.9em;
+        background-color: var(--input-bg); color: var(--input-text);
+        resize: vertical; box-sizing: border-box; vertical-align: middle;
+    }
+    #manual-email-copy-area-modal .copy-button {
+        background-color: var(--copy-button-bg); color: var(--button-text);
+        padding: 8px 10px; font-size: 0.8em; margin-left: 5px; vertical-align: middle;
+    }
+    #manual-email-copy-area-modal .copy-button:hover { background-color: var(--copy-button-hover-bg); }
+    .copy-feedback { font-size: 0.8em; color: var(--modal-button-action-bg); display: inline-block; margin-left: 10px; }
+
+    .modal-actions { margin-top: 20px; text-align: right; }
+    .modal-actions button {
+        margin-left: var(--modal-button-spacing);
+        background-color: var(--modal-button-close-bg);
+        color: var(--button-text);
+    }
+    .modal-actions button:hover { background-color: var(--modal-button-close-hover-bg); }
+
+
     @media (max-width: 768px) {
         h1 span {font-size: 0.40em;}
+        p.notice {font-size: 0.6em;color:#fc9992;padding-bottom:2px;}
+        p.notice2 {font-size: 0.8em;color:#fc9992;padding-bottom:2px;}
         .disclaimer {font-size:10px;text-align:center;margin-top:10px; color:#777;}
-        .button-grid { gap: 6px; } /* Keep 2 columns, maybe adjust gap */
-        .button-grid button { font-size: 0.85em; padding: 8px; } /* Adjust padding */
-        /* Adjust padding for active buttons too */
-        .button-grid button.active {
-            padding: 8px; /* Adjusted padding for active buttons on smaller screens */
-        }
+        .button-grid { gap: 6px; }
+        .button-grid button { font-size: 0.85em; padding: 8px; }
+        .button-grid button.active { padding: 8px; }
         .button-grid button[data-value="Coles"].active,
         .button-grid button[data-value="Woolworths"].active,
         .button-grid button[data-value="Aldi"].active,
         .button-grid button[data-value="IGA"].active,
         .button-grid button[data-value="Bunnings"].active,
         .button-grid button[data-value="Kmart"].active,
-        .button-grid button[data-value="BigW"].active {
-            padding: 8px; /* Adjusted padding for active buttons on smaller screens */
-        }
-     .condition-section .button-grid button.active {
-        /* Inherits default .button-grid button.active styles */
-        background-color: var(--rating-active-bg); /* Explicitly set default active blue */
-        color: var(--rating-active-text);
-        border: 0px solid var(--rating-active-bg);
-        padding: 8px; /* Match padding adjustment */
-        font-weight: bold;
-     }
-    #char-counter {margin-top:0px;font-size: 0.6em;}
-    .disclaimer {font-size:9px;text-align:center;margin-top:40px; color:#777;}
-    .disclaimer a {color:#999;text-decoration:none;}
+        .button-grid button[data-value="BigW"].active { padding: 8px; }
+        .condition-section .button-grid button.active { padding: 8px; }
+        #char-counter {margin-top:0px;font-size: 0.6em;margin-bottom:-20px;}
+        .disclaimer {font-size:9.5px;text-align:center;margin-top:30px; color:#777;}
+        .disclaimer a {color:#888;text-decoration:none;}
+        .modal-content { width: 95%; margin-top: 10%; padding: 20px; }
+        .modal-header { margin: -20px -20px 15px -20px; }
+        #manual-email-copy-area-modal textarea { width: calc(100% - 60px); }
+        #manual-email-copy-area-modal .copy-button { padding: 8px; }
     }
 </style>
 </head>
@@ -244,14 +280,15 @@
     <div class="container">
         <header>
             <h1>Trolley Report <icon>🛒</icon><span>Find & Report Abandoned Trolleys </span></h1>
-            </header>
+        </header>
         <main>
             <form id="trolley-form">
 
                 <section class="form-group">
-                    <label for="location">Date/Time & Location*</label>
+                    <label for="location">Trolley Location*</label>
+                   <p class="notice">You must be at the same location as the trolley when reporting</p>
                     <div class="location-group">
-                        <button type="button" id="get-location-btn" class="secondary full-width">Get Date/Time & Location</button>
+                        <button type="button" id="get-location-btn" class="secondary full-width">Get Trolley Location</button>
                         <span id="location-display"></span>
                     </div>
                     <input type="hidden" id="latitude" name="latitude" required>
@@ -260,7 +297,7 @@
                 </section>
 
                 <section class="form-group brand-section required-group" data-group-name="brand">
-                    <label>Trolley Brand(s)*</label>
+                    <label>Trolley Brands*</label>
                     <div class="button-grid">
                         <button type="button" data-value="Coles">Coles</button>
                         <button type="button" data-value="Woolworths">Woolworths</button>
@@ -268,7 +305,9 @@
                         <button type="button" data-value="IGA">IGA</button>
                         <button type="button" data-value="Kmart">Kmart</button>
                         <button type="button" data-value="BigW">Big W</button>
-                        <button type="button" data-value="Bunnings">Bunnings</button> <button type="button" data-value="Other">Other</button> </div>
+                        <button type="button" data-value="Bunnings">Bunnings</button>
+                        <button type="button" data-value="Other">Other</button>
+                    </div>
                     <input type="hidden" name="brands" class="group-value">
                 </section>
 
@@ -276,135 +315,157 @@
                     <section class="form-group condition-section" data-brand="Coles">
                         <label>Coles Trolley Condition</label>
                         <div class="button-grid condition-buttons">
-                            <button type="button" data-value="Good Condition">Good Condition</button>
+                            <button type="button" data-value="Good Condition">Good</button>
                             <button type="button" data-value="Needs Cleaning">Needs Cleaning</button>
-                            <button type="button" data-value="Rusty Frame">Rusty Frame</button>
-                            <button type="button" data-value="Damaged Wheel(s)">Damaged Wheel(s)</button>
+                            <button type="button" data-value="Rusty Frame">Rusty</button>
+                            <button type="button" data-value="Damaged Wheel(s)">Damaged Wheel</button>
                             <button type="button" data-value="Bent Frame">Bent Frame</button>
                             <button type="button" data-value="Broken Handle">Broken Handle</button>
-                            <button type="button" data-value="Child Seat Issue">Child Seat Issue</button>
-                            <button type="button" data-value="Other Damage">Other Damage</button>
+                            <button type="button" data-value="Child Seat Issue">Child Seat</button>
+                            <button type="button" data-value="Other Damage">Other</button>
                         </div>
                         <input type="hidden" name="conditions[Coles]" class="group-value condition-value">
                     </section>
                      <section class="form-group condition-section" data-brand="Woolworths">
                         <label>Woolworths Trolley Condition</label>
                          <div class="button-grid condition-buttons">
-                            <button type="button" data-value="Good Condition">Good Condition</button>
+                            <button type="button" data-value="Good Condition">Good</button>
                             <button type="button" data-value="Needs Cleaning">Needs Cleaning</button>
-                            <button type="button" data-value="Rusty Frame">Rusty Frame</button>
-                            <button type="button" data-value="Damaged Wheel(s)">Damaged Wheel(s)</button>
+                            <button type="button" data-value="Rusty Frame">Rusty</button>
+                            <button type="button" data-value="Damaged Wheel(s)">Damaged Wheel</button>
                             <button type="button" data-value="Bent Frame">Bent Frame</button>
                             <button type="button" data-value="Broken Handle">Broken Handle</button>
-                            <button type="button" data-value="Child Seat Issue">Child Seat Issue</button>
-                            <button type="button" data-value="Other Damage">Other Damage</button>
+                            <button type="button" data-value="Child Seat Issue">Child Seat</button>
+                            <button type="button" data-value="Other Damage">Other</button>
                         </div>
                         <input type="hidden" name="conditions[Woolworths]" class="group-value condition-value">
                     </section>
                     <section class="form-group condition-section" data-brand="Aldi">
                         <label>Aldi Trolley Condition</label>
                          <div class="button-grid condition-buttons">
-                            <button type="button" data-value="Good Condition">Good Condition</button>
+                            <button type="button" data-value="Good Condition">Good</button>
                             <button type="button" data-value="Needs Cleaning">Needs Cleaning</button>
-                            <button type="button" data-value="Rusty Frame">Rusty Frame</button>
-                            <button type="button" data-value="Damaged Wheel(s)">Damaged Wheel(s)</button>
+                            <button type="button" data-value="Rusty Frame">Rusty</button>
+                            <button type="button" data-value="Damaged Wheel(s)">Damaged Wheel</button>
                             <button type="button" data-value="Bent Frame">Bent Frame</button>
                             <button type="button" data-value="Broken Handle">Broken Handle</button>
-                            <button type="button" data-value="Child Seat Issue">Child Seat Issue</button>
-                            <button type="button" data-value="Other Damage">Other Damage</button>
+                            <button type="button" data-value="Child Seat Issue">Child Seat</button>
+                            <button type="button" data-value="Other Damage">Other</button>
                         </div>
                         <input type="hidden" name="conditions[Aldi]" class="group-value condition-value">
                     </section>
                     <section class="form-group condition-section" data-brand="IGA">
                         <label>IGA Trolley Condition</label>
                          <div class="button-grid condition-buttons">
-                            <button type="button" data-value="Good Condition">Good Condition</button>
+                            <button type="button" data-value="Good Condition">Good</button>
                             <button type="button" data-value="Needs Cleaning">Needs Cleaning</button>
-                            <button type="button" data-value="Rusty Frame">Rusty Frame</button>
-                            <button type="button" data-value="Damaged Wheel(s)">Damaged Wheel(s)</button>
+                            <button type="button" data-value="Rusty Frame">Rusty</button>
+                            <button type="button" data-value="Damaged Wheel(s)">Damaged Wheel</button>
                             <button type="button" data-value="Bent Frame">Bent Frame</button>
                             <button type="button" data-value="Broken Handle">Broken Handle</button>
-                            <button type="button" data-value="Child Seat Issue">Child Seat Issue</button>
-                            <button type="button" data-value="Other Damage">Other Damage</button>
+                            <button type="button" data-value="Child Seat Issue">Child Seat</button>
+                            <button type="button" data-value="Other Damage">Other</button>
                         </div>
                         <input type="hidden" name="conditions[IGA]" class="group-value condition-value">
                     </section>
                     <section class="form-group condition-section" data-brand="Kmart">
                         <label>Kmart Trolley Condition</label>
                          <div class="button-grid condition-buttons">
-                            <button type="button" data-value="Good Condition">Good Condition</button>
+                            <button type="button" data-value="Good Condition">Good</button>
                             <button type="button" data-value="Needs Cleaning">Needs Cleaning</button>
-                            <button type="button" data-value="Rusty Frame">Rusty Frame</button>
-                            <button type="button" data-value="Damaged Wheel(s)">Damaged Wheel(s)</button>
+                            <button type="button" data-value="Rusty Frame">Rusty</button>
+                            <button type="button" data-value="Damaged Wheel(s)">Damaged Wheel</button>
                             <button type="button" data-value="Bent Frame">Bent Frame</button>
                             <button type="button" data-value="Broken Handle">Broken Handle</button>
-                            <button type="button" data-value="Child Seat Issue">Child Seat Issue</button>
-                            <button type="button" data-value="Other Damage">Other Damage</button>
+                            <button type="button" data-value="Child Seat Issue">Child Seat</button>
+                            <button type="button" data-value="Other Damage">Other</button>
                         </div>
                         <input type="hidden" name="conditions[Kmart]" class="group-value condition-value">
                     </section>
                     <section class="form-group condition-section" data-brand="BigW">
                         <label>Big W Trolley Condition</label>
                         <div class="button-grid condition-buttons">
-                            <button type="button" data-value="Good Condition">Good Condition</button>
+                            <button type="button" data-value="Good Condition">Good</button>
                             <button type="button" data-value="Needs Cleaning">Needs Cleaning</button>
-                            <button type="button" data-value="Rusty Frame">Rusty Frame</button>
-                            <button type="button" data-value="Damaged Wheel(s)">Damaged Wheel(s)</button>
+                            <button type="button" data-value="Rusty Frame">Rusty</button>
+                            <button type="button" data-value="Damaged Wheel(s)">Damaged Wheel</button>
                             <button type="button" data-value="Bent Frame">Bent Frame</button>
                             <button type="button" data-value="Broken Handle">Broken Handle</button>
-                            <button type="button" data-value="Child Seat Issue">Child Seat Issue</button>
-                            <button type="button" data-value="Other Damage">Other Damage</button>
+                            <button type="button" data-value="Child Seat Issue">Child Seat</button>
+                            <button type="button" data-value="Other Damage">Other</button>
                         </div>
                         <input type="hidden" name="conditions[BigW]" class="group-value condition-value">
                     </section>
                     <section class="form-group condition-section" data-brand="Bunnings">
                         <label>Bunnings Trolley Condition</label>
                          <div class="button-grid condition-buttons">
-                            <button type="button" data-value="Good Condition">Good Condition</button>
+                            <button type="button" data-value="Good Condition">Good</button>
                             <button type="button" data-value="Needs Cleaning">Needs Cleaning</button>
-                            <button type="button" data-value="Rusty Frame">Rusty Frame</button>
-                            <button type="button" data-value="Damaged Wheel(s)">Damaged Wheel(s)</button>
+                            <button type="button" data-value="Rusty Frame">Rusty</button>
+                            <button type="button" data-value="Damaged Wheel(s)">Damaged Wheel</button>
                             <button type="button" data-value="Bent Frame">Bent Frame</button>
                             <button type="button" data-value="Broken Handle">Broken Handle</button>
-                            <button type="button" data-value="Child Seat Issue">Child Seat Issue</button>
-                            <button type="button" data-value="Other Damage">Other Damage</button>
+                            <button type="button" data-value="Child Seat Issue">Child Seat</button>
+                            <button type="button" data-value="Other Damage">Other</button>
                         </div>
                         <input type="hidden" name="conditions[Bunnings]" class="group-value condition-value">
                     </section>
                     <section class="form-group condition-section" data-brand="Other">
                         <label>Other Trolley Condition</label>
                          <div class="button-grid condition-buttons">
-                            <button type="button" data-value="Good Condition">Good Condition</button>
+                            <button type="button" data-value="Good Condition">Good</button>
                             <button type="button" data-value="Needs Cleaning">Needs Cleaning</button>
-                            <button type="button" data-value="Rusty Frame">Rusty Frame</button>
-                            <button type="button" data-value="Damaged Wheel(s)">Damaged Wheel(s)</button>
+                            <button type="button" data-value="Rusty Frame">Rusty</button>
+                            <button type="button" data-value="Damaged Wheel(s)">Damaged Wheel</button>
                             <button type="button" data-value="Bent Frame">Bent Frame</button>
                             <button type="button" data-value="Broken Handle">Broken Handle</button>
-                            <button type="button" data-value="Child Seat Issue">Child Seat Issue</button>
-                            <button type="button" data-value="Other Damage">Other Damage</button>
+                            <button type="button" data-value="Child Seat Issue">Child Seat</button>
+                            <button type="button" data-value="Other Damage">Other</button>
                         </div>
                         <input type="hidden" name="conditions[Other]" class="group-value condition-value">
                     </section>
-                     </div>
+                </div>
 
-                <section class="form-group">
+                <section class="form-group fg-comments">
                     <label for="comments">Additional Comments</label>
                     <textarea id="comments" name="comments" placeholder="Any other details..." maxlength="200"></textarea>
                     <div id="char-counter" style="color: var(--text-color);">200 characters remaining</div>
                 </section>
-
+                <button type="submit" class="primary">Submit Now</button>
                 <div class="button-group-actions">
                     <button type="button" id="reset-form-btn" class="secondary">Reset</button>
-                    <button type="button" id="see-logs-btn" class="thirdly" onclick="window.location.href='view_logs.php'">See List</button>
+                    <button type="button" class="thirdly" onclick="window.location.href='view_logs.php'">List</button>
+                    <button type="button" class="thirdly" onclick="window.location.href='map_view.html'">Map</button>
                 </div>
-                <button type="submit" class="primary">Submit Now</button>
+
             </form>
             <div id="confirmation-message"></div>
-            <p class="disclaimer">Not affilliated with/endorsed by any shopping trolley brand.<br /><a href="/trolley/privacy.html" target="_blank">Privacy</a> &bull; <a href="/trolley/terms.html" target="_blank">Terms</a> &bull; <a href="/trolley/faq.html" target="_blank">FAQs</a> &bull; <a href="https://sandgroper.net" target="_blank">Apps</a></p>
+
+            <div id="trolley-email-prompt-modal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Email This Report?</h2>
+                        <span class="close-button" id="close-trolley-email-modal">×</span>
+                    </div>
+                    <div class="modal-body">
+                        <p>Would you like to email this report to the owner(s) and/or local council?</p>
+                        <div id="trolley-submission-summary-modal" style="margin-bottom: 15px; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); padding: 10px 0;">
+                            </div>
+                        <div id="email-options-container-modal">
+                            </div>
+                        <div id="manual-email-copy-area-modal">
+                            </div>
+                    </div>
+                    <div class="modal-actions">
+                        <button id="email-prompt-action-btn">No, Thanks / All Done</button>
+                    </div>
+                </div>
+            </div>
+
+            <p class="disclaimer">Not affilliated with/endorsed by any shopping brand or LGA.<br /><a href="/trolley/privacy.html" target="_blank">Privacy</a> • <a href="/trolley/terms.html" target="_blank">Terms</a> • <a href="/trolley/faq.html" target="_blank">FAQs</a> • <a href="https://sandgroper.net" target="_blank">Apps</a></p>
         </main>
     </div>
 <script>
-    // JavaScript remains the same as the previous version
     document.addEventListener('DOMContentLoaded', () => {
         const trolleyForm = document.getElementById('trolley-form');
         const resetFormBtn = document.getElementById('reset-form-btn');
@@ -418,20 +479,35 @@
         const charCounter = document.getElementById('char-counter');
         const conditionSectionsContainer = document.getElementById('condition-sections-container');
         const brandSection = document.querySelector('.brand-section');
-        const brandButtons = brandSection.querySelectorAll('.button-grid button');
         const brandHiddenInput = brandSection.querySelector('.group-value');
+        const maxChars = 200;
 
-        const maxChars = 200; // Character limit for comments
+        const emailPromptModal = document.getElementById('trolley-email-prompt-modal');
+        const closeModalButton = document.getElementById('close-trolley-email-modal');
+        const emailPromptActionBtn = document.getElementById('email-prompt-action-btn');
+        const submissionSummaryModalDiv = document.getElementById('trolley-submission-summary-modal');
+        // Renamed and will contain sub-divs or headers for Brand/LGA options
+        const emailOptionsContainerModalDiv = document.getElementById('email-options-container-modal');
+        const manualEmailCopyAreaModalDiv = document.getElementById('manual-email-copy-area-modal');
 
-        // Update character counter
+        const brandEmailAddresses = {
+            "Coles": "DomainAdmin@coles.com.au;coles.customer.care@coles.com.au",
+            "Woolworths": "CloudTech-Ops@woolworths.com.au;info@trolleytracker.com.au;mail@bigw.com.au;support@woolworths.com.au",
+            "Aldi": "deborah.coburn@aldi.com.au;dataprotection@aldi.com.au;info@aldi.com.au;support@aldi.com.au;infor@aldi.com.au",
+            "IGA": "hostmaster@metcash.com;ask@igashop.com.au;privacy@metcash.com;recruitment@aldi.com.au;info@iga.com.au;support@iga.com.au",
+            "Kmart": "Kmart.ITNetworkServices@kmart.com.au;info@kmart.com.au;info@wesfarmers.com.au;support@kmart.com.au",
+            "BigW": "CloudTech-Ops@woolworths.com.au;info@bigw.com.au;support@bigw.com.au;mail@bigw.com.au;hoax@bigw.com.au;privacy@woolworths.com.au",
+            "Bunnings": "cyberops@bunnings.com.au;info@wesfarmers.com.au;customersupport@bunnings.com.au;support@bunnings.com.au;info@bunnings.com.au",
+            "Other": "" // No direct email for "Other" brands
+        };
+
         charCounter.textContent = `${maxChars} characters remaining`;
         commentsTextarea.addEventListener('input', () => {
             const remaining = maxChars - commentsTextarea.value.length;
             charCounter.textContent = `${remaining} characters remaining`;
-            charCounter.style.color = remaining < 10 ? 'var(--error-color)' : 'var(--text-color)';
+            charCounter.style.color = remaining < 20 ? 'var(--error-color)' : 'var(--text-color)';
         });
 
-        // --- Cookie functions for submission limiting (optional, reused) ---
         function getCookie(name) {
             const value = `; ${document.cookie}`;
             const parts = value.split(`; ${name}=`);
@@ -443,80 +519,63 @@
             const date = new Date();
             date.setTime(date.getTime() + (hours * 60 * 60 * 1000));
             const expires = `expires=${date.toUTCString()}`;
-            document.cookie = `${name}=${value};${expires};path=/;SameSite=Lax`; // Added SameSite
+            document.cookie = `${name}=${value};${expires};path=/;SameSite=Lax`;
         }
 
         function checkSubmissionLimit() {
-            const submissions = getCookie('trolley_submissions'); // Unique cookie name
-            const timestamp = getCookie('trolley_first_submission');
+            const submissions = getCookie('trolley_submissions_v2');
+            const timestamp = getCookie('trolley_first_submission_v2');
             const now = Date.now();
             const twelveHours = 12 * 60 * 60 * 1000;
 
             if (!submissions || !timestamp || (now - parseInt(timestamp) > twelveHours)) {
-                setCookie('trolley_submissions', '1', 12);
-                setCookie('trolley_first_submission', now.toString(), 12); // Store as string
+                setCookie('trolley_submissions_v2', '1', 12);
+                setCookie('trolley_first_submission_v2', now.toString(), 12);
                 return true;
             } else {
                 const count = parseInt(submissions);
-                if (count < 10) { // Adjusted limit if needed
-                    setCookie('trolley_submissions', (count + 1).toString(), 12);
+                if (count < 20) { // Allow 20 submissions (increased from 10 for testing, revert if needed)
+                    setCookie('trolley_submissions_v2', (count + 1).toString(), 12);
                     return true;
                 } else {
                     return false;
                 }
             }
         }
-        // --- End Cookie functions ---
 
-
-        // --- Location Handling ---
         function formatTimestampForInput(date) {
-            // Format consistently, e.g., YYYY-MM-DDTHH:mm:ss
             const pad = (n) => n < 10 ? '0' + n : n;
             return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
         }
 
          function formatTimestampForDisplay(date) {
-            // More user-friendly format for display
             return date.toLocaleString('en-AU', {
-                timeZone: 'Australia/Perth', // Use appropriate timezone
-                dateStyle: 'short',
-                timeStyle: 'short',
-                hour12: true
+                timeZone: 'Australia/Perth', dateStyle: 'short', timeStyle: 'short', hour12: true
             });
          }
 
         getLocationBtn.addEventListener('click', () => {
             const now = new Date();
             const displayTime = formatTimestampForDisplay(now);
-            const inputTime = formatTimestampForInput(now); // Use consistent format for backend
-            timestampInput.value = inputTime; // Store consistent format
-            locationDisplay.innerHTML = `Time: ${displayTime}<br />Lat: ---, Lon: ---`;
+            const inputTime = formatTimestampForInput(now);
+            timestampInput.value = inputTime;
+            locationDisplay.innerHTML = `Date/Time: ${displayTime}<br />Lat: ---, Lon: --- (Acquiring...)`;
             locationDisplay.classList.add('visible');
-            // Clear previous coords
-            latInput.value = '';
-            lonInput.value = '';
-
-             // Clear potential error highlight
+            latInput.value = ''; lonInput.value = '';
             getLocationBtn.parentElement.classList.remove('error-group');
             const label = getLocationBtn.parentElement.previousElementSibling;
             if (label) label.classList.remove('error-label');
 
-
             if (!navigator.geolocation) {
-                locationDisplay.innerHTML = `Time: ${displayTime}<br />Lat: ---, Lon: --- (Geolocation not supported)`;
-                timestampInput.value = inputTime; // Still set time
+                locationDisplay.innerHTML = `Date/Time: ${displayTime}<br />Lat: ---, Lon: --- (Geolocation not supported)`;
                 return;
             }
-
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     const lat = position.coords.latitude.toFixed(6);
                     const lon = position.coords.longitude.toFixed(6);
-                    latInput.value = lat;
-                    lonInput.value = lon;
-                    timestampInput.value = inputTime; // Ensure timestamp is set
-                    locationDisplay.innerHTML = `Time: ${displayTime}<br />Lat: ${lat}, Lon: ${lon}`;
+                    latInput.value = lat; lonInput.value = lon;
+                    locationDisplay.innerHTML = `Date/Time: ${displayTime}<br />Lat: <span class="latlon">${lat}</span>, Lon: <span class="latlon">${lon}</span>`;
                 },
                 (error) => {
                     let message = 'Lat: ---, Lon: --- (';
@@ -526,32 +585,22 @@
                         case error.TIMEOUT: message += "Request timed out)"; break;
                         default: message += "Unknown error)"; break;
                     }
-                    locationDisplay.innerHTML = `Time: ${displayTime}<br />${message}`;
-                    timestampInput.value = inputTime; // Still set time
-                    // Keep lat/lon empty to trigger validation later if needed
-                    latInput.value = '';
-                    lonInput.value = '';
+                    locationDisplay.innerHTML = `Date/Time: ${displayTime}<br />${message}`;
                 },
                 { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
             );
         });
 
-        // --- Button Group Handling (Brands and Conditions) ---
         function handleMultiSelectGroup(groupElement) {
             const buttons = groupElement.querySelectorAll('.button-grid button');
-            const hiddenInput = groupElement.querySelector('.group-value');
-
             buttons.forEach(button => {
                 button.addEventListener('click', () => {
                     button.classList.toggle('active');
                     updateGroupValue(groupElement);
-
-                     // If this is a brand button, toggle the corresponding condition section
                     if (groupElement.classList.contains('brand-section')) {
                         toggleConditionSectionVisibility(button.dataset.value, button.classList.contains('active'));
                     }
-                     // Clear potential error highlight on interaction
-                    groupElement.classList.remove('error-group');
+                    groupElement.classList.remove('error-group'); // Clear error on interaction
                     const label = groupElement.querySelector('label');
                     if (label) label.classList.remove('error-label');
                 });
@@ -562,68 +611,62 @@
             const hiddenInput = groupElement.querySelector('.group-value');
             const selectedValues = Array.from(groupElement.querySelectorAll('.button-grid button.active'))
                 .map(btn => btn.dataset.value);
-            hiddenInput.value = JSON.stringify(selectedValues); // Store as JSON array string
+            hiddenInput.value = JSON.stringify(selectedValues);
         }
 
         function toggleConditionSectionVisibility(brandValue, isActive) {
              const conditionSection = conditionSectionsContainer.querySelector(`.condition-section[data-brand="${brandValue}"]`);
              if (conditionSection) {
                 conditionSection.classList.toggle('visible', isActive);
-                // If hiding, deactivate and clear condition buttons within it
-                if (!isActive) {
+                if (!isActive) { // If de-selecting brand, clear its conditions
                     conditionSection.querySelectorAll('.button-grid button.active').forEach(btn => btn.classList.remove('active'));
-                    updateGroupValue(conditionSection); // Clear the hidden input value
+                    updateGroupValue(conditionSection); // Update the hidden input for conditions
                 }
             }
         }
 
-        // Initialize brand selection handling
         handleMultiSelectGroup(brandSection);
-
-        // Initialize condition selection handling for all condition sections
         conditionSectionsContainer.querySelectorAll('.condition-section').forEach(section => {
             handleMultiSelectGroup(section);
         });
 
-
-        // --- Form Reset ---
         resetFormBtn.addEventListener('click', () => {
-            if (confirm("Are you sure you want to reset the form? All entered data will be lost.")) {
-                window.location.reload(); // Easiest way to ensure clean reset
+            if (confirm("Are you sure you want to reset the form? Any unsaved data will be lost.")) {
+                resetPage();
             }
         });
 
-        function resetFormSilently() { // Alternative if reload is not desired
-             trolleyForm.reset();
-             locationDisplay.textContent = '';
-             locationDisplay.classList.remove('visible');
-             document.querySelectorAll('.button-grid button.active').forEach(btn => btn.classList.remove('active'));
-             document.querySelectorAll('.group-value').forEach(input => input.value = '');
-             document.querySelectorAll('.condition-section.visible').forEach(section => section.classList.remove('visible'));
-             confirmationMessage.style.display = 'none';
-             confirmationMessage.textContent = '';
-             // Clear all error styles
-             trolleyForm.querySelectorAll('.error-highlight').forEach(el => el.classList.remove('error-highlight'));
-             trolleyForm.querySelectorAll('.error-label').forEach(el => el.classList.remove('error-label'));
-             trolleyForm.querySelectorAll('.error-group').forEach(el => el.classList.remove('error-group'));
-             charCounter.textContent = `${maxChars} characters remaining`;
-             charCounter.style.color = 'var(--text-color)';
+        function resetPage() {
+            localStorage.removeItem('pendingTrolleyEmailSubmission');
+            // trolleyForm.reset(); // Standard form reset
+            // locationDisplay.textContent = '';
+            // locationDisplay.classList.remove('visible');
+            // latInput.value = '';
+            // lonInput.value = '';
+            // timestampInput.value = '';
+            // commentsTextarea.value = '';
+            // charCounter.textContent = `${maxChars} characters remaining`;
+            // charCounter.style.color = 'var(--text-color)';
+            // trolleyForm.querySelectorAll('.button-grid button.active').forEach(btn => btn.classList.remove('active'));
+            // trolleyForm.querySelectorAll('.condition-section.visible').forEach(sec => sec.classList.remove('visible'));
+            // updateGroupValue(brandSection); // Clear brands hidden input
+            // conditionSectionsContainer.querySelectorAll('.condition-section').forEach(section => updateGroupValue(section)); // Clear all conditions hidden inputs
+            // confirmationMessage.style.display = 'none';
+            // confirmationMessage.textContent = '';
+            // trolleyForm.querySelectorAll('.error-highlight, .error-label, .error-group').forEach(el => {
+            //     el.classList.remove('error-highlight', 'error-label', 'error-group');
+            // });
+            window.location.reload(); // Simplest way to ensure a clean state
         }
 
 
-        // --- Form Submission ---
         trolleyForm.addEventListener('submit', async (event) => {
             event.preventDefault();
             confirmationMessage.style.display = 'none';
             confirmationMessage.textContent = '';
-            confirmationMessage.style.color = 'var(--text-color)'; // Reset color
-            confirmationMessage.style.borderColor = 'var(--border-color)';
-            confirmationMessage.style.backgroundColor = 'var(--input-bg)';
 
-
-            // --- Submission Limit Check ---
             if (!checkSubmissionLimit()) {
-                confirmationMessage.textContent = 'Submission limit reached (10 per 12 hours). Please try again later.';
+                confirmationMessage.textContent = 'Submission limit reached (20 per 12 hours). Please try again later.';
                 confirmationMessage.style.color = 'var(--error-color)';
                 confirmationMessage.style.borderColor = 'var(--error-color)';
                 confirmationMessage.style.backgroundColor = 'var(--error-bg)';
@@ -631,25 +674,22 @@
                 return;
             }
 
-
-            // --- Validation ---
             let isValid = true;
             // Clear previous errors
-            trolleyForm.querySelectorAll('.error-highlight').forEach(el => el.classList.remove('error-highlight'));
-            trolleyForm.querySelectorAll('.error-label').forEach(el => el.classList.remove('error-label'));
-            trolleyForm.querySelectorAll('.error-group').forEach(el => el.classList.remove('error-group'));
+            trolleyForm.querySelectorAll('.error-highlight, .error-label, .error-group').forEach(el => {
+                el.classList.remove('error-highlight', 'error-label', 'error-group');
+            });
 
-
-            // Check location
-            if (!latInput.value || !lonInput.value || !timestampInput.value || locationDisplay.textContent.includes('---')) {
+            // Validate location
+            if (!latInput.value || !lonInput.value || !timestampInput.value || locationDisplay.textContent.includes('---') || locationDisplay.textContent.includes('(Acquiring...)')) {
                 isValid = false;
                 const locationGroup = getLocationBtn.parentElement;
                 locationGroup.classList.add('error-group');
-                const label = locationGroup.previousElementSibling;
+                const label = locationGroup.previousElementSibling; // Get the <label>
                  if (label) label.classList.add('error-label');
             }
 
-            // Check Brand selection
+            // Validate brand selection
             if (!brandHiddenInput.value || brandHiddenInput.value === '[]') {
                  isValid = false;
                  brandSection.classList.add('error-group');
@@ -657,108 +697,509 @@
                  if (label) label.classList.add('error-label');
             }
 
-             // Check required fields general (though hidden inputs manage main data)
-            // This is more for visual indication if something failed strangely
-             trolleyForm.querySelectorAll('[required]').forEach(field => {
-                 if (!field.value.trim()) {
+            // Generic required field check (though most are handled by button groups or location logic)
+            trolleyForm.querySelectorAll('[required]').forEach(field => {
+                 // Only check non-hidden inputs that are empty. Hidden ones are validated by their specific logic (location, brand)
+                 if (field.type !== "hidden" && !field.value.trim()) {
                      isValid = false;
-                     // Attempt to find associated visible element or group to highlight
                      const parentGroup = field.closest('.form-group');
                      if (parentGroup) {
                          parentGroup.classList.add('error-group');
                          const label = parentGroup.querySelector('label');
                          if (label) label.classList.add('error-label');
+                     } else { // Fallback if not in a .form-group
+                         field.classList.add('error-highlight');
+                          const labelForField = trolleyForm.querySelector(`label[for="${field.id}"]`);
+                          if (labelForField) labelForField.classList.add('error-label');
                      }
                  }
              });
 
 
             if (!isValid) {
-                confirmationMessage.textContent = 'Please ensure location is captured and at least one brand is selected.';
+                confirmationMessage.textContent = 'Please ensure location is captured and at least one brand is selected. Check fields marked in red.';
                 confirmationMessage.style.color = 'var(--error-color)';
                 confirmationMessage.style.borderColor = 'var(--error-color)';
                 confirmationMessage.style.backgroundColor = 'var(--error-bg)';
                 confirmationMessage.style.display = 'block';
-                window.scrollTo(0, 0); // Scroll to top to see messages
+                window.scrollTo(0, 0); // Scroll to top to see message
                 return;
             }
 
-            // --- Prepare Data ---
             const formData = new FormData(trolleyForm);
-            const logData = {};
-            const conditionsData = {};
+            let clientLogData = {};
+            const conditionsData = {}; // To hold structured conditions
 
             formData.forEach((value, key) => {
-                if (!value) return; // Skip empty values
+                if (!value) return; // Skip empty values early
 
                 if (key === 'brands') {
-                    try {
-                        logData[key] = JSON.parse(value); // Parse brand JSON string
-                    } catch (e) { logData[key] = []; console.error("Error parsing brands");}
+                    try { clientLogData[key] = JSON.parse(value); } catch (e) { clientLogData[key] = []; }
                 } else if (key.startsWith('conditions[')) {
                     const brandMatch = key.match(/conditions\[(.*?)\]/);
                     if (brandMatch && brandMatch[1]) {
                         const brandName = brandMatch[1];
                          try {
                             const conditionValues = JSON.parse(value);
-                            if (conditionValues.length > 0) { // Only include if conditions were selected for this brand
+                            if (conditionValues.length > 0) { // Only add if there are conditions
                                 conditionsData[brandName] = conditionValues;
                             }
-                        } catch (e) { console.error(`Error parsing conditions for ${brandName}`); }
+                        } catch (e) { /* ignore malformed JSON for conditions */ }
                     }
                 } else {
-                    logData[key] = value; // Standard fields like lat, lon, timestamp, comments
+                    clientLogData[key] = value;
                 }
             });
+            // Add the structured conditions to the main log data
+            if (Object.keys(conditionsData).length > 0) {
+                clientLogData.conditions = conditionsData;
+            }
 
-            // Add the structured conditions data
-            logData.conditions = conditionsData;
 
-            // Add client submission timestamp (using display format for simplicity here)
-             logData.clientSubmissionTimestamp = formatTimestampForDisplay(new Date());
-
-            // --- Send Data ---
             const submitButton = trolleyForm.querySelector('button[type="submit"]');
             const originalButtonText = submitButton.textContent;
             submitButton.textContent = 'Submitting...';
             submitButton.disabled = true;
 
             try {
-                const response = await fetch('log_trolley.php', { // Updated endpoint
+                const response = await fetch('log_trolley.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(logData),
+                    body: JSON.stringify(clientLogData),
                 });
                 const result = await response.json();
+                console.log("DEBUG: AJAX Response from log_trolley.php:", result);
 
-                if (response.ok && result.status === 'success') {
-                    confirmationMessage.textContent = 'Log submitted successfully! The form will reset shortly.';
-                    confirmationMessage.style.color = 'var(--text-color)'; // Use default colors for success
+                if (response.ok && result.status === 'success' && result.logData) {
+                    confirmationMessage.textContent = 'Log submitted successfully! Preparing email options...';
+                    confirmationMessage.style.color = 'var(--text-color)'; // Success color
                     confirmationMessage.style.borderColor = 'var(--border-color)';
-                    confirmationMessage.style.backgroundColor = '#103010'; // Success background
+                    confirmationMessage.style.backgroundColor = '#103010'; // Dark green success
                     confirmationMessage.style.display = 'block';
+
+                    const serverEnrichedLogData = result.logData;
+                    console.log("DEBUG: Data being stored in localStorage for email (from server response):", serverEnrichedLogData);
+                    localStorage.setItem('pendingTrolleyEmailSubmission', JSON.stringify(serverEnrichedLogData));
+
+                    // Short delay before reload to allow user to see success message
                     setTimeout(() => {
-                        // window.location.reload(); // Option 1: Reload page
-                        resetFormSilently(); // Option 2: Reset form without reload
-                    }, 2500); // Longer delay to read message
+                        window.location.reload(); // This will trigger the localStorage check on page load
+                    }, 1500); // 1.5 seconds
+
                 } else {
-                    throw new Error(result.message || 'Could not submit log.');
+                    let errMsg = 'Could not submit log.';
+                    if(result && result.message) errMsg = result.message;
+                    // More specific check if logData is missing but status was success
+                    if(result && result.status === 'success' && !result.logData) {
+                        errMsg = "Log saved, but server did not return full details for email prompt. Please check logs manually if needed.";
+                        console.error("DEBUG: Server indicated success but logData was missing in response:", result);
+                    } else if (result) {
+                        console.error("DEBUG: Log submission issue or server did not return expected logData:", result);
+                    }
+                    throw new Error(errMsg);
                 }
             } catch (error) {
-                console.error("Submission Error:", error);
-                confirmationMessage.textContent = `Error: ${error.message}. Could not connect or save data. Please try again.`;
+                console.error("DEBUG: Submission Error Object:", error);
+                confirmationMessage.textContent = `Error: ${error.message}. Data not saved. Please try again.`;
                 confirmationMessage.style.color = 'var(--error-color)';
                 confirmationMessage.style.borderColor = 'var(--error-color)';
                 confirmationMessage.style.backgroundColor = 'var(--error-bg)';
                 confirmationMessage.style.display = 'block';
+                localStorage.removeItem('pendingTrolleyEmailSubmission'); // Important: Clear if submission process failed
             } finally {
                 submitButton.textContent = originalButtonText;
-                submitButton.disabled = false;
-                confirmationMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                submitButton.disabled = false; // Re-enable the button
+                // Scroll to the confirmation message if it's displayed
+                if (confirmationMessage.style.display === 'block') {
+                    confirmationMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
             }
         });
+
+        function getDayWithSuffix(day) {
+            if (day > 3 && day < 21) return day + 'th';
+            switch (day % 10) {
+                case 1: return day + "st";
+                case 2: return day + "nd";
+                case 3: return day + "rd";
+                default: return day + "th";
+            }
+        }
+
+        function parseTimestampToDateObj(timestampString) {
+            if (!timestampString || typeof timestampString !== 'string') {
+                console.warn("parseTimestampToDateObj: Invalid timestampString received", timestampString);
+                return null;
+            }
+            // Primarily expect ISO 8601 format (YYYY-MM-DDTHH:MM:SS) which is what client sends and server may also use (ATOM is compatible)
+            let dateObj = new Date(timestampString);
+            if (!isNaN(dateObj.getTime())) {
+                return dateObj;
+            }
+            // Fallback for "DD/MM/YYYY, H:MM AM/PM" (less likely for serverTimestampUTC but good for robustness)
+            const parts = timestampString.match(/(\d{1,2})\/(\d{1,2})\/(\d{2,4}),\s*(\d{1,2}):(\d{2})\s*(am|pm)/i);
+            if (parts) {
+                const day = parseInt(parts[1], 10);
+                const month = parseInt(parts[2], 10) - 1; // JS months are 0-indexed
+                let year = parseInt(parts[3], 10);
+                if (year < 100) year += 2000; // Handle 2-digit years
+                let hour = parseInt(parts[4], 10);
+                const minute = parseInt(parts[5], 10);
+                const period = parts[6].toLowerCase();
+
+                if (period === 'pm' && hour !== 12) hour += 12;
+                else if (period === 'am' && hour === 12) hour = 0; // Midnight case
+
+                dateObj = new Date(year, month, day, hour, minute);
+                return isNaN(dateObj.getTime()) ? null : dateObj;
+            }
+            console.warn('Could not parse timestamp with known formats:', timestampString);
+            return null;
+        }
+
+        function formatDateForEmail(timestampToParse, forSubject = false) {
+            // Prioritize serverTimestampUTC if available and valid, otherwise use client's timestamp
+            let effectiveTimestamp = timestampToParse; // Assume timestampToParse is the one to use (e.g., submissionData.timestamp)
+            // If submissionData also contains serverTimestampUTC, you might prefer it:
+            // if (submissionData && submissionData.serverTimestampUTC) {
+            //     effectiveTimestamp = submissionData.serverTimestampUTC;
+            // }
+
+            const dateObj = parseTimestampToDateObj(effectiveTimestamp);
+
+            if (!dateObj) {
+                 console.warn("formatDateForEmail: Failed to parse timestamp:", effectiveTimestamp);
+                 // Fallback to returning the original string if parsing fails
+                 return effectiveTimestamp || (forSubject ? '[Date Not Provided]' : '[Date and Time Not Provided]');
+            }
+
+            // Using local time representation for email display is generally preferred for user readability.
+            // The dateObj created from an ISO string (like YYYY-MM-DDTHH:MM:SS or ATOM) will be in the client's local timezone.
+            const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+            const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+            const dayName = weekdays[dateObj.getDay()];
+            const dayNum = getDayWithSuffix(dateObj.getDate());
+            const monthName = months[dateObj.getMonth()];
+            const yearNum = dateObj.getFullYear();
+
+            if (forSubject) {
+                return `${dayName} ${dayNum} ${monthName} ${yearNum}`;
+            }
+
+            let displayHour = dateObj.getHours();
+            const period = displayHour >= 12 ? 'PM' : 'AM';
+            displayHour = displayHour % 12;
+            displayHour = displayHour ? displayHour : 12; // Convert 0 to 12 for 12 AM/PM
+            const minute = String(dateObj.getMinutes()).padStart(2, '0');
+
+            // Indicate timezone if it was parsed from a UTC string (e.g., serverTimestampUTC)
+            // This is a simple check; robust timezone detection is complex.
+            const tzIndicator = (effectiveTimestamp && (effectiveTimestamp.includes("Z") || effectiveTimestamp.includes("+00:00"))) ? " (UTC)" : " (Local Time)";
+
+            return `${dayName} ${dayNum} ${monthName} ${yearNum} at ${displayHour}:${minute} ${period}${tzIndicator}`;
+        }
+
+        function generateTrolleyEmailBody(entityName, submissionData, entityType = "Brand") { // entityType can be "Brand" or "LGA"
+            const suburb = submissionData.suburb || '[Suburb Not Available]';
+            const state = submissionData.state || '[State Not Available]';
+            let locationString = `${suburb}, ${state}`;
+            if (suburb === '[Suburb Not Available]' && state === '[State Not Available]') {
+                locationString = '[Location Not Available]';
+            } else if (suburb === '[Suburb Not Available]') {
+                locationString = state;
+            } else if (state === '[State Not Available]') {
+                locationString = suburb;
+            }
+
+            let trolleyBrandInfo = "";
+            if (submissionData.brands && submissionData.brands.length > 0) {
+                trolleyBrandInfo = submissionData.brands.join(', ');
+            } else {
+                trolleyBrandInfo = "[Brand Not Specified]";
+            }
+
+            let body = `Dear ${entityName || (entityType === "LGA" ? 'Council' : 'Team')},\n\n`;
+            body += `I would like to report an abandoned trolley in ${locationString}.`;
+            if (entityType === "LGA" && submissionData.brands && submissionData.brands.length > 0) {
+                 body += ` The trolley appears to belong to: ${trolleyBrandInfo}.`;
+            } else if (entityType === "Brand") {
+                body = `Dear ${entityName || 'Brand'} Team,\n\nI would like to report an abandoned ${entityName} trolley in ${locationString}.`;
+            }
+
+
+            body += `\n\nDetails:`;
+            body += `\n• Brand(s): ${trolleyBrandInfo}`;
+            // Use submissionData.timestamp (original client timestamp) for 'Reported on' for user consistency
+            body += `\n• Reported: ${formatDateForEmail(submissionData.timestamp, false)}`; // Client's local time preferred for "Reported on"
+            body += `\n• Approx. Location (Lat, Lon): ${submissionData.latitude}, ${submissionData.longitude}`;
+            body += `\n• Map Link: https://www.google.com/maps?q=${submissionData.latitude},${submissionData.longitude}`; // Corrected Google Maps link
+             if (submissionData.suburb && submissionData.state) {
+                 body += `\n• Address Details: Near ${submissionData.suburb}, ${submissionData.state}`;
+                 if (submissionData.lgaName && entityType !== "LGA") { // Add LGA info if known and not emailing the LGA itself
+                    body += ` (LGA: ${submissionData.lgaName})`;
+                 }
+             }
+
+            // Conditions: Check for the specific brand if emailing a brand, or list all if emailing LGA
+            let conditionsListed = false;
+            if (submissionData.conditions) {
+                if (entityType === "Brand" && submissionData.conditions[entityName] && submissionData.conditions[entityName].length > 0) {
+                    const conditionsList = submissionData.conditions[entityName]
+                                             .map(c => typeof c === 'string' ? c : (c.text || 'Unknown condition'))
+                                             .join(', ');
+                    body += `\n• Condition of ${entityName} trolley: ${conditionsList}`;
+                    conditionsListed = true;
+                } else if (entityType === "LGA") { // For LGA, list conditions for all reported brands
+                    let allConditionsString = "";
+                    for (const brand of submissionData.brands) {
+                        if (submissionData.conditions[brand] && submissionData.conditions[brand].length > 0) {
+                            const conditionsList = submissionData.conditions[brand].join(', ');
+                            allConditionsString += `\n  - ${brand}: ${conditionsList}`;
+                        }
+                    }
+                    if (allConditionsString) {
+                        body += `\n• Reported Condition(s): ${allConditionsString}`;
+                        conditionsListed = true;
+                    }
+                }
+            }
+
+            if (!conditionsListed) {
+                 body += `\n• Condition: Not specified or assumed Good.`;
+            }
+
+
+            if (submissionData.comments) {
+                body += `\n\nComments:\n${submissionData.comments}`;
+            }
+            body += `\n\nThank you for your attention to this matter.`;
+            body += `\n\nRegards,\nA concerned community member`;
+            body += `\n\n\n--- Report generated by TrolleyReport (sandgroper.net/trolley) ---`;
+            body += `\n--- See a map of abandoned trolleys at https://sandgroper.net/trolley/map_view.html ---`;
+            return body;
+        }
+
+
+        function displayTrolleyEmailPrompt(submissionData) {
+            if (!submissionData || !emailPromptModal) return;
+            console.log("DEBUG (displayTrolleyEmailPrompt): Data received:", submissionData);
+
+            const modalTitle = emailPromptModal.querySelector('.modal-header h2');
+            const modalPara = emailPromptModal.querySelector('.modal-body > p');
+
+            if(modalTitle) modalTitle.textContent = "Email This Report?";
+            if(modalPara) modalPara.innerHTML = "Would you like to email this report to the trolley owner(s) and/or the local council?";
+
+            submissionSummaryModalDiv.innerHTML = `
+                <p><strong>Date:</strong> ${formatDateForEmail(submissionData.timestamp, false)}</p>
+                <p><strong>GPS:</strong> Lat: ${submissionData.latitude}, Lon: ${submissionData.longitude}</p>
+                ${submissionData.suburb && submissionData.state ? `<p><strong>Location:</strong> ${submissionData.suburb}, ${submissionData.state}</p>` : '<p><strong>Approx. Area:</strong> Suburb/State not determined.</p>'}
+                ${submissionData.lgaName ? `<p><strong>LGA:</strong> ${submissionData.lgaName}</p>` : ''}
+                ${submissionData.comments ? `<p><strong>Comment:</strong> ${submissionData.comments.length > 70 ? submissionData.comments.substring(0, 70) + '...' : submissionData.comments}</p>` : ''}
+            `;
+            submissionSummaryModalDiv.style.display = 'block';
+
+            emailOptionsContainerModalDiv.innerHTML = ''; // Clear previous options
+            manualEmailCopyAreaModalDiv.style.display = 'none';
+            manualEmailCopyAreaModalDiv.innerHTML = '';
+            emailOptionsContainerModalDiv.style.display = 'block';
+
+            const selectedBrands = submissionData.brands || [];
+            let hasEmailableBrand = false;
+
+            // --- Brand Email Options ---
+            if (selectedBrands.length > 0) {
+                const brandHeader = document.createElement('h3');
+                brandHeader.textContent = "Trolley Owner(s)";
+                emailOptionsContainerModalDiv.appendChild(brandHeader);
+
+                selectedBrands.forEach(brand => {
+                    if (brandEmailAddresses[brand]) {
+                        hasEmailableBrand = true;
+                        const emailButton = document.createElement('button');
+                        emailButton.textContent = `Email ${brand}`;
+                        emailButton.type = 'button';
+                        emailButton.className = 'brand-email-btn'; // Class for styling
+                        emailButton.onclick = () => {
+                            const dateForSubject = formatDateForEmail(submissionData.timestamp, true);
+                            const suburbForSubject = submissionData.suburb || '[Suburb]';
+                            const subject = `Abandoned ${brand} Trolley report - ${dateForSubject} in ${suburbForSubject}`;
+                            const body = generateTrolleyEmailBody(brand, submissionData, "Brand");
+                            const mailtoLink = `mailto:${brandEmailAddresses[brand]}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+                            window.location.href = mailtoLink;
+                            showManualCopyUI(brand, brandEmailAddresses[brand], subject, body, "Brand");
+                            if(modalTitle) modalTitle.textContent = `Email for ${brand}`;
+                            if(modalPara) modalPara.innerHTML = `If your email app didn't open, copy the details below. You can then choose another recipient or click "All Done".`;
+                            emailPromptActionBtn.textContent = "All Done";
+                        };
+                        emailOptionsContainerModalDiv.appendChild(emailButton);
+                    } else if (brand === "Other") {
+                        const otherInfo = document.createElement('p');
+                        otherInfo.innerHTML = `For <strong>Other</strong> trolleys, please contact your local council or the store directly if known.`;
+                        otherInfo.style.fontSize = "0.9em";
+                        otherInfo.style.marginTop = "5px";
+                        emailOptionsContainerModalDiv.appendChild(otherInfo);
+                    }
+                });
+            }
+
+
+            // --- LGA Email Option ---
+            if (submissionData.lgaName && submissionData.lgaEmail) {
+                const lgaHeader = document.createElement('h3');
+                lgaHeader.textContent = "Local Council (LGA)";
+                emailOptionsContainerModalDiv.appendChild(lgaHeader);
+
+                const lgaEmailButton = document.createElement('button');
+                lgaEmailButton.textContent = `Email ${submissionData.lgaName}`;
+                lgaEmailButton.type = 'button';
+                lgaEmailButton.className = 'lga-email-btn'; // Class for styling
+                lgaEmailButton.onclick = () => {
+                    const dateForSubject = formatDateForEmail(submissionData.timestamp, true);
+                    const suburbForSubject = submissionData.suburb || '[Suburb]';
+                    // Make subject slightly different for LGA
+                    const subject = `Report of Abandoned Trolley(s) - ${dateForSubject} in ${suburbForSubject}`;
+                    const body = generateTrolleyEmailBody(submissionData.lgaName, submissionData, "LGA");
+                    const mailtoLink = `mailto:${submissionData.lgaEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+                    window.location.href = mailtoLink;
+                    showManualCopyUI(submissionData.lgaName, submissionData.lgaEmail, subject, body, "LGA");
+                     if(modalTitle) modalTitle.textContent = `Email for ${submissionData.lgaName}`;
+                    if(modalPara) modalPara.innerHTML = `If your email app didn't open, copy the details below. You can then choose another recipient or click "All Done".`;
+                    emailPromptActionBtn.textContent = "All Done";
+                };
+                emailOptionsContainerModalDiv.appendChild(lgaEmailButton);
+                hasEmailableBrand = true; // Consider LGA as an emailable option for the purpose of the "No, thanks" button text
+            } else if (submissionData.suburb && (!submissionData.lgaName || !submissionData.lgaEmail)) {
+                // If suburb is known but LGA email is not, provide info.
+                const lgaHeader = document.createElement('h3');
+                lgaHeader.textContent = "Local Council (LGA)";
+                emailOptionsContainerModalDiv.appendChild(lgaHeader);
+                const noLgaEmailInfo = document.createElement('p');
+                noLgaEmailInfo.innerHTML = `LGA contact details for <strong>${submissionData.suburb}</strong> are not currently in our system. You may need to look them up manually.`;
+                noLgaEmailInfo.style.fontSize = "0.9em";
+                noLgaEmailInfo.style.marginTop = "5px";
+                emailOptionsContainerModalDiv.appendChild(noLgaEmailInfo);
+            }
+
+
+            // Adjust "No, thanks" button text based on available options
+            if (!hasEmailableBrand && selectedBrands.length === 0) { // No brands, no LGA
+                 emailOptionsContainerModalDiv.innerHTML += `<p>No email contacts available for this report. Click "Done" to finish.</p>`;
+                 emailPromptActionBtn.textContent = "Done";
+            } else if (!hasEmailableBrand && selectedBrands.length > 0 && selectedBrands.includes("Other") && selectedBrands.length === 1 && !submissionData.lgaEmail) {
+                 // Only "Other" brand and no LGA email
+                 emailOptionsContainerModalDiv.innerHTML += `<p>For <strong>Other</strong> trolleys, please contact the store or council directly. No automated email option available.`;
+                 emailPromptActionBtn.textContent = "Done";
+            } else {
+                 emailPromptActionBtn.textContent = "No, Thanks / All Done";
+            }
+
+            emailPromptModal.style.display = 'block';
+             if (confirmationMessage.style.display === 'block') {
+                 emailPromptModal.scrollIntoView({ behavior: 'smooth', block: 'center' });
+             }
+        }
+
+        function showManualCopyUI(entityName, emailAddress, subject, body, entityType = "Brand") {
+            manualEmailCopyAreaModalDiv.innerHTML = `
+                <h3>Email Details for ${entityName} (${entityType})</h3>
+                <p>To: <strong>${emailAddress}</strong></p>
+                <div>
+                    <strong>Subject:</strong> <button type="button" class="copy-button" id="copy-subject-btn-modal">Copy</button> <span id="subject-copy-feedback-modal" class="copy-feedback"></span>
+                    <textarea id="email-subject-textarea-modal" rows="2" readonly>${subject}</textarea>
+                </div>
+                <div>
+                    <strong>Body:</strong> <button type="button" class="copy-button" id="copy-body-btn-modal">Copy</button> <span id="body-copy-feedback-modal" class="copy-feedback"></span>
+                    <textarea id="email-body-textarea-modal" rows="8" readonly>${body}</textarea>
+                </div>`;
+            manualEmailCopyAreaModalDiv.style.display = 'block';
+
+            document.getElementById('copy-subject-btn-modal').onclick = () => copyToClipboard(subject, 'subject-copy-feedback-modal');
+            document.getElementById('copy-body-btn-modal').onclick = () => copyToClipboard(body, 'body-copy-feedback-modal');
+        }
+
+
+        function copyToClipboard(textToCopy, feedbackElementId) {
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const feedbackEl = document.getElementById(feedbackElementId);
+                if (feedbackEl) {
+                    feedbackEl.textContent = 'Copied!';
+                    setTimeout(() => { feedbackEl.textContent = ''; }, 2000);
+                }
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                const feedbackEl = document.getElementById(feedbackElementId);
+                if (feedbackEl) feedbackEl.textContent = 'Copy failed';
+            });
+        }
+
+        function handleModalMainAction() {
+            localStorage.removeItem('pendingTrolleyEmailSubmission');
+            emailPromptModal.style.display = 'none';
+
+            // Reset modal content for next time
+            const modalTitle = emailPromptModal.querySelector('.modal-header h2');
+            const modalPara = emailPromptModal.querySelector('.modal-body > p');
+            if(modalTitle) modalTitle.textContent = "Email This Report?"; // Generic title
+            if(modalPara) modalPara.innerHTML = "Would you like to email this report to the owner(s) and/or local council?"; // Generic para
+            submissionSummaryModalDiv.innerHTML = '';
+            emailOptionsContainerModalDiv.innerHTML = '';
+            manualEmailCopyAreaModalDiv.innerHTML = '';
+            manualEmailCopyAreaModalDiv.style.display = 'none';
+            emailPromptActionBtn.textContent = "No, Thanks / All Done"; // Default button text
+
+            // Only reload if the main confirmation message indicates successful submission that triggered this flow
+             if (confirmationMessage.textContent.includes("Log submitted successfully!")) {
+                 // resetPage(); // Called to ensure form is fully reset.
+                 // No longer resetting the page here, it's done after submission success & storing to localStorage
+             }
+        }
+
+        closeModalButton.addEventListener('click', handleModalMainAction);
+        emailPromptActionBtn.addEventListener('click', handleModalMainAction);
+
+        window.addEventListener('click', (event) => {
+            if (event.target == emailPromptModal) {
+                handleModalMainAction();
+            }
+        });
+
+        // This runs once the page is loaded and ready
+        const pendingSubmissionJSON = localStorage.getItem('pendingTrolleyEmailSubmission');
+        if (pendingSubmissionJSON) {
+            try {
+                const pendingSubmissionData = JSON.parse(pendingSubmissionJSON);
+                console.log("DEBUG (DOMContentLoaded): Data retrieved from localStorage FOR EMAIL PROMPT:", pendingSubmissionData);
+
+                // Check for essential data for the email prompt
+                if (!pendingSubmissionData.latitude || !pendingSubmissionData.longitude || !pendingSubmissionData.timestamp || !pendingSubmissionData.brands) {
+                    console.warn("DEBUG (DOMContentLoaded): Essential data missing from localStorage, clearing and aborting email prompt.", pendingSubmissionData);
+                    localStorage.removeItem('pendingTrolleyEmailSubmission');
+                    return; // Abort if critical data is missing
+                }
+
+                console.log(`DEBUG (DOMContentLoaded): Suburb: '${pendingSubmissionData.suburb}', State: '${pendingSubmissionData.state}', LGA Name: '${pendingSubmissionData.lgaName}', LGA Email: '${pendingSubmissionData.lgaEmail}'`);
+
+                // Display the prompt.
+                // Small timeout to ensure DOM is fully ready and any success messages from submission are briefly visible.
+                setTimeout(() => {
+                    // Clear any previous general confirmation messages (like submission errors) before showing email prompt
+                    if (confirmationMessage.style.display === 'block' && !confirmationMessage.textContent.includes("Log submitted successfully!")) {
+                        confirmationMessage.style.display = 'none';
+                        confirmationMessage.textContent = '';
+                    }
+                    displayTrolleyEmailPrompt(pendingSubmissionData);
+                }, 100); // 100ms delay
+
+            } catch (e) {
+                console.error('Error parsing pending trolley submission from local storage:', e);
+                localStorage.removeItem('pendingTrolleyEmailSubmission'); // Clear corrupted item
+            }
+        }
     });
 </script>
-
 </body>
 </html>

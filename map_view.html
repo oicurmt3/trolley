@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trolley Map - Reported Abandoned Trolleys</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+
+    <style>
+        /* Styles adapted from your existing files */
+        :root {
+            --bg-color: #1a1a1a;
+            --text-color: #e0e0e0;
+            --card-bg: #2c2c2c; /* For container background */
+            --border-color: #444;
+            --button-bg: #007bff; /* Default primary button */
+            --button-secondary-bg: #555;
+            --button-secondary-hover-bg: #777;
+            --button-text: #ffffff;
+            --rating-inactive-bg: #444;
+            --rating-inactive-text: #ccc;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body {
+            height: 100%; /* Ensure full height */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex; /* Use flexbox for centering */
+            flex-direction: column; /* Stack children vertically */
+            align-items: center; /* Center horizontally */
+            padding: 5px;
+         }
+         .container {
+             width: 100%;
+             min-width: 100%;
+             max-width: 95%; /* Adjust as needed */
+             margin: 5px auto;
+             padding: 10px; /* Slightly more padding */
+             border-radius: 8px;
+             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+             background-color: var(--card-bg);
+             border: 1px solid var(--border-color);
+             display: flex; /* Use flexbox for internal layout */
+             flex-direction: column;
+             flex-grow: 1; /* Allow container to take available space */
+         }
+         h1 {
+             color: var(--text-color);
+             margin-top: 0; /* Remove default margin */
+             margin-bottom: 15px;
+             font-size: 1.8em;
+             text-align: center;
+             border-bottom: 1px solid var(--border-color);
+             padding-bottom: 10px;
+         }
+
+        #map {
+            width: 100%;
+            /* height: 450px; */ /* Let flexbox control height */
+            flex-grow: 1; /* Allow map to take available vertical space */
+            border-radius: 5px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 15px; /* Space below map */
+        }
+
+        /* Styles for Brand Links Section */
+        .brand-links-container {
+            margin-top: 5px; /* Reduced margin */
+            padding-top: 5px;
+            border-top: 1px dashed var(--border-color);
+            text-align: center;
+        }
+        .brand-links-container h2 {
+             font-size: 1.1em;
+             color: var(--text-color);
+             margin-bottom: 10px; /* Increased space */
+             font-weight: normal;
+        }
+        .brand-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            padding: 0;
+            list-style: none;
+        }
+        .brand-link-button {
+            display: inline-block;
+            padding: 5px 10px;
+            font-size: 0.9em;
+            text-align: center;
+            border-radius: 5px;
+            border: 1px solid transparent;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            min-width: 100px;
+            color: var(--button-text);
+        }
+        /* Brand Specific Colors for Links */
+        .brand-link-button.brand-coles { background-color: #ed1c22; color: white; border-color: #ed1c22; }
+        .brand-link-button.brand-coles:hover { background-color: #c8191e; border-color: #c8191e;}
+        .brand-link-button.brand-woolworths { background-color: #54b848; color: white; border-color: #54b848; }
+        .brand-link-button.brand-woolworths:hover { background-color: #47a03d; border-color: #47a03d;}
+        .brand-link-button.brand-aldi { background-color: #00005F; color: white; border-color: #00005F; }
+        .brand-link-button.brand-aldi:hover { background-color: #00004a; border-color: #00004a;}
+        .brand-link-button.brand-iga { background-color: #D8C69D; color: #333333; border-color: #D8C69D; }
+        .brand-link-button.brand-iga:hover { background-color: #c2b28d; border-color: #c2b28d;}
+        .brand-link-button.brand-kmart { background-color: #E92A28; color: white; border-color: #E92A28; }
+        .brand-link-button.brand-kmart:hover { background-color: #c72321; border-color: #c72321;}
+        .brand-link-button.brand-bigw { background-color: #0046C8; color: white; border-color: #0046C8; }
+        .brand-link-button.brand-bigw:hover { background-color: #0037a0; border-color: #0037a0;}
+        .brand-link-button.brand-bunnings { background-color: #0d5257; color: white; border-color: #0d5257; }
+        .brand-link-button.brand-bunnings:hover { background-color: #0b494e; border-color: #0b494e;}
+        .brand-link-button.brand-other { background-color: var(--rating-inactive-bg); color: var(--rating-inactive-text); border-color: var(--border-color);}
+        .brand-link-button.brand-other:hover { background-color: var(--button-secondary-bg); border-color: var(--button-secondary-bg);}
+        /* End Brand Specific Colors */
+
+        /* Back Link Styles */
+        .back-link-container {
+            text-align: center;
+            margin-top: 20px; /* Reduced margin */
+            padding-top: 15px;
+            border-top: 1px dashed var(--border-color);
+            flex-shrink: 0; /* Prevent shrinking */
+        }
+        .back-link {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: var(--button-bg);
+            color: var(--button-text);
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+            margin: 5px; /* Use margin for spacing */
+        }
+        .back-link:hover {
+            background-color: var(--button-secondary-hover-bg);
+            text-decoration: none;
+            color: var(--button-text);
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+             body { padding: 1px; } /* Adjust padding for smaller screens */
+             .container { padding: 5px; max-width: 100%; }
+             h1 { font-size: 1.5em; }
+             #map { min-height: 350px; } /* Ensure minimum height */
+             .brand-link-button { font-size: 0.85em; padding: 8px 10px; min-width: 80px;}
+             .back-link {
+                 padding: 8px 12px;
+                 font-size: 0.9em;
+             }
+        }
+        /* Style for Leaflet marker cluster icons */
+        .marker-cluster-small {
+            background-color: rgba(181, 226, 140, 0.6);
+        }
+        .marker-cluster-small div {
+            background-color: rgba(110, 204, 57, 0.6);
+        }
+        .marker-cluster-medium {
+            background-color: rgba(241, 211, 87, 0.6);
+        }
+        .marker-cluster-medium div {
+            background-color: rgba(240, 194, 12, 0.6);
+        }
+        .marker-cluster-large {
+            background-color: rgba(253, 156, 115, 0.6);
+        }
+        .marker-cluster-large div {
+            background-color: rgba(241, 128, 23, 0.6);
+        }
+        .marker-cluster div {
+            width: 30px;
+            height: 30px;
+            margin-left: 5px;
+            margin-top: 5px;
+            text-align: center;
+            border-radius: 15px;
+            font: 12px "Helvetica Neue", Arial, Helvetica, sans-serif;
+            color: #fff; /* White text for better contrast */
+            line-height: 30px; /* Vertically center text */
+            text-shadow: 1px 1px 1px #000; /* Text shadow for readability */
+        }
+        .marker-cluster {
+            border-radius: 50%; /* Make cluster icons circular */
+            box-shadow: 0 0 5px rgba(0,0,0,0.5); /* Add shadow */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Trolley Map</h1>
+        <div id="map"></div> <div class="brand-links-container">
+             <h2>Brand Maps</h2>
+             <div class="brand-links">
+                 <a href="map_coles.html" class="brand-link-button brand-coles">Coles</a>
+                 <a href="map_woolworths.html" class="brand-link-button brand-woolworths">Woolworths</a>
+                 <a href="map_aldi.html" class="brand-link-button brand-aldi">Aldi</a>
+                 <a href="map_iga.html" class="brand-link-button brand-iga">IGA</a>
+                 <a href="map_kmart.html" class="brand-link-button brand-kmart">Kmart</a>
+                 <a href="map_bigw.html" class="brand-link-button brand-bigw">Big W</a>
+                 <a href="map_bunnings.html" class="brand-link-button brand-bunnings">Bunnings</a>
+                 <a href="map_other.html" class="brand-link-button brand-other">Other</a>
+             </div>
+        </div>
+
+        <div class="back-link-container">
+            <a href="index.html" class="back-link">Report</a>
+            <a href="view_logs.php" class="back-link">List</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("DOM Ready, initializing map...");
+            const mapElement = document.getElementById('map');
+            if (!mapElement) { console.error("Map container element not found!"); return; }
+
+            // Define initial map center and zoom level
+            const initialCenter = [-31.9523, 115.8613]; // Perth approx center
+            const initialZoom = 9; // Zoom level for initial view
+
+            const map = L.map('map').setView(initialCenter, initialZoom);
+            console.log("Map initialized");
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            console.log("Tile layer added");
+
+            // ** NEW: Initialize MarkerClusterGroup **
+            const markerClusterGroup = L.markerClusterGroup();
+            map.addLayer(markerClusterGroup); // Add the group to the map
+            console.log("MarkerClusterGroup added to map");
+
+            // Invalidate map size after a short delay to ensure proper rendering
+            setTimeout(() => { map.invalidateSize(); console.log("Map size invalidated."); }, 200);
+
+            async function loadMarkers() {
+                 console.log("Loading markers...");
+                try {
+                    // Fetch log data
+                    const response = await fetch('trolley_logs.json?_=' + new Date().getTime());
+                    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                    const logs = await response.json();
+                    if (!Array.isArray(logs)) throw new Error("Invalid data format received.");
+                     console.log(`Fetched ${logs.length} logs.`);
+
+                    // ** Clear previous markers from the cluster group **
+                    markerClusterGroup.clearLayers();
+                    let markersFound = 0;
+
+                    // Process each log entry
+                    logs.forEach((log, index) => {
+                        const lat = parseFloat(log.latitude);
+                        const lon = parseFloat(log.longitude);
+
+                        // Validate coordinates
+                        if (!isNaN(lat) && !isNaN(lon) && Math.abs(lat) <= 90 && Math.abs(lon) <= 180) {
+                            const marker = L.marker([lat, lon]);
+
+                            // Create popup content
+                            let popupContent = `<b>Brand(s):</b> ${Array.isArray(log.brands) ? log.brands.map(escapeHtml).join(', ') : 'N/A'}<br>`;
+                            popupContent += `<b>Reported:</b> ${formatDisplayDateTime(log.serverTimestampUTC || log.timestamp)}<br>`;
+                            if (log.suburb && log.state) {
+                                popupContent += `<b>Location:</b> ${escapeHtml(log.suburb)}, ${escapeHtml(log.state)}<br>`;
+                            }
+                            let conditionsText = getConditionsText(log.conditions);
+                            if (conditionsText) {
+                                popupContent += `<b>Condition(s):</b> ${escapeHtml(conditionsText)}<br>`;
+                            }
+                            if (log.comments) {
+                                popupContent += `<b>Comments:</b> ${escapeHtml(log.comments)}`;
+                            }
+                            marker.bindPopup(popupContent);
+
+                            // ** Add marker to the cluster group instead of a layerGroup **
+                            markerClusterGroup.addLayer(marker);
+                            markersFound++;
+                        } else {
+                            console.warn(`Skipping log entry ${index} with invalid coordinates:`, log);
+                        }
+                    });
+                     console.log(`Added ${markersFound} markers to cluster group.`);
+
+                    // Handle cases with no markers
+                    if (markersFound === 0) {
+                         if (mapElement) mapElement.innerHTML = '<p style="text-align:center; padding-top: 20px;">No trolley locations found in logs.</p>';
+                         // Reset to default view if no markers
+                         map.setView(initialCenter, initialZoom);
+                    } else {
+                        // ** Fit bounds using the markerClusterGroup **
+                        const bounds = markerClusterGroup.getBounds();
+                        if (bounds.isValid()) {
+                            map.fitBounds(bounds, { padding: [50, 50], maxZoom: 16 }); // Add padding and maxZoom
+                            console.log("Map bounds fit to marker cluster group.");
+                        } else {
+                            console.warn("Marker cluster bounds are not valid, cannot fit bounds. Resetting view.");
+                            map.setView(initialCenter, initialZoom); // Fallback view
+                        }
+                    }
+                    map.invalidateSize(); // Ensure map redraws correctly
+
+                } catch (error) {
+                    console.error("Error loading map markers:", error);
+                    if (mapElement) mapElement.innerHTML = `<p style="text-align:center; padding-top: 20px; color: red;">Error loading map data: ${error.message}</p>`;
+                }
+            }
+
+            // --- Helper Functions ---
+             function formatDisplayDateTime(isoTimestamp) {
+                 // ... (keep the existing function) ...
+                 if (!isoTimestamp) return 'N/A';
+                 try {
+                     const date = new Date(isoTimestamp);
+                      if (isNaN(date.getTime())) {
+                          const alternativeDate = new Date(isoTimestamp.replace('T', ' ').replace(/-/g, '/'));
+                           return !isNaN(alternativeDate.getTime())
+                               ? alternativeDate.toLocaleString('en-AU', { timeZone: 'Australia/Perth', dateStyle: 'short', timeStyle: 'short', hour12: true })
+                               : isoTimestamp;
+                      }
+                     return date.toLocaleString('en-AU', { timeZone: 'Australia/Perth', dateStyle: 'short', timeStyle: 'short', hour12: true });
+                 } catch (e) { console.error("Date formatting error:", e); return isoTimestamp; }
+             }
+             function getConditionsText(conditions) {
+                 // ... (keep the existing function) ...
+                 if (typeof conditions !== 'object' || conditions === null) return '';
+                 let allConditions = [];
+                  for (const brand in conditions) {
+                      if (Array.isArray(conditions[brand])) allConditions.push(...conditions[brand]);
+                  }
+                  // Return unique conditions, joined by comma
+                  return [...new Set(allConditions)].join(', ');
+             }
+             function escapeHtml(text) {
+                 // ... (keep the existing function) ...
+                 if (!text) return '';
+                 const map = {'&': '&amp;','<': '&lt;','>': '&gt;','"': '&quot;',"'": '&#039;'};
+                 return text.replace(/[&<>"']/g, m => map[m]);
+             }
+
+            // Load markers on initial page load
+            loadMarkers();
+        });
+    </script>
+
+</body>
+</html>

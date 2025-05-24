@@ -14,8 +14,7 @@
         "clientSubmissionTimestamp": "12/4/25, 8:10 pm",
         "suburb": "Riverton",
         "state": "Western Australia",
-        "serverTimestampUTC": "2025-04-12T12:10:30+00:00",
-        "ipAddress": "45.248.78.30"
+        "serverTimestampUTC": "2025-04-12T12:10:30+00:00"
     },
     {
         "latitude": "-32.017536",
@@ -33,8 +32,7 @@
         "clientSubmissionTimestamp": "17/4/25, 5:35 pm",
         "suburb": "Cannington",
         "state": "Western Australia",
-        "serverTimestampUTC": "2025-04-17T09:35:16+00:00",
-        "ipAddress": "103.107.197.94"
+        "serverTimestampUTC": "2025-04-17T09:35:16+00:00"
     },
     {
         "latitude": "-32.020444",
@@ -52,8 +50,7 @@
         "clientSubmissionTimestamp": "17/4/25, 5:36 pm",
         "suburb": "Cannington",
         "state": "Western Australia",
-        "serverTimestampUTC": "2025-04-17T09:36:39+00:00",
-        "ipAddress": "103.107.197.94"
+        "serverTimestampUTC": "2025-04-17T09:36:39+00:00"
     },
     {
         "latitude": "-32.025722",
@@ -67,8 +64,7 @@
         "clientSubmissionTimestamp": "17/4/25, 5:39 pm",
         "suburb": "Cannington",
         "state": "Western Australia",
-        "serverTimestampUTC": "2025-04-17T09:39:34+00:00",
-        "ipAddress": "103.107.197.94"
+        "serverTimestampUTC": "2025-04-17T09:39:34+00:00"
     },
     {
         "latitude": "-32.004262",
@@ -85,8 +81,7 @@
         "clientSubmissionTimestamp": "19/4/25, 12:44 pm",
         "suburb": "Bentley",
         "state": "Western Australia",
-        "serverTimestampUTC": "2025-04-19T04:44:38+00:00",
-        "ipAddress": "103.107.197.92"
+        "serverTimestampUTC": "2025-04-19T04:44:38+00:00"
     },
     {
         "latitude": "-31.997120",
@@ -103,8 +98,7 @@
         "clientSubmissionTimestamp": "19/4/25, 12:48 pm",
         "suburb": "St James",
         "state": "Western Australia",
-        "serverTimestampUTC": "2025-04-19T04:48:24+00:00",
-        "ipAddress": "103.107.197.92"
+        "serverTimestampUTC": "2025-04-19T04:48:24+00:00"
     },
     {
         "latitude": "-31.996931",
@@ -122,8 +116,7 @@
         "clientSubmissionTimestamp": "19/4/25, 12:49 pm",
         "suburb": "St James",
         "state": "Western Australia",
-        "serverTimestampUTC": "2025-04-19T04:49:12+00:00",
-        "ipAddress": "103.107.197.92"
+        "serverTimestampUTC": "2025-04-19T04:49:12+00:00"
     },
     {
         "latitude": "-31.983365",
@@ -140,8 +133,7 @@
         "clientSubmissionTimestamp": "19/4/25, 12:56 pm",
         "suburb": "East Victoria Park",
         "state": "Western Australia",
-        "serverTimestampUTC": "2025-04-19T04:56:08+00:00",
-        "ipAddress": "103.107.197.92"
+        "serverTimestampUTC": "2025-04-19T04:56:08+00:00"
     },
     {
         "latitude": "-31.988565",
@@ -159,8 +151,7 @@
         "clientSubmissionTimestamp": "19/4/25, 3:39 pm",
         "suburb": "East Victora Park",
         "state": "Western Australia",
-        "serverTimestampUTC": "2025-04-19T07:39:22+00:00",
-        "ipAddress": "103.107.197.92"
+        "serverTimestampUTC": "2025-04-19T07:39:22+00:00"
     },
     {
         "latitude": "-32.006651",
@@ -178,7 +169,543 @@
         "clientSubmissionTimestamp": "19/4/25, 3:47 pm",
         "suburb": "Bentley",
         "state": "Western Australia",
-        "serverTimestampUTC": "2025-04-19T07:47:53+00:00",
-        "ipAddress": "103.107.197.92"
+        "serverTimestampUTC": "2025-04-19T07:47:53+00:00"
+    },
+    {
+        "latitude": "-32.057606",
+        "longitude": "115.956413",
+        "timestamp": "2025-04-20T17:12:45",
+        "brands": [
+            "Coles"
+        ],
+        "comments": "Near the soccer club entrance ",
+        "conditions": {
+            "Coles": [
+                "Good Condition"
+            ]
+        },
+        "clientSubmissionTimestamp": "20/4/25, 5:13 pm",
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "serverTimestampUTC": "2025-04-20T09:13:28+00:00"
+    },
+    {
+        "latitude": "-32.058345",
+        "longitude": "115.957606",
+        "timestamp": "2025-04-20T17:15:24",
+        "brands": [
+            "Woolworths"
+        ],
+        "conditions": {
+            "Woolworths": [
+                "Good Condition",
+                "Needs Cleaning"
+            ]
+        },
+        "clientSubmissionTimestamp": "20/4/25, 5:15 pm",
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "serverTimestampUTC": "2025-04-20T09:15:36+00:00"
+    },
+    {
+        "latitude": "-31.970898",
+        "longitude": "115.895479",
+        "timestamp": "2025-04-22T06:27:54",
+        "brands": [
+            "Woolworths"
+        ],
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "clientSubmissionTimestamp": "22/4/25, 6:28 am",
+        "suburb": "Victoria Park",
+        "state": "Western Australia",
+        "serverTimestampUTC": "2025-04-21T22:28:11+00:00"
+    },
+    {
+        "latitude": "-32.069542",
+        "longitude": "115.999890",
+        "timestamp": "2025-04-26T15:32:55",
+        "brands": [
+            "Coles"
+        ],
+        "comments": "Outside Dome",
+        "conditions": {
+            "Coles": [
+                "Good Condition"
+            ]
+        },
+        "clientSubmissionTimestamp": "26/4/25, 3:33 pm",
+        "suburb": "Gosnells",
+        "state": "Western Australia",
+        "serverTimestampUTC": "2025-04-26T07:33:10+00:00"
+    },
+    {
+        "latitude": "-32.059026",
+        "longitude": "115.964636",
+        "timestamp": "2025-04-26T18:29:34",
+        "brands": [
+            "Other"
+        ],
+        "comments": "Spudshed behind bus stop shelter ",
+        "conditions": {
+            "Other": [
+                "Good Condition"
+            ]
+        },
+        "clientSubmissionTimestamp": "26/4/25, 6:30 pm",
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "serverTimestampUTC": "2025-04-26T10:30:09+00:00"
+    },
+    {
+        "latitude": "-32.056737",
+        "longitude": "115.962466",
+        "timestamp": "2025-04-26T18:32:08",
+        "brands": [
+            "Other"
+        ],
+        "comments": "Spudshed on the other side of Spencer road near the bus station",
+        "conditions": {
+            "Other": [
+                "Good Condition"
+            ]
+        },
+        "clientSubmissionTimestamp": "26/4/25, 6:32 pm",
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "serverTimestampUTC": "2025-04-26T10:32:30+00:00"
+    },
+    {
+        "latitude": "-32.055994",
+        "longitude": "115.961866",
+        "timestamp": "2025-04-26T18:33:18",
+        "brands": [
+            "Woolworths"
+        ],
+        "comments": "3 trolleys on the other side of Spencer road altogether",
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "clientSubmissionTimestamp": "26/4/25, 6:33 pm",
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "serverTimestampUTC": "2025-04-26T10:33:37+00:00"
+    },
+    {
+        "latitude": "-32.038772",
+        "longitude": "115.886703",
+        "timestamp": "2025-04-27T16:24:26",
+        "brands": [
+            "Other"
+        ],
+        "comments": "All foods",
+        "conditions": {
+            "Other": [
+                "Good Condition"
+            ]
+        },
+        "clientSubmissionTimestamp": "27/4/25, 4:24 pm",
+        "suburb": null,
+        "state": null,
+        "serverTimestampUTC": "2025-04-27T08:24:37+00:00"
+    },
+    {
+        "latitude": "-32.038703",
+        "longitude": "115.914842",
+        "timestamp": "2025-04-27T16:33:47",
+        "brands": [
+            "Coles"
+        ],
+        "comments": "4 trolleys",
+        "conditions": {
+            "Coles": [
+                "Good Condition"
+            ]
+        },
+        "clientSubmissionTimestamp": "27/4/25, 4:34 pm",
+        "suburb": "Parkwood",
+        "state": "Western Australia",
+        "serverTimestampUTC": "2025-04-27T08:34:01+00:00"
+    },
+    {
+        "latitude": "-32.060482",
+        "longitude": "115.940248",
+        "timestamp": "2025-04-27T16:47:43",
+        "brands": [
+            "IGA"
+        ],
+        "comments": "Wheelchair accessible trolley ",
+        "conditions": {
+            "IGA": [
+                "Good Condition"
+            ]
+        },
+        "clientSubmissionTimestamp": "27/4/25, 4:48 pm",
+        "suburb": null,
+        "state": null,
+        "serverTimestampUTC": "2025-04-27T08:48:02+00:00"
+    },
+    {
+        "latitude": "-32.038732",
+        "longitude": "115.905878",
+        "timestamp": "2025-05-01T16:29:45",
+        "brands": [
+            "Woolworths"
+        ],
+        "conditions": [],
+        "clientSubmissionTimestamp": "1/5/25, 4:29 pm",
+        "suburb": "Parkwood",
+        "state": "Western Australia",
+        "serverTimestampUTC": "2025-05-01T08:29:56+00:00"
+    },
+    {
+        "latitude": "-32.046505",
+        "longitude": "115.959138",
+        "timestamp": "2025-05-04T10:00:45",
+        "brands": [
+            "Woolworths"
+        ],
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "clientSubmissionTimestamp": "4/5/25, 10:00 am",
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "serverTimestampUTC": "2025-05-04T02:00:55+00:00"
+    },
+    {
+        "latitude": "-32.059403",
+        "longitude": "115.961154",
+        "timestamp": "2025-05-04T16:28:31",
+        "brands": [
+            "Woolworths"
+        ],
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "clientSubmissionTimestamp": "4/5/25, 4:28 pm",
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "serverTimestampUTC": "2025-05-04T08:28:43+00:00"
+    },
+    {
+        "latitude": "-32.049842",
+        "longitude": "115.952316",
+        "timestamp": "2025-05-05T05:56:10",
+        "brands": [
+            "Other"
+        ],
+        "comments": "Spudshed",
+        "conditions": {
+            "Other": [
+                "Good Condition"
+            ]
+        },
+        "clientSubmissionTimestamp": "5/5/25, 5:56 am",
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "serverTimestampUTC": "2025-05-04T21:56:39+00:00"
+    },
+    {
+        "latitude": "-32.045487",
+        "longitude": "115.990684",
+        "timestamp": "2025-05-05T10:12:49",
+        "brands": [
+            "Coles"
+        ],
+        "conditions": {
+            "Coles": [
+                "Good Condition"
+            ]
+        },
+        "clientSubmissionTimestamp": "5/5/25, 10:13 am",
+        "suburb": "Maddington",
+        "state": "Western Australia",
+        "serverTimestampUTC": "2025-05-05T02:13:04+00:00"
+    },
+    {
+        "latitude": "-32.047616",
+        "longitude": "115.951973",
+        "timestamp": "2025-05-05T17:31:59",
+        "brands": [
+            "Woolworths"
+        ],
+        "comments": "Train station ",
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "clientSubmissionTimestamp": "5/5/25, 5:32 pm",
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "serverTimestampUTC": "2025-05-05T09:32:12+00:00"
+    },
+    {
+        "latitude": "-32.060377",
+        "longitude": "115.940544",
+        "timestamp": "2025-05-07T06:20:40",
+        "brands": [
+            "BigW"
+        ],
+        "conditions": {
+            "BigW": [
+                "Good Condition"
+            ]
+        },
+        "clientSubmissionTimestamp": "7/5/25, 6:20 am",
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "serverTimestampUTC": "2025-05-06T22:20:48+00:00"
+    },
+    {
+        "latitude": "-32.063496",
+        "longitude": "115.936597",
+        "timestamp": "2025-05-08T06:17:58",
+        "brands": [
+            "IGA"
+        ],
+        "comments": "Bus stop ",
+        "conditions": {
+            "IGA": [
+                "Good Condition"
+            ]
+        },
+        "clientSubmissionTimestamp": "8/5/25, 6:18 am",
+        "suburb": null,
+        "state": null,
+        "serverTimestampUTC": "2025-05-07T22:18:11+00:00"
+    },
+    {
+        "latitude": "-32.068181",
+        "longitude": "115.992737",
+        "timestamp": "2025-05-11T10:12:02",
+        "brands": [
+            "Coles"
+        ],
+        "conditions": {
+            "Coles": [
+                "Good Condition"
+            ]
+        },
+        "clientSubmissionTimestamp": "11/5/25, 10:12 am",
+        "suburb": "Gosnells",
+        "state": "Western Australia",
+        "serverTimestampUTC": "2025-05-11T02:12:23+00:00"
+    },
+    {
+        "latitude": "-32.091859",
+        "longitude": "116.001626",
+        "timestamp": "2025-05-11T11:58:50",
+        "brands": [
+            "Coles"
+        ],
+        "conditions": {
+            "Coles": [
+                "Good Condition"
+            ]
+        },
+        "clientSubmissionTimestamp": "11/5/25, 11:59 am",
+        "suburb": "Gosnells",
+        "state": "Western Australia",
+        "serverTimestampUTC": "2025-05-11T03:59:05+00:00"
+    },
+    {
+        "latitude": "-32.049781",
+        "longitude": "115.953343",
+        "timestamp": "2025-05-13T05:54:36",
+        "brands": [
+            "Other"
+        ],
+        "comments": "Spudshed ",
+        "conditions": {
+            "Other": [
+                "Good Condition"
+            ]
+        },
+        "clientSubmissionTimestamp": "13/5/25, 5:54 am",
+        "suburb": null,
+        "state": null,
+        "serverTimestampUTC": "2025-05-12T21:54:40+00:00"
+    },
+    {
+        "latitude": "-32.048572",
+        "longitude": "115.952681",
+        "timestamp": "2025-05-13T17:32:21",
+        "brands": [
+            "Other"
+        ],
+        "comments": "Spudshed ",
+        "conditions": {
+            "Other": [
+                "Good Condition"
+            ]
+        },
+        "clientSubmissionTimestamp": "13/5/25, 5:32 pm",
+        "suburb": null,
+        "state": null,
+        "serverTimestampUTC": "2025-05-13T09:32:35+00:00"
+    },
+    {
+        "latitude": "-32.063546",
+        "longitude": "115.936488",
+        "timestamp": "2025-05-14T06:25:00",
+        "brands": [
+            "IGA"
+        ],
+        "conditions": {
+            "IGA": [
+                "Good Condition"
+            ]
+        },
+        "clientSubmissionTimestamp": "14/5/25, 6:25 am",
+        "suburb": "Canning Vale",
+        "state": "Western Australia",
+        "serverTimestampUTC": "2025-05-13T22:25:11+00:00"
+    },
+    {
+        "latitude": "-32.056874",
+        "longitude": "115.954040",
+        "timestamp": "2025-05-14T13:15:25",
+        "brands": [
+            "Woolworths"
+        ],
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "clientSubmissionTimestamp": "14/5/25, 1:15 pm",
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "serverTimestampUTC": "2025-05-14T05:15:34+00:00"
+    },
+    {
+        "latitude": "-32.047379",
+        "longitude": "115.952779",
+        "timestamp": "2025-05-16T06:09:32",
+        "brands": [
+            "Woolworths"
+        ],
+        "comments": "Near Fire hydrant ",
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "clientSubmissionTimestamp": "16/5/25, 6:10 am",
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "serverTimestampUTC": "2025-05-15T22:10:14+00:00"
+    },
+    {
+        "latitude": "-32.062288",
+        "longitude": "115.992672",
+        "timestamp": "2025-05-16T09:01:54",
+        "brands": [
+            "Woolworths"
+        ],
+        "conditions": [],
+        "clientSubmissionTimestamp": "16/5/25, 9:01 am",
+        "suburb": "Gosnells",
+        "state": "Western Australia",
+        "serverTimestampUTC": "2025-05-16T01:01:59+00:00"
+    },
+    {
+        "latitude": "-32.048572",
+        "longitude": "115.793627",
+        "timestamp": "2025-05-18T14:32:43",
+        "brands": [
+            "Woolworths"
+        ],
+        "comments": "Across the other side of the road in the park",
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Palmyra",
+        "state": "Western Australia",
+        "serverTimestampUTC": "2025-05-18T06:33:12+00:00"
+    },
+    {
+        "latitude": "-31.953491",
+        "longitude": "115.801881",
+        "timestamp": "2025-05-19T13:17:27",
+        "brands": [
+            "Coles"
+        ],
+        "comments": "On the corner under a tree",
+        "conditions": {
+            "Coles": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Shenton Park",
+        "state": "Western Australia",
+        "serverTimestampUTC": "2025-05-19T05:17:45+00:00"
+    },
+    {
+        "latitude": "-32.047677",
+        "longitude": "115.953274",
+        "timestamp": "2025-05-20T06:03:33",
+        "brands": [
+            "Woolworths",
+            "Other"
+        ],
+        "comments": "Woolworths and spudshed",
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ],
+            "Other": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "serverTimestampUTC": "2025-05-19T22:04:04+00:00"
+    },
+    {
+        "latitude": "-31.955111",
+        "longitude": "115.803548",
+        "timestamp": "2025-05-20T12:30:15",
+        "brands": [
+            "Coles"
+        ],
+        "comments": "Outside the sales office",
+        "conditions": {
+            "Coles": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Shenton Park",
+        "state": "Western Australia",
+        "serverTimestampUTC": "2025-05-20T04:30:30+00:00"
+    },
+    {
+        "latitude": "-31.954418",
+        "longitude": "115.803229",
+        "timestamp": "2025-05-20T12:32:05",
+        "brands": [
+            "Coles"
+        ],
+        "conditions": {
+            "Coles": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Shenton Park",
+        "state": "Western Australia",
+        "serverTimestampUTC": "2025-05-20T04:32:16+00:00"
     }
 ]

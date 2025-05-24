@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abandoned Trolleys - Kmart</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+
+    <style>
+        /* Styles adapted from your existing files */
+        :root {
+            --bg-color: #1a1a1a;
+            --text-color: #e0e0e0;
+            --card-bg: #2c2c2c;
+            --border-color: #444;
+            --button-bg: #007bff;
+            --button-hover-bg: #0056b3;
+            --button-text: #ffffff;
+            --highlight: #ff9800;
+            --detail-row-bg: #4a4a4a;
+            --brand-button-bg: #6c757d;
+            --brand-button-hover-bg: #5a6268;
+            --button-secondary-bg: #555;
+            --button-secondary-hover-bg: #777;
+            --error-color: #dc3545;
+            --link-color: #00aaff;
+            --link-hover-color: #0077cc;
+
+            /* Brand Colors */
+            --kmart-bg: #E92A28;
+            --kmart-hover-bg: #c72321;
+            /* Add other brand colors if needed for toggles/popups */
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { height: 100%; }
+        body {
+            min-height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 5px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+        .container {
+            width: 100%;
+            max-width: 1200px; /* Wider for map + table */
+            margin: 10px auto;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+        h1 { color: var(--text-color); margin-bottom: 15px; font-size: 1.8em; text-align: center; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;}
+        h1 span{display:block;font-size:0.5em;font-weight:normal;}
+
+        /* Map Styles */
+        #map {
+            width: 100%;
+            height: 400px; /* Keep fixed height or use flex-grow if desired */
+            border-radius: 5px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+            flex-shrink: 0; /* Prevent map shrinking if container flexes */
+        }
+
+        /* Table Styles */
+        .table-section { overflow-x: auto; flex-grow: 1; display: flex; flex-direction: column; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+        th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border-color); white-space: nowrap; font-size: 1em; }
+        th { background-color: #444; position: sticky; top: 0; color: var(--highlight); z-index: 1; }
+        th.sortable { cursor: pointer; }
+        th.sortable:hover { background-color: #555; }
+        td { background-color: var(--card-bg); vertical-align: middle; }
+        tr.detail-row td { background-color: var(--detail-row-bg); white-space: normal; }
+        .sortable::after { content: var(--sort-icon, " \2195"); font-size: 1em; opacity: 0.8; margin-left: 4px; }
+        .map-btn { /* Table map button */
+            padding: 5px 8px; background-color: var(--button-bg); color: var(--button-text); border: none; border-radius: 4px; cursor: pointer; text-decoration: none; display: inline-block; font-size: 1em; text-align: center; line-height: 1.2; min-width: 70px;
+        }
+        .map-btn:hover { background-color: var(--button-hover-bg); }
+        .brand-button-group { display: flex; flex-wrap: wrap; gap: 4px; }
+        .brand-toggle { /* Table brand toggle */
+            padding: 4px 6px; border-radius: 4px; color: #fff; border: none; cursor: pointer; font-size: 1em; transition: background-color 0.2s; min-width: 40px; text-align: center; display: inline-block;
+        }
+        .brand-toggle[data-brand="Kmart"] { background-color: var(--kmart-bg); }
+        .brand-toggle[data-brand="Kmart"]:hover { background-color: var(--kmart-hover-bg); }
+        /* Add other brand styles if needed for table toggles */
+        .detail-content { padding: 8px; background-color: var(--detail-row-bg); }
+        .detail-content h4 { margin-top: 0; margin-bottom: 8px; color: var(--highlight); font-size: 1em; }
+        .detail-content span { display: block; margin-bottom: 5px; font-size: 0.9em; line-height: 1.4;}
+        .detail-content strong { color: var(--highlight); margin-right: 5px; }
+        .no-details { font-style: italic; color: #aaa; }
+        .time-part { display: inline; margin-left: 5px; font-size: 0.9em; opacity: 0.8; }
+
+        /* Pagination Styles */
+        .pagination { margin: 15px 0 0 0; text-align: center; flex-shrink: 0; } /* Place at bottom */
+        .pagination button, .pagination span { vertical-align: middle; margin: 0 4px; }
+        .pagination button { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9em; transition: background-color 0.2s ease; display: inline-block; background-color: var(--button-bg); color: var(--button-text); }
+        .pagination button:disabled { background-color: #666; cursor: not-allowed; opacity: 0.7; }
+        .pagination button:hover:not(:disabled) { background-color: var(--button-hover-bg); }
+        .pagination span { margin: 0 8px; display: inline-block; }
+
+        .loading-message, .error-loading { text-align: center; padding: 20px; font-size: 1.1em; }
+        .bottom-message { font-size: 0.8em; color: #aaa; text-align: center; margin-top: 10px; flex-shrink: 0; }
+
+        /* Back Link Styles */
+        .back-link-container {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--border-color);
+            flex-shrink: 0;
+        }
+        .back-link { display: inline-block; padding: 10px 15px; background-color: var(--button-bg); color: var(--button-text); border-radius: 5px; text-decoration: none; transition: background-color 0.2s ease; margin: 5px; }
+        .back-link:hover { background-color: var(--button-secondary-hover-bg); text-decoration: none; color: var(--button-text); }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            body { padding: 5px; }
+            .container { padding: 5px; }
+            h1 { font-size: 1.5em; }
+            #map { height: 300px; }
+            table { font-size: 0.85em; }
+            th, td { padding: 6px 8px; white-space: normal; }
+            th { white-space: nowrap; font-size: 1em; }
+            td:nth-child(1) { width: auto; } /* Adjust widths as needed */
+            td:nth-child(2) { width: auto; }
+            td:nth-child(3) { width: auto; white-space: normal; }
+            .sortable::after { font-size: 1em; }
+            .map-btn { padding: 4px 6px; font-size: 1em; min-width: 60px; }
+            .brand-toggle { font-size: 1em; padding: 3px 5px; min-width: 35px; }
+            .pagination button { padding: 5px 10px; font-size: 1em; }
+            .detail-content { padding: 5px; }
+            .detail-content h4 { font-size: 0.95em; }
+            .detail-content span { font-size: 0.85em;}
+            .time-part { display: none; }
+            .back-link { padding: 8px 12px; font-size: 0.9em;}
+        }
+        /* Marker Cluster Styles (same as map_view.html) */
+        .marker-cluster-small { background-color: rgba(181, 226, 140, 0.6); }
+        .marker-cluster-small div { background-color: rgba(110, 204, 57, 0.6); }
+        .marker-cluster-medium { background-color: rgba(241, 211, 87, 0.6); }
+        .marker-cluster-medium div { background-color: rgba(240, 194, 12, 0.6); }
+        .marker-cluster-large { background-color: rgba(253, 156, 115, 0.6); }
+        .marker-cluster-large div { background-color: rgba(241, 128, 23, 0.6); }
+        .marker-cluster div { width: 30px; height: 30px; margin-left: 5px; margin-top: 5px; text-align: center; border-radius: 15px; font: 12px "Helvetica Neue", Arial, Helvetica, sans-serif; color: #fff; line-height: 30px; text-shadow: 1px 1px 1px #000; }
+        .marker-cluster { border-radius: 50%; box-shadow: 0 0 5px rgba(0,0,0,0.5); }
+    </style>
+</head>
+<body>
+    <div class="container">
+         <h1>Kmart Trolleys<span>Phone Report: 1800 876 553</span></h1> 
+         <div id="map"></div> 
+         <div class="table-section"> <div id="loading" class="loading-message">Loading data...</div>
+             <div id="table-container" style="display: none;">
+                 <table id="logs-table">
+                     <thead>
+                         <tr>
+                             <th>Brand</th> <th class="sortable" data-sort="timestamp">Date</th>
+                             <th>Location</th>
+                         </tr>
+                     </thead>
+                     <tbody id="table-body">
+                         </tbody>
+                 </table>
+             </div>
+             <div id="error-loading" class="loading-message error-loading" style="display: none;"></div> <p class="bottom-message">*Location accuracy depends on device GPS.</p>
+             <div class="pagination"> <button id="prev-page" disabled>Previous</button>
+                 <span id="page-info">Page 1 of 1</span>
+                 <button id="next-page" disabled>Next</button>
+             </div>
+        </div>
+
+        <div class="back-link-container"> <a href="index.html" class="back-link">Report</a>
+             <a href="map_view.html" class="back-link">Map</a>
+             <a href="view_logs.php" class="back-link">List</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // *** Target Brand for this page ***
+            const targetBrand = 'Kmart';
+
+            // --- Map Initialization ---
+            const initialCenter = [-31.9523, 115.8613]; // Perth approx center
+            const initialZoom = 10; // Default zoom
+
+            const map = L.map('map').setView(initialCenter, initialZoom);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            // ** NEW: Initialize MarkerClusterGroup **
+            const markerClusterGroup = L.markerClusterGroup();
+            map.addLayer(markerClusterGroup); // Add group to map
+
+            // Invalidate map size after delay
+            setTimeout(() => { map.invalidateSize(); }, 200);
+
+            // --- Table State Variables ---
+            let tableLogs = []; // Will hold only filtered logs for the table
+            const itemsPerPage = 15;
+            let currentPage = 1;
+            let sortColumn = "timestamp"; // Default sort column (Date)
+            let sortDirection = -1;     // Default sort: newest first
+
+            // --- DOM Elements (for table) ---
+            const loadingDiv = document.getElementById('loading');
+            const errorDiv = document.getElementById('error-loading');
+            const tableContainer = document.getElementById('table-container');
+            const tableBody = document.getElementById('table-body');
+            const pageInfo = document.getElementById('page-info');
+            const prevButton = document.getElementById('prev-page');
+            const nextButton = document.getElementById('next-page');
+            const tableHead = document.querySelector('#logs-table thead');
+
+
+            // --- Shared Helper Functions ---
+            const stateAbbreviations = { /* ... state mapping ... */
+                "Western Australia": "WA", "South Australia": "SA", "New South Wales": "NSW",
+                "Queensland": "QLD", "Victoria": "VIC", "Tasmania": "TAS",
+                "Northern Territory": "NT", "Australian Capital Territory": "ACT",
+                "Jervis Bay Territory": "ACT"
+            };
+            function getStateAbbreviation(stateName) { /* ... function ... */
+                return stateName ? (stateAbbreviations[stateName] || stateName) : null;
+            }
+            const customBrandText = { /* ... brand text mapping for table buttons ... */
+                 "Coles": "CO", "Woolworths": "WO", "Aldi": "AL", "IGA": "IG",
+                 "Kmart": "KM", "BigW": "BI", "Bunnings": "BU", "Other": "OT"
+            };
+            function formatDisplayDateTime(isoTimestamp, includeTime = true) { /* ... function ... */
+                 if (!isoTimestamp) return 'N/A';
+                 try {
+                     const options = { timeZone: 'Australia/Perth', dateStyle: 'short', ...(includeTime && { timeStyle: 'short', hour12: true }) };
+                     const date = new Date(isoTimestamp);
+                     if (isNaN(date.getTime())) {
+                         const altDate = new Date(isoTimestamp.replace('T', ' ').replace(/-/g, '/'));
+                         return !isNaN(altDate.getTime()) ? altDate.toLocaleString('en-AU', options) : isoTimestamp;
+                     }
+                     return date.toLocaleString('en-AU', options);
+                 } catch (e) { console.error("DT formatting error:", e); return isoTimestamp; }
+            }
+            function formatDisplayDate(isoTimestamp) { return formatDisplayDateTime(isoTimestamp, false); }
+            function formatDisplayTime(isoTimestamp) { /* ... function ... */
+                 if (!isoTimestamp) return '';
+                 try {
+                     const date = new Date(isoTimestamp);
+                     if (isNaN(date.getTime())) {
+                         const altDate = new Date(isoTimestamp.replace('T', ' ').replace(/-/g, '/'));
+                         return !isNaN(altDate.getTime()) ? altDate.toLocaleString('en-AU', { timeZone: 'Australia/Perth', timeStyle: 'short', hour12: true }) : '';
+                     }
+                     return date.toLocaleString('en-AU', { timeZone: 'Australia/Perth', timeStyle: 'short', hour12: true });
+                 } catch (e) { console.error("Time formatting error:", e); return ''; }
+            }
+            function generateStableRowId(log, index) { /* ... function ... */
+                const tsPart = log.serverTimestampUTC || log.timestamp || `no-ts-${index}`;
+                const ipPart = log.ipAddress || 'no-ip';
+                return `log-${targetBrand}-${tsPart}-${ipPart}-${index}`; // Add brand to ID for uniqueness if needed
+            }
+            function escapeHtml(text) { /* ... function ... */
+                 if (!text) return '';
+                 const map = {'&': '&amp;','<': '&lt;','>': '&gt;','"': '&quot;',"'": '&#039;'};
+                 return text.replace(/[&<>"']/g, m => map[m]);
+            }
+             function getConditionsText(conditions, brandToShow) { /* Get conditions only for the specific brand */
+                 if (typeof conditions !== 'object' || conditions === null || !conditions[brandToShow] || !Array.isArray(conditions[brandToShow])) {
+                     return '';
+                 }
+                 // Return unique conditions for the target brand, joined by comma
+                 return [...new Set(conditions[brandToShow])].join(', ');
+             }
+
+            // --- Core Data Loading and Processing ---
+            async function loadAndProcessData() {
+                loadingDiv.style.display = 'block';
+                tableContainer.style.display = 'none';
+                errorDiv.style.display = 'none';
+                markerClusterGroup.clearLayers(); // Clear previous map markers
+
+                try {
+                    const response = await fetch('trolley_logs.json?_=' + new Date().getTime());
+                    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                    let allLogs = await response.json();
+                    if (!Array.isArray(allLogs)) throw new Error("Invalid data format received.");
+
+                    // Filter logs for the target brand FIRST
+                    const filteredLogs = allLogs.filter(log =>
+                        Array.isArray(log.brands) && log.brands.includes(targetBrand)
+                    ).map((log, index) => { // Add stable IDs AFTER filtering
+                        log._rowId = generateStableRowId(log, index);
+                        return log;
+                    });
+
+                    // 1. Populate Map Markers using filtered logs
+                    populateMap(filteredLogs);
+
+                    // 2. Populate Table Data using the same filtered logs
+                    tableLogs = filteredLogs; // Assign filtered data for table use
+                    sortLogs(); // Sort the initial table data
+                    currentPage = 1; // Reset to first page
+                    updateTable(); // Render the table
+
+                    // Show table container, hide loading
+                    loadingDiv.style.display = 'none';
+                    tableContainer.style.display = 'block';
+
+                } catch (error) {
+                    console.error("Error loading data:", error);
+                    loadingDiv.style.display = 'none';
+                    errorDiv.textContent = `Error loading data for ${targetBrand}: ${error.message}. Please try refreshing.`;
+                    errorDiv.style.display = 'block';
+                    document.getElementById('map').innerHTML = `<p style="text-align:center; padding-top: 20px; color: red;">Error loading map data: ${error.message}</p>`;
+                }
+            }
+
+            // --- Map Populating Function ---
+            function populateMap(logsToMap) {
+                 let markersFound = 0;
+                 logsToMap.forEach(log => {
+                     const lat = parseFloat(log.latitude);
+                     const lon = parseFloat(log.longitude);
+                     if (!isNaN(lat) && !isNaN(lon) && Math.abs(lat) <= 90 && Math.abs(lon) <= 180) {
+                         const marker = L.marker([lat, lon]);
+                         // Popup Content - Simplified as it's only for targetBrand
+                         let popupContent = `<b>Brand:</b> ${escapeHtml(targetBrand)}<br>`; // Assuming only target brand
+                         popupContent += `<b>Reported:</b> ${formatDisplayDateTime(log.serverTimestampUTC || log.timestamp)}<br>`;
+                         if (log.suburb && log.state) {
+                             popupContent += `<b>Location:</b> ${escapeHtml(log.suburb)}, ${escapeHtml(log.state)}<br>`;
+                         }
+                         let conditionsText = getConditionsText(log.conditions, targetBrand); // Get conditions ONLY for the target brand
+                         if (conditionsText) {
+                             popupContent += `<b>Condition(s):</b> ${escapeHtml(conditionsText)}<br>`;
+                         }
+                         if (log.comments) {
+                             popupContent += `<b>Comments:</b> ${escapeHtml(log.comments)}`;
+                         }
+                         marker.bindPopup(popupContent);
+                         // ** Add marker to the cluster group **
+                         markerClusterGroup.addLayer(marker);
+                         markersFound++;
+                     }
+                 });
+
+                 // Fit map bounds or show message
+                 if (markersFound === 0) {
+                     document.getElementById('map').innerHTML = `<p style="text-align:center; padding-top: 20px;">No map locations found for '${escapeHtml(targetBrand)}'.</p>`;
+                     map.setView(initialCenter, initialZoom); // Reset view
+                 } else {
+                      // ** Fit bounds using the markerClusterGroup **
+                      const bounds = markerClusterGroup.getBounds();
+                      if (bounds.isValid()) {
+                          map.fitBounds(bounds, { padding: [50, 50], maxZoom: 16 }); // Add padding and maxZoom
+                          console.log(`Map bounds fit to ${targetBrand} markers.`);
+                      } else {
+                          console.warn(`Marker bounds for ${targetBrand} are not valid, cannot fit bounds. Resetting view.`);
+                          map.setView(initialCenter, initialZoom); // Fallback view
+                      }
+                 }
+                 map.invalidateSize(); // Ensure map redraws
+            }
+
+
+            // --- Table Rendering Functions ---
+            function sortLogs() {
+                 if (!sortColumn) return;
+                 // Only allow sorting by timestamp for simplicity on this page
+                 if (sortColumn !== 'timestamp') return;
+
+                 tableLogs.sort((a, b) => {
+                     const timeA = new Date(a.serverTimestampUTC || a.timestamp || 0).getTime();
+                     const timeB = new Date(b.serverTimestampUTC || b.timestamp || 0).getTime();
+                     const validTimeA = isNaN(timeA) ? 0 : timeA;
+                     const validTimeB = isNaN(timeB) ? 0 : timeB;
+                     return (validTimeA - validTimeB) * sortDirection;
+                 });
+            }
+
+            function updateSortDirection(column) {
+                 if (column !== 'timestamp') return; // Only sort by date
+                 if (sortColumn === column) { sortDirection *= -1; }
+                 else { sortColumn = column; sortDirection = -1; } // Default newest first
+                 sortLogs();
+                 currentPage = 1;
+                 updateTable();
+            }
+
+             function updateSortIndicators() {
+                 document.querySelectorAll('#logs-table th.sortable').forEach(th => {
+                     th.style.setProperty('--sort-icon', '""'); // Clear previous
+                     if (th.dataset.sort === 'timestamp') {
+                         if (sortColumn === 'timestamp') {
+                             const indicator = sortDirection === 1 ? ' ▲' : ' ▼';
+                             th.style.setProperty('--sort-icon', `"${indicator}"`);
+                         } else {
+                             th.style.setProperty('--sort-icon', '" ↕"');
+                         }
+                     }
+                 });
+             }
+
+
+            function renderTable() {
+                 tableBody.innerHTML = '';
+                 document.querySelectorAll('.detail-row').forEach(row => row.remove());
+
+                 const totalPages = Math.max(1, Math.ceil(tableLogs.length / itemsPerPage));
+                 currentPage = Math.max(1, Math.min(currentPage, totalPages));
+                 const start = (currentPage - 1) * itemsPerPage;
+                 const end = start + itemsPerPage;
+                 const pageData = tableLogs.slice(start, end);
+
+                 if (pageData.length === 0 && tableLogs.length > 0) {
+                     currentPage = Math.max(1, currentPage - 1); // Go back if page empty
+                     renderTable();
+                     return;
+                 } else if (pageData.length === 0) {
+                     tableBody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding: 20px;">No '${escapeHtml(targetBrand)}' logs found.</td></tr>`;
+                 }
+
+                 pageData.forEach((log) => {
+                     if (typeof log !== 'object' || log === null || !log._rowId) { console.warn("Skipping invalid log entry:", log); return; }
+                     const rowId = log._rowId;
+                     const tr = document.createElement('tr');
+                     tr.dataset.rowId = rowId;
+
+                     // Brand Cell (Simplified - always the targetBrand)
+                     const tdBrand = document.createElement('td');
+                     const brandGroup = document.createElement('div');
+                     brandGroup.className = 'brand-button-group';
+                     const button = document.createElement('button');
+                     button.className = 'brand-toggle';
+                     button.textContent = customBrandText[targetBrand] || targetBrand;
+                     button.dataset.brand = targetBrand;
+                     button.dataset.targetRowId = rowId;
+                     button.type = 'button';
+                     brandGroup.appendChild(button);
+                     tdBrand.appendChild(brandGroup);
+
+                     // Date/Time Cell
+                     const tdDateTime = document.createElement('td');
+                     const timestamp = log.serverTimestampUTC || log.timestamp;
+                     tdDateTime.textContent = formatDisplayDate(timestamp); // Show only Date
+                     // Optionally add time part back if needed
+                     // const timeSpan = document.createElement('span');
+                     // timeSpan.className = 'time-part'; timeSpan.textContent = formatDisplayTime(timestamp); tdDateTime.appendChild(timeSpan);
+
+                     // Location Cell (Map Button)
+                     const tdMap = document.createElement('td');
+                     if (log.latitude && log.longitude) {
+                         const lat = log.latitude; const lon = log.longitude;
+                         if (Math.abs(parseFloat(lat)) <= 90 && Math.abs(parseFloat(lon)) <= 180) {
+                             const mapLink = document.createElement('a');
+                             mapLink.href = `https://maps.google.com/?q=${encodeURIComponent(lat)},${encodeURIComponent(lon)}`;
+                             mapLink.target = '_blank'; mapLink.rel = 'noopener noreferrer'; mapLink.className = 'map-btn';
+                             const suburb = log.suburb || null;
+                             const stateFullName = log.state || null;
+                             const stateAbbr = getStateAbbreviation(stateFullName);
+                             let buttonText = 'Map';
+                             if (suburb && stateAbbr) { buttonText = `${escapeHtml(suburb)}, ${escapeHtml(stateAbbr)}`; }
+                             else if (suburb) { buttonText = escapeHtml(suburb); }
+                             else if (stateAbbr) { buttonText = escapeHtml(stateAbbr); }
+                             else if (stateFullName) { buttonText = escapeHtml(stateFullName); }
+                             mapLink.textContent = buttonText;
+                             tdMap.appendChild(mapLink);
+                         } else { tdMap.textContent = 'Invalid Coords'; }
+                     } else { tdMap.textContent = ''; }
+
+                     tr.appendChild(tdBrand);
+                     tr.appendChild(tdDateTime);
+                     tr.appendChild(tdMap);
+                     tableBody.appendChild(tr);
+                 });
+                 updatePagination(totalPages);
+                 updateSortIndicators();
+             }
+
+            function toggleDetailRow(button) {
+                const brand = button.dataset.brand; // Should always be targetBrand here
+                const targetRowId = button.dataset.targetRowId;
+                const mainRow = document.querySelector(`tr[data-row-id="${targetRowId}"]`);
+                if (!mainRow) { console.error("Could not find main row for ID:", targetRowId); return; }
+
+                // Use a unique ID for the detail row based on brand and row ID
+                const detailRowId = `detail-${targetRowId}-${brand}`;
+                const existingDetailRow = document.getElementById(detailRowId);
+
+                // Remove any *other* open detail rows first
+                document.querySelectorAll('.detail-row').forEach(row => {
+                    if (row.id !== detailRowId) {
+                        row.remove();
+                    }
+                });
+
+                // If this detail row exists, remove it and return (toggle off)
+                if (existingDetailRow) {
+                    existingDetailRow.remove();
+                    return;
+                }
+
+                // Find the data for this row
+                const logData = tableLogs.find(log => log._rowId === targetRowId);
+                if (!logData) { console.error("Could not find data for rowId:", targetRowId); alert("Error: Could not retrieve details."); return; }
+
+                // Create and insert the new detail row
+                try {
+                    const detailRow = document.createElement('tr');
+                    detailRow.id = detailRowId; // Assign the unique ID
+                    detailRow.classList.add('detail-row');
+                    const detailCell = document.createElement('td');
+                    detailCell.colSpan = 3; // Span all columns
+
+                    const conditions = (typeof logData.conditions === 'object' && logData.conditions !== null) ? logData.conditions : {};
+                    const comments = logData.comments || '';
+                    const brandConditionsText = getConditionsText(conditions, brand); // Get conditions for this specific brand
+
+                    let detailHtml = '<div class="detail-content">';
+                    detailHtml += `<h4>Details for ${escapeHtml(brand)} Trolley</h4>`;
+
+                    if (brandConditionsText) {
+                        detailHtml += `<span class="conditions_yes"><strong>Conditions Reported:</strong> ${escapeHtml(brandConditionsText)}</span>`;
+                    } else {
+                        detailHtml += '<span class="no-details">No specific conditions reported.</span>';
+                    }
+
+                    if (comments) {
+                        detailHtml += `<span class="add_comments"><strong>General Comments:</strong> ${escapeHtml(comments).replace(/\n/g, '<br>')}</span>`;
+                    } else {
+                        detailHtml += '<span class="no-details">No general comments submitted.</span>';
+                    }
+
+                    detailHtml += '</div>';
+                    detailCell.innerHTML = detailHtml;
+                    detailRow.appendChild(detailCell);
+                    mainRow.parentNode.insertBefore(detailRow, mainRow.nextSibling);
+                } catch (error) { console.error("Error occurred during detail row creation:", error); alert("An error occurred."); }
+            }
+
+            function updatePagination(totalPages) { /* ... function ... */
+                pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+                prevButton.disabled = currentPage === 1;
+                nextButton.disabled = currentPage === totalPages || totalPages === 0;
+            }
+
+            function changePage(direction) { /* ... function ... */
+                 const oldPage = currentPage;
+                 currentPage += direction;
+                 const totalPages = Math.max(1, Math.ceil(tableLogs.length / itemsPerPage));
+                 currentPage = Math.max(1, Math.min(currentPage, totalPages));
+                 if (currentPage !== oldPage) {
+                     document.querySelectorAll('.detail-row').forEach(row => row.remove());
+                     renderTable();
+                 }
+            }
+
+            function setupEventListeners() { /* ... Event Listeners ... */
+                 if (tableHead) {
+                     tableHead.addEventListener('click', (event) => {
+                         const th = event.target.closest('th.sortable');
+                         if (th) { updateSortDirection(th.dataset.sort); }
+                     });
+                 } else { console.error("Could not find table head element (#logs-table thead)"); }
+                 prevButton.addEventListener('click', () => changePage(-1));
+                 nextButton.addEventListener('click', () => changePage(1));
+                 if (tableBody) {
+                     tableBody.addEventListener('click', (event) => {
+                         const button = event.target.closest('.brand-toggle');
+                         if (button) { toggleDetailRow(button); }
+                     });
+                 } else { console.error("Could not find table body element (#table-body)"); }
+            }
+
+            function updateTable() { /* Helper to render table and update sort indicators */
+                renderTable(); // Renders based on current `tableLogs`, `currentPage`, etc.
+            }
+
+            // --- Initial Load ---
+            loadAndProcessData();
+            setupEventListeners();
+
+        });
+    </script>
+
+</body>
+</html>

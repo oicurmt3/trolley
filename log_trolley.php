@@ -6,15 +6,25 @@ header('Access-Control-Allow-Headers: Content-Type');
 header('Content-Type: application/json');
 
 // --- Configuration ---
-$logDirectory = __DIR__; // Log in the same directory as the script
+$logDirectory = __DIR__;
 $jsonLogFileName = 'trolley_logs.json';
 $jsonLogFilePath = $logDirectory . '/' . $jsonLogFileName;
-// $csvLogFilePath = $logDirectory . '/trolley_logs.csv'; // Optional CSV logging
+
+// New file paths for LGA data
+$suburbLgaMapFilePath = $logDirectory . '/suburb_lga_mapping.json';
+$lgaContactsFilePath = $logDirectory . '/lga_contact_details.json';
+
+$nominatimBaseUrl = 'https://nominatim.openstreetmap.org/reverse';
+$nominatimUserAgent = 'TrolleyReportApp/1.3 (sandgroper.net; admin@sandgroper.net)'; // Updated version
 
 // --- Function to Send JSON Response ---
-function sendJsonResponse($status, $message, $httpStatusCode = 200) {
+function sendJsonResponse($status, $message, $httpStatusCode = 200, $returnedData = null) {
     http_response_code($httpStatusCode);
-    echo json_encode(['status' => $status, 'message' => $message]);
+    $response = ['status' => $status, 'message' => $message];
+    if ($returnedData !== null) {
+        $response['logData'] = $returnedData;
+    }
+    echo json_encode($response);
     exit;
 }
 
@@ -33,138 +43,184 @@ $jsonPayload = file_get_contents('php://input');
 if (empty($jsonPayload)) {
     sendJsonResponse('error', 'No data received.', 400);
 }
-$newLogData = json_decode($jsonPayload, true); // Decode as associative array
+$logDataFromClient = json_decode($jsonPayload, true);
 if (json_last_error() !== JSON_ERROR_NONE) {
     sendJsonResponse('error', 'Invalid JSON data received: ' . json_last_error_msg(), 400);
 }
 
 // --- Basic Data Validation (Server-Side) ---
-if (!isset($newLogData['latitude']) || !isset($newLogData['longitude']) || !isset($newLogData['timestamp'])) {
+if (!isset($logDataFromClient['latitude']) || !isset($logDataFromClient['longitude']) || !isset($logDataFromClient['timestamp'])) {
     sendJsonResponse('error', 'Missing required location data (latitude, longitude, timestamp).', 400);
 }
-if (!isset($newLogData['brands']) || !is_array($newLogData['brands']) || empty($newLogData['brands'])) {
+if (!isset($logDataFromClient['brands']) || !is_array($logDataFromClient['brands']) || empty($logDataFromClient['brands'])) {
     sendJsonResponse('error', 'Missing or invalid brand data.', 400);
 }
-// Optional: Validate condition structure if present
-if (isset($newLogData['conditions']) && !is_array($newLogData['conditions'])) {
-     sendJsonResponse('error', 'Invalid condition data format.', 400);
+
+// --- Perform Reverse Geocoding using Nominatim ---
+$latitude = filter_var($logDataFromClient['latitude'], FILTER_VALIDATE_FLOAT);
+$longitude = filter_var($logDataFromClient['longitude'], FILTER_VALIDATE_FLOAT);
+$suburbName = null;
+$stateName = null;
+$lgaName = null; // This will be the LGAFullName from lga_contact_details.json
+$lgaEmail = null;
+
+if ($latitude !== false && $longitude !== false) {
+    $nominatimApiUrl = $nominatimBaseUrl . '?format=jsonv2&addressdetails=1&lat=' . $latitude . '&lon=' . $longitude . '&accept-language=en';
+    $context = stream_context_create([
+        'http' => [
+            'method' => 'GET',
+            'header' => "User-Agent: " . $nominatimUserAgent . "\r\n",
+            'ignore_errors' => true,
+            'timeout' => 7
+        ]
+    ]);
+    $geoResponseJson = @file_get_contents($nominatimApiUrl, false, $context);
+
+    if ($geoResponseJson !== false) {
+        $geo_http_response_header = $http_response_header ?? [];
+        $geoStatusCode = 0;
+        if (!empty($geo_http_response_header[0])) {
+            preg_match('{HTTP\/\S*\s(\d{3})}', $geo_http_response_header[0], $match);
+            if ($match) { $geoStatusCode = (int)$match[1]; }
+        }
+
+        if ($geoStatusCode === 200) {
+            $geoData = json_decode($geoResponseJson, true);
+            if (json_last_error() === JSON_ERROR_NONE && isset($geoData['address'])) {
+                $address = $geoData['address'];
+                $suburbName = $address['suburb'] ?? $address['village'] ?? $address['town'] ?? $address['city_district'] ?? $address['hamlet'] ?? null;
+                $stateName = $address['state'] ?? null;
+
+                // --- LGA Lookup (Two-step process) ---
+                if ($suburbName) {
+                    $lgaIdentifier = null;
+                    // Step 1: Get LGA Identifier from suburb mapping
+                    if (file_exists($suburbLgaMapFilePath)) {
+                        $suburbMapJson = file_get_contents($suburbLgaMapFilePath);
+                        $suburbLgaList = json_decode($suburbMapJson, true);
+                        if (json_last_error() === JSON_ERROR_NONE && is_array($suburbLgaList)) {
+                            foreach ($suburbLgaList as $mappingEntry) {
+                                if (isset($mappingEntry['Suburb']) && strcasecmp($mappingEntry['Suburb'], $suburbName) == 0) {
+                                    $lgaIdentifier = $mappingEntry['LGAKey'] ?? null;
+                                    break;
+                                }
+                            }
+                        } else {
+                            error_log("PHP Warning: Suburb-LGA mapping file '$suburbLgaMapFilePath' might be corrupted. JSON Error: " . json_last_error_msg());
+                        }
+                    } else {
+                        error_log("PHP Warning: Suburb-LGA mapping file not found at: " . $suburbLgaMapFilePath);
+                    }
+
+                    // Step 2: Get LGA details using the identifier
+                    if ($lgaIdentifier && file_exists($lgaContactsFilePath)) {
+                        $lgaContactsJson = file_get_contents($lgaContactsFilePath);
+                        $lgaContacts = json_decode($lgaContactsJson, true); // Contacts are an associative array (object)
+                        if (json_last_error() === JSON_ERROR_NONE && is_array($lgaContacts)) {
+                            if (isset($lgaContacts[$lgaIdentifier])) {
+                                $lgaDetails = $lgaContacts[$lgaIdentifier];
+                                $lgaName = $lgaDetails['LGAFullName'] ?? $lgaIdentifier; // Fallback to identifier if FullName is missing
+                                $lgaEmail = $lgaDetails['Email'] ?? null;
+                            } else {
+                                error_log("PHP Warning: LGA Identifier '$lgaIdentifier' for suburb '$suburbName' not found in '$lgaContactsFilePath'.");
+                            }
+                        } else {
+                            error_log("PHP Warning: LGA contacts file '$lgaContactsFilePath' might be corrupted. JSON Error: " . json_last_error_msg());
+                        }
+                    } elseif ($lgaIdentifier && !file_exists($lgaContactsFilePath)) {
+                         error_log("PHP Warning: LGA contacts file not found at: " . $lgaContactsFilePath);
+                    } elseif (!$lgaIdentifier) {
+                        error_log("PHP Info: No LGAKey found for suburb '$suburbName' in '$suburbLgaMapFilePath'.");
+                    }
+                }
+                // --- End LGA Lookup ---
+
+            } else {
+                 error_log("PHP Nominatim JSON decode error or missing address for $latitude, $longitude. Response: " . substr($geoResponseJson, 0, 250));
+            }
+        } else {
+             error_log("PHP Nominatim API request failed ($geoStatusCode) for $latitude, $longitude. Response: " . substr($geoResponseJson, 0, 250));
+        }
+    } else {
+        error_log("PHP Failed to contact Nominatim API for $latitude, $longitude. Error: " . (error_get_last()['message'] ?? 'Unknown file_get_contents error'));
+    }
 }
 
+// Create the final log entry object
+$finalLogEntry = $logDataFromClient;
+$finalLogEntry['suburb'] = $suburbName;
+$finalLogEntry['state'] = $stateName;
+$finalLogEntry['lgaName'] = $lgaName;   // This is the LGAFullName
+$finalLogEntry['lgaEmail'] = $lgaEmail;
 
 // --- Add Server-Side Metadata ---
 try {
-    // Use UTC for server timestamp consistency
     $dateTime = new DateTime('now', new DateTimeZone('UTC'));
-    // Format in ISO 8601 for better machine readability
-    $newLogData['serverTimestampUTC'] = $dateTime->format(DateTime::ATOM); // e.g., 2025-04-11T12:54:25+00:00
+    $finalLogEntry['serverTimestampUTC'] = $dateTime->format(DateTime::ATOM);
 } catch (Exception $e) {
-    // Fallback if timezone fails
-     $newLogData['serverTimestampUTC'] = gmdate(DateTime::ATOM);
+     $finalLogEntry['serverTimestampUTC'] = gmdate(DateTime::ATOM);
 }
-$newLogData['ipAddress'] = $_SERVER['REMOTE_ADDR'] ?? 'Unknown';
+// $finalLogEntry['ipAddress'] = $_SERVER['REMOTE_ADDR'] ?? 'Unknown';
 
 
 // --- JSON Logging ---
-
-// Check if directory is writable (important!)
+// (The logging part remains the same as your previous version)
 if (!is_writable($logDirectory)) {
      error_log("PHP Error: Log directory not writable: " . $logDirectory);
-     sendJsonResponse('error', 'Server configuration error: Cannot write to log directory.', 500);
+     sendJsonResponse('error', 'Server configuration error: Cannot write to log directory.', 500, $finalLogEntry);
 }
-
-// Check file permissions if it exists
 if (file_exists($jsonLogFilePath) && (!is_readable($jsonLogFilePath) || !is_writable($jsonLogFilePath))) {
     error_log("PHP Error: JSON log file not readable/writable: " . $jsonLogFilePath);
-    sendJsonResponse('error', 'Server config error: Cannot read/write JSON log file.', 500);
+    sendJsonResponse('error', 'Server config error: Cannot read/write JSON log file.', 500, $finalLogEntry);
 }
 
 $logs = [];
-// Read existing data safely
 if (file_exists($jsonLogFilePath) && filesize($jsonLogFilePath) > 0) {
     $existingJson = file_get_contents($jsonLogFilePath);
     if ($existingJson !== false) {
         $decodedLogs = json_decode($existingJson, true);
-        // Check if decoding was successful and resulted in an array
         if (json_last_error() === JSON_ERROR_NONE && is_array($decodedLogs)) {
             $logs = $decodedLogs;
         } else {
-            // File exists but is corrupt or not valid JSON array - log error, start fresh
-            error_log("PHP Warning: JSON log file '$jsonLogFilePath' might be corrupted or not an array. Resetting log. JSON Error: " . json_last_error_msg());
-            // Consider backing up the corrupted file here before overwriting
-            // rename($jsonLogFilePath, $jsonLogFilePath . '.corrupt.' . time());
+            error_log("PHP Warning: JSON log file '$jsonLogFilePath' might be corrupted. Resetting. Error: " . json_last_error_msg());
             $logs = [];
         }
     } else {
          error_log("PHP Warning: Could not read existing JSON log file: " . $jsonLogFilePath);
-         // Decide if to proceed with empty array or fail
-         $logs = []; // Proceed with empty array
+         $logs = [];
     }
 }
-// Add the new log entry
-$logs[] = $newLogData;
 
-// Write back to the file with locking
-$fileHandle = fopen($jsonLogFilePath, 'c'); // 'c' - create if not exist, truncate if exists, pointer at start
+$logs[] = $finalLogEntry;
+
+$fileHandle = fopen($jsonLogFilePath, 'c');
 if ($fileHandle === false) {
     error_log("PHP Error: Could not open JSON log file for writing: " . $jsonLogFilePath);
-    sendJsonResponse('error', 'Server error: Could not open JSON log file.', 500);
+    sendJsonResponse('error', 'Server error: Could not open JSON log file.', 500, $finalLogEntry);
 }
-
 $logWriteSuccess = false;
-if (flock($fileHandle, LOCK_EX)) { // Exclusive lock
-    if (ftruncate($fileHandle, 0)) { // Clear the file content
-        rewind($fileHandle); // Move pointer to the beginning
+if (flock($fileHandle, LOCK_EX)) {
+    if (ftruncate($fileHandle, 0)) {
+        rewind($fileHandle);
         $updatedJson = json_encode($logs, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         if ($updatedJson !== false && fwrite($fileHandle, $updatedJson) !== false) {
-            fflush($fileHandle); // Ensure data is written to disk
+            fflush($fileHandle);
             $logWriteSuccess = true;
         } else {
-            error_log("PHP Error: Failed to write or encode JSON to: " . $jsonLogFilePath . " JSON Error: " . json_last_error_msg());
+            error_log("PHP Error: Failed to write/encode JSON to: " . $jsonLogFilePath . ". JSON Error: " . json_last_error_msg());
         }
     } else {
         error_log("PHP Error: Failed to truncate JSON file: " . $jsonLogFilePath);
     }
-    flock($fileHandle, LOCK_UN); // Release lock
+    flock($fileHandle, LOCK_UN);
 } else {
     error_log("PHP Warning: Could not lock JSON file for writing: " . $jsonLogFilePath);
-    // Don't send error to user usually, just log it, maybe try again later?
-    // For now, we'll indicate failure if lock fails.
 }
 fclose($fileHandle);
 
 if (!$logWriteSuccess) {
-    // Don't expose detailed server error to client, but log it.
-    sendJsonResponse('error', 'Server error: Failed to save log data.', 500);
+    sendJsonResponse('error', 'Server error: Failed to save log data.', 500, $finalLogEntry);
 }
 
-
-// --- Optional: CSV Logging (Add if needed) ---
-/*
-// Define CSV fields carefully, especially for nested 'conditions'
-$csvFields = [
-    'timestamp', 'latitude', 'longitude', 'brands', // Keep brands as JSON string? Or comma-separated?
-    // How to represent conditions? Maybe flatten? E.g., condition_Coles, condition_Woolies?
-    'comments', 'serverTimestampUTC', 'ipAddress', 'clientSubmissionTimestamp'
-];
-
-// Implement CSV writing logic similar to JSON (fopen 'a', flock, fputcsv, fclose)
-// Need to decide how to flatten the $newLogData['conditions'] array for CSV.
-// Example flattening:
-$csvRow = [];
-foreach ($csvFields as $field) {
-    if ($field === 'brands' && isset($newLogData['brands'])) {
-         $csvRow[] = implode(', ', $newLogData['brands']); // Simple comma separation
-    } elseif (isset($newLogData[$field])) {
-         $csvRow[] = $newLogData[$field];
-    } // Add logic here for conditions if needed
-     else {
-        $csvRow[] = '';
-    }
-}
-// ... fputcsv logic ...
-*/
-
-
-// --- Send Final Success Response ---
-sendJsonResponse('success', 'Log saved successfully.', 200);
+sendJsonResponse('success', 'Log saved successfully.', 200, $finalLogEntry);
 ?>

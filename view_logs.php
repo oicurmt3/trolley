@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="View logged abandoned shopping trolleys">
-    <title>Trolley List - Reported Abandoned Trolleys</title>
+    <title>Trolley List - Reported Abandoned Trolleys in WA</title>
 <style>
 /* ... CSS ... */
 :root {
@@ -39,6 +39,9 @@
     --bigw-hover-bg: #0037a0;
     --bunnings-bg: #0d5257;
     --bunnings-hover-bg: #0b494e;
+    --spudshed-bg: #a6cf4d;
+    --spudshed-color:#8b380a;
+    --spudshed-hover-bg:#84a53d;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg-color); color: var(--text-color); padding: 5px; }
@@ -84,6 +87,9 @@ tr.detail-row td { background-color: var(--detail-row-bg); white-space: normal; 
 .brand-toggle[data-brand="BigW"]:hover { background-color: var(--bigw-hover-bg); }
 .brand-toggle[data-brand="Bunnings"] { background-color: var(--bunnings-bg); }
 .brand-toggle[data-brand="Bunnings"]:hover { background-color: var(--bunnings-hover-bg); }
+.brand-toggle[data-brand="Spudshed"] { background-color: var(--spudshed-bg); }
+.brand-toggle[data-brand="Spudshed"] { color: var(--spudshed-color); }
+.brand-toggle[data-brand="Spudshed"]:hover { background-color: var(--spudshed-hover-bg); }
 
 .pagination { margin: 20px 0; text-align: center; }
 /* *** MODIFICATION: Use primary blue for these links *** */
@@ -164,6 +170,8 @@ tr.detail-row td { background-color: var(--detail-row-bg); white-space: normal; 
         .brand-link-button.brand-bigw:hover { background-color: #0037a0; border-color: #0037a0;}
         .brand-link-button.brand-bunnings { background-color: #0d5257; color: white; border-color: #0d5257; }
         .brand-link-button.brand-bunnings:hover { background-color: #0b494e; border-color: #0b494e;}
+        .brand-link-button.brand-spudshed { background-color: #a6cf4d; color: #8b380a; border-color: #0d5257; }
+        .brand-link-button.brand-spudshed:hover { background-color: #84a53d; border-color: #0b494e;}
         .brand-link-button.brand-other { background-color: var(--rating-inactive-bg); color: var(--rating-inactive-text); border-color: var(--border-color);}
         .brand-link-button.brand-other:hover { background-color: var(--button-secondary-bg); border-color: var(--button-secondary-bg);}
         /* End Brand Specific Colors */
@@ -214,7 +222,7 @@ tr.detail-row td { background-color: var(--detail-row-bg); white-space: normal; 
 <body>
     <div class="container">
         <header>
-            <h1>Trolley List <icon>🛒️</icon><span>Reported Abandoned Trolleys</span></h1>
+            <h1>WA Trolley List <icon>🛒️</icon><span>Reported Abandoned Trolleys in WA</span></h1>
         </header>
 
         <div id="loading" class="loading-message">Loading...</div>
@@ -274,12 +282,12 @@ tr.detail-row td { background-color: var(--detail-row-bg); white-space: normal; 
     // --- Custom Brand Text Mapping ---
     const customBrandText = { /* ... */
          "Coles": "CO", "Woolworths": "WO", "Aldi": "AL", "IGA": "IG",
-         "Kmart": "KM", "BigW": "BI", "Bunnings": "BU", "Other": "OT"
+         "Kmart": "KM", "BigW": "BI", "Bunnings": "BU", "Spudshed": "SP", "Other": "OT"
      };
 
     // --- Data Loading and Initialization ---
     let allLogs = [];
-    const itemsPerPage = 15;
+    const itemsPerPage = 30;
     let currentPage = 1;
     let sortColumn = "timestamp";
     let sortDirection = -1;
@@ -459,8 +467,8 @@ tr.detail-row td { background-color: var(--detail-row-bg); white-space: normal; 
              const conditions = (typeof logData.conditions === 'object' && logData.conditions !== null) ? logData.conditions : {};
              const brandConditions = conditions[brand] || []; const comments = logData.comments || '';
              let detailHtml = '<div class="detail-content">'; detailHtml += `<h4>Details for ${brand} Trolley</h4>`;
-             if (brandConditions.length > 0) { const conditionsText = brandConditions.join(', '); const escapedConditionsText = conditionsText.replace(/</g, "<").replace(/>/g, ">"); detailHtml += `<span class="conditions_yes"><strong>Conditions Reported (${brand}):</strong> ${escapedConditionsText}</span><br>`; }
-             else { detailHtml += `<span class="no-details">No specific conditions reported for ${brand}.</span><br>`; }
+             if (brandConditions.length > 0) { const conditionsText = brandConditions.join(', '); const escapedConditionsText = conditionsText.replace(/</g, "<").replace(/>/g, ">"); detailHtml += `<span class="conditions_yes"><strong>Condition (${brand}):</strong> ${escapedConditionsText}</span><br>`; }
+             else { detailHtml += `<span class="no-details">No specific conditions reported for ${brand} trolley.</span><br>`; }
              if (comments) { const escapedComments = comments.replace(/</g, "<").replace(/>/g, ">"); detailHtml += `<span class="add_comments" style="display:block;"><strong>General Comments:</strong> ${escapedComments.replace(/\n/g, '<br>')}</span>`; }
              else { detailHtml += '<span class="no-details">No general comments submitted.</span>'; }
              detailHtml += '</div>'; detailCell.innerHTML = detailHtml; detailRow.appendChild(detailCell);

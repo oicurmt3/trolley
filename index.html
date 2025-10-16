@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Report Abandoned Shopping Trolleys (it only take 3 taps)">
-    <title>Trolley Report - Find & Report Abandoned Trolleys</title>
+    <title>WA Trolley Report - Find & Report Abandoned Trolleys</title>
 <style>
     :root {
         --bg-color: #1a1a1a;
@@ -47,8 +47,8 @@
     body { display: flex; flex-direction: column; align-items: center; padding: 5px 5px 15px 5px; background-color: var(--bg-color); color: var(--text-color); }
     .container { width: 100%; max-width: 600px; margin: 10px auto; padding: 0px 10px 20px 10px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); background-color: var(--card-bg); border: 1px solid var(--border-color); }
     header { text-align: center; margin-bottom: 5px; margin-top: 15px; }
-    h1 { font-size: 2.0em; margin: -10px 0px 0px 0px; }
-    h1 span { display: block; font-weight: normal; font-size: 0.45em; margin: -8px 0px 0px 0px; }
+    h1 { font-size: 3.0em; margin: -10px 0px 0px 0px; }
+    h1 span { display: block; font-weight: normal; font-size: 0.5em; margin: -8px 0px 0px 0px; }
     h1 icon {font-weight: normal; font-size: 0.9em; margin: -8px 0px 0px 0px; }
     .form-group { margin-bottom: 20px; }
     label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.95em; }
@@ -140,6 +140,12 @@
     .button-grid button[data-value="Bunnings"] { background-color: #0d5257; color: white; border-color: #0d5257; }
     .button-grid button[data-value="Bunnings"]:hover { background-color: #0b494e; border-color: #0b494e;}
     .button-grid button[data-value="Bunnings"].active {
+        background-color: #bf9000; color: white;
+        border: 0px solid var(--active-border-color); padding: 10px; font-weight: bold;
+    }
+    .button-grid button[data-value="Spudshed"] { background-color: #a6cf4d; color: #8b380a; border-color: #a6cf4d; }
+    .button-grid button[data-value="Spudshed"]:hover { background-color: #84a53d ; border-color: #0b494e;}
+    .button-grid button[data-value="Spudshed"].active {
         background-color: #bf9000; color: white;
         border: 0px solid var(--active-border-color); padding: 10px; font-weight: bold;
     }
@@ -251,7 +257,8 @@
 
 
     @media (max-width: 768px) {
-        h1 span {font-size: 0.40em;}
+        h1 {font-size: 30px;}
+        h1 span {font-size: 0.45em;}
         p.notice {font-size: 0.6em;color:#fc9992;padding-bottom:2px;}
         p.notice2 {font-size: 0.8em;color:#fc9992;padding-bottom:2px;}
         .disclaimer {font-size:10px;text-align:center;margin-top:10px; color:#777;}
@@ -264,6 +271,7 @@
         .button-grid button[data-value="IGA"].active,
         .button-grid button[data-value="Bunnings"].active,
         .button-grid button[data-value="Kmart"].active,
+        .button-grid button[data-value="Spudshed"].active,
         .button-grid button[data-value="BigW"].active { padding: 8px; }
         .condition-section .button-grid button.active { padding: 8px; }
         #char-counter {margin-top:0px;font-size: 0.6em;margin-bottom:-20px;}
@@ -279,7 +287,7 @@
 <body>
     <div class="container">
         <header>
-            <h1>Trolley Report <icon>🛒</icon><span>Find & Report Abandoned Trolleys </span></h1>
+            <h1>WA Trolley Report <icon>🛒</icon><span>Find & Report Abandoned Trolleys in WA</span></h1>
         </header>
         <main>
             <form id="trolley-form">
@@ -306,6 +314,7 @@
                         <button type="button" data-value="Kmart">Kmart</button>
                         <button type="button" data-value="BigW">Big W</button>
                         <button type="button" data-value="Bunnings">Bunnings</button>
+                        <button type="button" data-value="Spudshed">Spudshed</button>
                         <button type="button" data-value="Other">Other</button>
                     </div>
                     <input type="hidden" name="brands" class="group-value">
@@ -410,6 +419,20 @@
                         </div>
                         <input type="hidden" name="conditions[Bunnings]" class="group-value condition-value">
                     </section>
+                    <section class="form-group condition-section" data-brand="Spudshed">
+                        <label>Spudshed Trolley Condition</label>
+                         <div class="button-grid condition-buttons">
+                            <button type="button" data-value="Good Condition">Good</button>
+                            <button type="button" data-value="Needs Cleaning">Needs Cleaning</button>
+                            <button type="button" data-value="Rusty Frame">Rusty</button>
+                            <button type="button" data-value="Damaged Wheel(s)">Damaged Wheel</button>
+                            <button type="button" data-value="Bent Frame">Bent Frame</button>
+                            <button type="button" data-value="Broken Handle">Broken Handle</button>
+                            <button type="button" data-value="Child Seat Issue">Child Seat</button>
+                            <button type="button" data-value="Other Damage">Other</button>
+                        </div>
+                        <input type="hidden" name="conditions[Spudshed]" class="group-value condition-value">
+                    </section>
                     <section class="form-group condition-section" data-brand="Other">
                         <label>Other Trolley Condition</label>
                          <div class="button-grid condition-buttons">
@@ -462,7 +485,7 @@
                 </div>
             </div>
 
-            <p class="disclaimer">Not affilliated with/endorsed by any shopping brand or LGA.<br /><a href="/trolley/privacy.html" target="_blank">Privacy</a> • <a href="/trolley/terms.html" target="_blank">Terms</a> • <a href="/trolley/faq.html" target="_blank">FAQs</a> • <a href="https://sandgroper.net" target="_blank">Apps</a></p>
+            <p class="disclaimer">Not affilliated with/endorsed by any shopping brand or LGA.<br /><a href="/trolley/privacy.html" target="_blank">Privacy</a> • <a href="/trolley/terms.html" target="_blank">Terms</a> • <a href="/trolley/faq.html" target="_blank">FAQs</a> • <a href="https://sandgroper.net" target="_blank">Apps</a> • <a href="https://sandgroper.net/trolley/trolleyfinder.apk" target="_blank">Download</a></p>
         </main>
     </div>
 <script>
@@ -491,13 +514,14 @@
         const manualEmailCopyAreaModalDiv = document.getElementById('manual-email-copy-area-modal');
 
         const brandEmailAddresses = {
-            "Coles": "DomainAdmin@coles.com.au;coles.customer.care@coles.com.au",
-            "Woolworths": "CloudTech-Ops@woolworths.com.au;info@trolleytracker.com.au;mail@bigw.com.au;support@woolworths.com.au",
-            "Aldi": "deborah.coburn@aldi.com.au;dataprotection@aldi.com.au;info@aldi.com.au;support@aldi.com.au;infor@aldi.com.au",
-            "IGA": "hostmaster@metcash.com;ask@igashop.com.au;privacy@metcash.com;recruitment@aldi.com.au;info@iga.com.au;support@iga.com.au",
-            "Kmart": "Kmart.ITNetworkServices@kmart.com.au;info@kmart.com.au;info@wesfarmers.com.au;support@kmart.com.au",
-            "BigW": "CloudTech-Ops@woolworths.com.au;info@bigw.com.au;support@bigw.com.au;mail@bigw.com.au;hoax@bigw.com.au;privacy@woolworths.com.au",
-            "Bunnings": "cyberops@bunnings.com.au;info@wesfarmers.com.au;customersupport@bunnings.com.au;support@bunnings.com.au;info@bunnings.com.au",
+            "Coles": "ccccontactus@coles.com.au",
+            "Woolworths": "info@trolleytracker.com.au;mail@bigw.com.au;support@woolworths.com.au",
+            "Aldi": "customer@service.aldi.com.au",
+            "IGA": "hostmaster@metcash.com;privacy@metcash.com",
+            "Kmart": "info@wesfarmers.com.au",
+            "Bunnings": "support@bunnings.com.au;info@bunnings.com.au;scamwatch@bunnings.com.au;info@wesfarmers.com.au;customersupport@bunnings.com.au;privacy@bunnings.com.au",
+            "BigW": ";info@bigw.com.au;support@bigw.com.au;mail@bigw.com.au;hoax@bigw.com.au;privacy@woolworths.com.au",
+            "Spudshed": "CustomerService@spudshed.com.au", // natasha.kennington@galatibros.com.au
             "Other": "" // No direct email for "Other" brands
         };
 
@@ -920,9 +944,9 @@
             }
 
             let body = `Dear ${entityName || (entityType === "LGA" ? 'Council' : 'Team')},\n\n`;
-            body += `I would like to report an abandoned trolley in ${locationString}.`;
+            body += `I would like to report an abandoned trolley(s) in ${locationString}.`;
             if (entityType === "LGA" && submissionData.brands && submissionData.brands.length > 0) {
-                 body += ` The trolley appears to belong to: ${trolleyBrandInfo}.`;
+                 body += ` The trolley(s) belongs to ${trolleyBrandInfo}.`;
             } else if (entityType === "Brand") {
                 body = `Dear ${entityName || 'Brand'} Team,\n\nI would like to report an abandoned ${entityName} trolley in ${locationString}.`;
             }
@@ -931,11 +955,11 @@
             body += `\n\nDetails:`;
             body += `\n• Brand(s): ${trolleyBrandInfo}`;
             // Use submissionData.timestamp (original client timestamp) for 'Reported on' for user consistency
-            body += `\n• Reported: ${formatDateForEmail(submissionData.timestamp, false)}`; // Client's local time preferred for "Reported on"
-            body += `\n• Approx. Location (Lat, Lon): ${submissionData.latitude}, ${submissionData.longitude}`;
+            body += `\n• Date/Time: ${formatDateForEmail(submissionData.timestamp, false)}`; // Client's local time preferred for "Reported on"
+            ////// body += `\n• Approx. Location (Lat, Lon): ${submissionData.latitude}, ${submissionData.longitude}`;
             body += `\n• Map Link: https://www.google.com/maps?q=${submissionData.latitude},${submissionData.longitude}`; // Corrected Google Maps link
              if (submissionData.suburb && submissionData.state) {
-                 body += `\n• Address Details: Near ${submissionData.suburb}, ${submissionData.state}`;
+                 body += `\n• Suburb/State: ${submissionData.suburb}, ${submissionData.state}`;
                  if (submissionData.lgaName && entityType !== "LGA") { // Add LGA info if known and not emailing the LGA itself
                     body += ` (LGA: ${submissionData.lgaName})`;
                  }
@@ -959,7 +983,7 @@
                         }
                     }
                     if (allConditionsString) {
-                        body += `\n• Reported Condition(s): ${allConditionsString}`;
+                        body += `\n• Condition(s): ${allConditionsString}`;
                         conditionsListed = true;
                     }
                 }
@@ -973,9 +997,9 @@
             if (submissionData.comments) {
                 body += `\n\nComments:\n${submissionData.comments}`;
             }
-            body += `\n\nThank you for your attention to this matter.`;
-            body += `\n\nRegards,\nA concerned community member`;
-            body += `\n\n\n--- Report generated by TrolleyReport (sandgroper.net/trolley) ---`;
+            body += `\n\nThank you.`;
+            body += `\n\nRegards,\nA trolley spotter`;
+            body += `\n\n\n--- Report generated by "Trolley Report" (sandgroper.net/trolley) ---`;
             body += `\n--- See a map of abandoned trolleys at https://sandgroper.net/trolley/map_view.html ---`;
             return body;
         }
@@ -1024,14 +1048,14 @@
                         emailButton.onclick = () => {
                             const dateForSubject = formatDateForEmail(submissionData.timestamp, true);
                             const suburbForSubject = submissionData.suburb || '[Suburb]';
-                            const subject = `Abandoned ${brand} Trolley report - ${dateForSubject} in ${suburbForSubject}`;
+                            const subject = `Abandoned ${brand} Trolley in ${suburbForSubject} ${dateForSubject}`;
                             const body = generateTrolleyEmailBody(brand, submissionData, "Brand");
                             const mailtoLink = `mailto:${brandEmailAddresses[brand]}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
                             window.location.href = mailtoLink;
                             showManualCopyUI(brand, brandEmailAddresses[brand], subject, body, "Brand");
                             if(modalTitle) modalTitle.textContent = `Email for ${brand}`;
-                            if(modalPara) modalPara.innerHTML = `If your email app didn't open, copy the details below. You can then choose another recipient or click "All Done".`;
+                            if(modalPara) modalPara.innerHTML = `If your email app didn't open, copy the details below, open your email app and paste it into your email manually, or click "All Done".`;
                             emailPromptActionBtn.textContent = "All Done";
                         };
                         emailOptionsContainerModalDiv.appendChild(emailButton);
@@ -1060,7 +1084,7 @@
                     const dateForSubject = formatDateForEmail(submissionData.timestamp, true);
                     const suburbForSubject = submissionData.suburb || '[Suburb]';
                     // Make subject slightly different for LGA
-                    const subject = `Report of Abandoned Trolley(s) - ${dateForSubject} in ${suburbForSubject}`;
+                    const subject = `Abandoned Trolley(s) in ${suburbForSubject}, ${dateForSubject}`;
                     const body = generateTrolleyEmailBody(submissionData.lgaName, submissionData, "LGA");
                     const mailtoLink = `mailto:${submissionData.lgaEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 

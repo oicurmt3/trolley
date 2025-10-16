@@ -99,3 +99,4 @@ of OSM's Nominatim geocodin
 <p>You have been blocked because you have violated the
 <a href="https://operations.osmfoundation.org/policies/nominatim/">usage policy</a>
 of OSM's Nominatim geocodin
+[02-Jul-2025 10:38:06 Australia/Sydney] PHP Info: No LGAKey found for suburb 'Wallsend' in '/home/perthrel/sandgroper.net/trolley/suburb_lga_mapping.json'.

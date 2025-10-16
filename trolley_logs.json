@@ -707,5 +707,1953 @@
         "suburb": "Shenton Park",
         "state": "Western Australia",
         "serverTimestampUTC": "2025-05-20T04:32:16+00:00"
+    },
+    {
+        "latitude": "-32.060370",
+        "longitude": "115.940903",
+        "timestamp": "2025-05-28T05:56:44",
+        "brands": [
+            "Woolworths"
+        ],
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-05-27T21:56:52+00:00"
+    },
+    {
+        "latitude": "-32.047265",
+        "longitude": "115.956844",
+        "timestamp": "2025-05-29T06:45:23",
+        "brands": [
+            "Woolworths"
+        ],
+        "comments": "No. 14",
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-05-28T22:45:55+00:00"
+    },
+    {
+        "latitude": "-32.046310",
+        "longitude": "115.960404",
+        "timestamp": "2025-05-29T06:49:35",
+        "brands": [
+            "Woolworths"
+        ],
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-05-28T22:49:50+00:00"
+    },
+    {
+        "latitude": "-31.953814",
+        "longitude": "115.799928",
+        "timestamp": "2025-05-30T13:37:27",
+        "brands": [
+            "Coles"
+        ],
+        "comments": "Out the front of Milroy lodge ",
+        "conditions": {
+            "Coles": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Shenton Park",
+        "state": "Western Australia",
+        "lgaName": "City of Nedlands",
+        "lgaEmail": "council@nedlands.wa.gov.au",
+        "serverTimestampUTC": "2025-05-30T05:37:56+00:00"
+    },
+    {
+        "latitude": "-32.047841",
+        "longitude": "115.953301",
+        "timestamp": "2025-06-03T17:20:05",
+        "brands": [
+            "Other"
+        ],
+        "comments": "Spudshed near the traffic light box",
+        "conditions": {
+            "Other": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-06-03T09:20:35+00:00"
+    },
+    {
+        "latitude": "-31.849537",
+        "longitude": "115.835829",
+        "timestamp": "2025-06-06T10:51:08",
+        "brands": [
+            "IGA"
+        ],
+        "conditions": {
+            "IGA": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Balga",
+        "state": "Western Australia",
+        "lgaName": "City of Stirling",
+        "lgaEmail": "stirling@stirling.wa.gov.au",
+        "serverTimestampUTC": "2025-06-06T02:52:02+00:00"
+    },
+    {
+        "latitude": "-31.983203",
+        "longitude": "115.780866",
+        "timestamp": "2025-06-09T18:36:22",
+        "brands": [
+            "Coles",
+            "Bunnings"
+        ],
+        "comments": "Next to the bus shelter",
+        "conditions": {
+            "Coles": [
+                "Good Condition"
+            ],
+            "Bunnings": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Claremont",
+        "state": "Western Australia",
+        "lgaName": "Town of Claremont",
+        "lgaEmail": "toc@claremont.wa.gov.au",
+        "serverTimestampUTC": "2025-06-09T10:36:44+00:00"
+    },
+    {
+        "latitude": "-32.047877",
+        "longitude": "115.953421",
+        "timestamp": "2025-06-10T17:07:27",
+        "brands": [
+            "Spudshed"
+        ],
+        "conditions": {
+            "Spudshed": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-06-10T09:07:37+00:00"
+    },
+    {
+        "latitude": "-32.060348",
+        "longitude": "115.940925",
+        "timestamp": "2025-06-12T07:12:00",
+        "brands": [
+            "Woolworths"
+        ],
+        "comments": "Outside 206 Yale road ",
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-06-11T23:12:30+00:00"
+    },
+    {
+        "latitude": "-32.047807",
+        "longitude": "115.953407",
+        "timestamp": "2025-06-17T06:10:51",
+        "brands": [
+            "Spudshed"
+        ],
+        "comments": "2 x at the corner ",
+        "conditions": {
+            "Spudshed": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-06-16T22:11:12+00:00"
+    },
+    {
+        "latitude": "-32.063569",
+        "longitude": "115.937257",
+        "timestamp": "2025-06-19T06:45:38",
+        "brands": [
+            "IGA"
+        ],
+        "comments": "Other side of the road outside persona homes",
+        "conditions": {
+            "IGA": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Canning Vale",
+        "state": "Western Australia",
+        "lgaName": "City of Canning",
+        "lgaEmail": "customer@canning.wa.gov.au",
+        "serverTimestampUTC": "2025-06-18T22:46:23+00:00"
+    },
+    {
+        "latitude": "-32.047694",
+        "longitude": "115.953163",
+        "timestamp": "2025-06-24T06:01:05",
+        "brands": [
+            "Spudshed"
+        ],
+        "conditions": {
+            "Spudshed": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-06-23T22:01:19+00:00"
+    },
+    {
+        "latitude": "-31.953646",
+        "longitude": "115.803079",
+        "timestamp": "2025-06-24T13:02:07",
+        "brands": [
+            "Other"
+        ],
+        "comments": "Farmer jacks",
+        "conditions": {
+            "Other": [
+                "Rusty Frame"
+            ]
+        },
+        "suburb": "Shenton Park",
+        "state": "Western Australia",
+        "lgaName": "City of Nedlands",
+        "lgaEmail": "council@nedlands.wa.gov.au",
+        "serverTimestampUTC": "2025-06-24T05:02:55+00:00"
+    },
+    {
+        "latitude": "-32.085000",
+        "longitude": "116.007400",
+        "timestamp": "2025-06-24T14:07:47",
+        "brands": [
+            "Kmart"
+        ],
+        "conditions": {
+            "Kmart": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Gosnells",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-06-24T06:08:08+00:00"
+    },
+    {
+        "latitude": "-32.085000",
+        "longitude": "116.007400",
+        "timestamp": "2025-06-24T14:09:34",
+        "brands": [
+            "Bunnings"
+        ],
+        "conditions": {
+            "Bunnings": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Gosnells",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-06-24T06:09:49+00:00"
+    },
+    {
+        "latitude": "-32.085000",
+        "longitude": "116.007400",
+        "timestamp": "2025-06-24T14:10:37",
+        "brands": [
+            "IGA"
+        ],
+        "conditions": {
+            "IGA": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Gosnells",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-06-24T06:10:51+00:00"
+    },
+    {
+        "latitude": "-32.061404",
+        "longitude": "115.938352",
+        "timestamp": "2025-06-25T06:24:42",
+        "brands": [
+            "Coles"
+        ],
+        "comments": "At the bottom of the bridge",
+        "conditions": {
+            "Coles": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-06-24T22:25:04+00:00"
+    },
+    {
+        "latitude": "-32.062782",
+        "longitude": "115.938415",
+        "timestamp": "2025-06-25T06:49:25",
+        "brands": [
+            "Coles"
+        ],
+        "comments": "Near the pile of dirt on the edge of the train station car park along Nicholson Road",
+        "conditions": {
+            "Coles": [
+                "Needs Cleaning"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-06-24T22:50:15+00:00"
+    },
+    {
+        "latitude": "-32.060803",
+        "longitude": "115.939520",
+        "timestamp": "2025-06-25T06:57:01",
+        "brands": [
+            "Woolworths"
+        ],
+        "comments": "Next to the bus stop on the opposite side to the church",
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-06-24T22:57:28+00:00"
+    },
+    {
+        "latitude": "-32.051305",
+        "longitude": "115.951650",
+        "timestamp": "2025-06-26T06:32:40",
+        "brands": [
+            "Woolworths",
+            "Spudshed"
+        ],
+        "comments": "Two spudshed and one Woolworths trolley next to the bus stop",
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-06-25T22:33:10+00:00"
+    },
+    {
+        "latitude": "-32.047289",
+        "longitude": "115.957026",
+        "timestamp": "2025-06-26T06:40:40",
+        "brands": [
+            "Spudshed"
+        ],
+        "comments": "Outside number 14",
+        "conditions": {
+            "Spudshed": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-06-25T22:41:01+00:00"
+    },
+    {
+        "latitude": "-32.046288",
+        "longitude": "115.960819",
+        "timestamp": "2025-06-26T06:45:15",
+        "brands": [
+            "Spudshed"
+        ],
+        "comments": "Outside number 46",
+        "conditions": {
+            "Spudshed": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-06-25T22:45:38+00:00"
+    },
+    {
+        "latitude": "-32.047642",
+        "longitude": "115.962253",
+        "timestamp": "2025-06-26T06:58:39",
+        "brands": [
+            "Woolworths"
+        ],
+        "comments": "On the side of the road on Charlton",
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-06-25T22:59:14+00:00"
+    },
+    {
+        "latitude": "-32.047797",
+        "longitude": "115.961963",
+        "timestamp": "2025-06-26T06:59:44",
+        "brands": [
+            "Woolworths"
+        ],
+        "comments": "Outside number 11",
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-06-25T23:00:02+00:00"
+    },
+    {
+        "latitude": "-32.048818",
+        "longitude": "115.960758",
+        "timestamp": "2025-06-26T07:01:52",
+        "brands": [
+            "Spudshed"
+        ],
+        "comments": "In the shopping centre car park",
+        "conditions": {
+            "Spudshed": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-06-25T23:02:16+00:00"
+    },
+    {
+        "latitude": "-32.048854",
+        "longitude": "115.960337",
+        "timestamp": "2025-06-26T07:02:50",
+        "brands": [
+            "Kmart"
+        ],
+        "comments": "Outside Thornlie Continental food shop",
+        "conditions": {
+            "Kmart": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-06-25T23:03:27+00:00"
+    },
+    {
+        "latitude": "-32.051213",
+        "longitude": "115.957606",
+        "timestamp": "2025-06-26T07:07:47",
+        "brands": [
+            "Woolworths"
+        ],
+        "comments": "1 next to the bus stop and one on the corner",
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-06-25T23:08:14+00:00"
+    },
+    {
+        "latitude": "-31.953876",
+        "longitude": "115.800760",
+        "timestamp": "2025-06-30T14:05:23",
+        "brands": [
+            "Coles"
+        ],
+        "comments": "On the other side of the fence",
+        "conditions": {
+            "Coles": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Shenton Park",
+        "state": "Western Australia",
+        "lgaName": "City of Nedlands",
+        "lgaEmail": "council@nedlands.wa.gov.au",
+        "serverTimestampUTC": "2025-06-30T06:05:42+00:00"
+    },
+    {
+        "latitude": "-32.053963",
+        "longitude": "115.949556",
+        "timestamp": "2025-07-01T15:17:53",
+        "brands": [
+            "Woolworths"
+        ],
+        "comments": "In the water authority driveway",
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-07-01T07:18:26+00:00"
+    },
+    {
+        "latitude": "-32.061671",
+        "longitude": "115.938564",
+        "timestamp": "2025-07-09T06:39:17",
+        "brands": [
+            "Coles"
+        ],
+        "conditions": {
+            "Coles": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-07-08T22:39:27+00:00"
+    },
+    {
+        "latitude": "-31.954442",
+        "longitude": "115.803450",
+        "timestamp": "2025-07-11T13:14:58",
+        "brands": [
+            "Coles"
+        ],
+        "conditions": {
+            "Coles": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Shenton Park",
+        "state": "Western Australia",
+        "lgaName": "City of Nedlands",
+        "lgaEmail": "council@nedlands.wa.gov.au",
+        "serverTimestampUTC": "2025-07-11T05:15:13+00:00"
+    },
+    {
+        "latitude": "-32.056426",
+        "longitude": "115.945300",
+        "timestamp": "2025-07-16T06:41:33",
+        "brands": [
+            "Spudshed"
+        ],
+        "comments": "At the corner of Yale and Elliot Road",
+        "conditions": {
+            "Spudshed": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-07-15T22:41:54+00:00"
+    },
+    {
+        "latitude": "-32.055666",
+        "longitude": "115.949235",
+        "timestamp": "2025-07-18T05:55:28",
+        "brands": [
+            "Woolworths"
+        ],
+        "comments": "On the west side of the park",
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-07-17T21:56:06+00:00"
+    },
+    {
+        "latitude": "-32.056228",
+        "longitude": "115.960657",
+        "timestamp": "2025-07-23T16:46:28",
+        "brands": [
+            "Woolworths"
+        ],
+        "comments": "Outside the Thornlie church of Christ car park gate",
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-07-23T08:46:54+00:00"
+    },
+    {
+        "latitude": "-32.057050",
+        "longitude": "115.959519",
+        "timestamp": "2025-07-23T17:18:21",
+        "brands": [
+            "Spudshed"
+        ],
+        "comments": "18 Sandon rd",
+        "conditions": {
+            "Spudshed": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-07-23T09:18:44+00:00"
+    },
+    {
+        "latitude": "-32.056433",
+        "longitude": "115.956354",
+        "timestamp": "2025-07-23T17:23:51",
+        "brands": [
+            "Woolworths"
+        ],
+        "comments": "Outside 9 Manston rd",
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-07-23T09:25:01+00:00"
+    },
+    {
+        "latitude": "-32.067579",
+        "longitude": "115.940054",
+        "timestamp": "2025-07-24T06:37:23",
+        "brands": [
+            "Coles"
+        ],
+        "comments": "Behind the bus stop",
+        "conditions": {
+            "Coles": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-07-23T22:37:39+00:00"
+    },
+    {
+        "latitude": "-32.066442",
+        "longitude": "115.945448",
+        "timestamp": "2025-07-24T06:45:54",
+        "brands": [
+            "Coles",
+            "Woolworths",
+            "Aldi"
+        ],
+        "comments": "Near the entrance to the park. \n\nThere's also a Coles trolley for the disabled",
+        "conditions": {
+            "Coles": [
+                "Good Condition"
+            ],
+            "Woolworths": [
+                "Good Condition"
+            ],
+            "Aldi": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-07-23T22:46:42+00:00"
+    },
+    {
+        "latitude": "-32.063763",
+        "longitude": "115.952149",
+        "timestamp": "2025-07-24T06:56:30",
+        "brands": [
+            "Coles",
+            "Woolworths"
+        ],
+        "comments": "Next to power pole number 89035",
+        "conditions": {
+            "Coles": [
+                "Good Condition"
+            ],
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-07-23T22:57:23+00:00"
+    },
+    {
+        "latitude": "-32.073038",
+        "longitude": "115.946648",
+        "timestamp": "2025-07-26T15:34:31",
+        "brands": [
+            "Woolworths"
+        ],
+        "comments": "On the corner",
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-07-26T07:35:04+00:00"
+    },
+    {
+        "latitude": "-32.088749",
+        "longitude": "115.943942",
+        "timestamp": "2025-07-26T17:00:55",
+        "brands": [
+            "Woolworths"
+        ],
+        "comments": "2 trolleys near the bus stop",
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Canning Vale",
+        "state": "Western Australia",
+        "lgaName": "City of Canning",
+        "lgaEmail": "customer@canning.wa.gov.au",
+        "serverTimestampUTC": "2025-07-26T09:01:10+00:00"
+    },
+    {
+        "latitude": "-32.063883",
+        "longitude": "115.952234",
+        "timestamp": "2025-07-26T17:52:44",
+        "brands": [
+            "Coles"
+        ],
+        "conditions": {
+            "Coles": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-07-26T09:52:58+00:00"
+    },
+    {
+        "latitude": "-32.063739",
+        "longitude": "115.937154",
+        "timestamp": "2025-07-30T06:37:33",
+        "brands": [
+            "IGA"
+        ],
+        "comments": "Outside a shop across the road from the IGA",
+        "conditions": {
+            "IGA": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Canning Vale",
+        "state": "Western Australia",
+        "lgaName": "City of Canning",
+        "lgaEmail": "customer@canning.wa.gov.au",
+        "serverTimestampUTC": "2025-07-29T22:38:16+00:00"
+    },
+    {
+        "latitude": "-32.056346",
+        "longitude": "115.945120",
+        "timestamp": "2025-07-30T07:02:14",
+        "brands": [
+            "Spudshed"
+        ],
+        "comments": "On the corner of Elliot and Yale Road",
+        "conditions": {
+            "Spudshed": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-07-29T23:02:47+00:00"
+    },
+    {
+        "latitude": "-32.052579",
+        "longitude": "115.948159",
+        "timestamp": "2025-07-30T13:10:56",
+        "brands": [
+            "Coles"
+        ],
+        "comments": "At the entrance to the park",
+        "conditions": {
+            "Coles": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-07-30T05:11:10+00:00"
+    },
+    {
+        "latitude": "-32.044525",
+        "longitude": "115.964929",
+        "timestamp": "2025-07-31T06:19:25",
+        "brands": [
+            "Spudshed"
+        ],
+        "comments": "In the car park next to the footpath",
+        "conditions": {
+            "Spudshed": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-07-30T22:19:40+00:00"
+    },
+    {
+        "latitude": "-32.051627",
+        "longitude": "115.963262",
+        "timestamp": "2025-07-31T06:34:04",
+        "brands": [
+            "Woolworths"
+        ],
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-07-30T22:34:11+00:00"
+    },
+    {
+        "latitude": "-32.051805",
+        "longitude": "115.963293",
+        "timestamp": "2025-07-31T06:34:58",
+        "brands": [
+            "Woolworths",
+            "Spudshed"
+        ],
+        "comments": "Under the tree",
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-07-30T22:35:19+00:00"
+    },
+    {
+        "latitude": "-32.059033",
+        "longitude": "115.964742",
+        "timestamp": "2025-08-02T10:56:08",
+        "brands": [
+            "Spudshed"
+        ],
+        "comments": "Outside number 360",
+        "conditions": {
+            "Spudshed": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-08-02T02:56:20+00:00"
+    },
+    {
+        "latitude": "-32.073310",
+        "longitude": "115.999800",
+        "timestamp": "2025-08-02T12:03:20",
+        "brands": [
+            "Coles"
+        ],
+        "comments": "Outside 124",
+        "conditions": {
+            "Coles": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Gosnells",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-08-02T04:03:39+00:00"
+    },
+    {
+        "latitude": "-32.071566",
+        "longitude": "115.998764",
+        "timestamp": "2025-08-02T12:06:57",
+        "brands": [
+            "Coles"
+        ],
+        "comments": "On the corner of demclick way",
+        "conditions": {
+            "Coles": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Gosnells",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-08-02T04:07:41+00:00"
+    },
+    {
+        "latitude": "-32.057095",
+        "longitude": "115.959521",
+        "timestamp": "2025-08-02T17:25:24",
+        "brands": [
+            "Spudshed"
+        ],
+        "conditions": {
+            "Spudshed": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-08-02T09:25:36+00:00"
+    },
+    {
+        "latitude": "-32.048631",
+        "longitude": "115.952851",
+        "timestamp": "2025-08-05T05:49:06",
+        "brands": [
+            "Woolworths"
+        ],
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-08-04T21:49:26+00:00"
+    },
+    {
+        "latitude": "-32.044421",
+        "longitude": "115.965294",
+        "timestamp": "2025-08-07T06:13:08",
+        "brands": [
+            "Spudshed"
+        ],
+        "comments": "In the car park next to the footpath. I've already reported this a week ago and spudshed haven't picked it up",
+        "conditions": {
+            "Spudshed": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-08-06T22:13:52+00:00"
+    },
+    {
+        "latitude": "-32.052823",
+        "longitude": "115.954390",
+        "timestamp": "2025-08-07T06:38:10",
+        "brands": [
+            "Woolworths"
+        ],
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-08-06T22:38:29+00:00"
+    },
+    {
+        "latitude": "-32.056904",
+        "longitude": "115.964295",
+        "timestamp": "2025-08-10T15:39:30",
+        "brands": [
+            "Spudshed"
+        ],
+        "comments": "In the driveway",
+        "conditions": {
+            "Spudshed": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-08-10T07:39:58+00:00"
+    },
+    {
+        "latitude": "-32.057316",
+        "longitude": "115.964432",
+        "timestamp": "2025-08-10T15:41:28",
+        "brands": [
+            "Spudshed"
+        ],
+        "conditions": {
+            "Spudshed": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-08-10T07:41:36+00:00"
+    },
+    {
+        "latitude": "-32.056260",
+        "longitude": "115.960618",
+        "timestamp": "2025-08-10T15:48:30",
+        "brands": [
+            "Woolworths"
+        ],
+        "comments": "Outside the church",
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-08-10T07:48:46+00:00"
+    },
+    {
+        "latitude": "-32.056956",
+        "longitude": "115.959678",
+        "timestamp": "2025-08-10T15:50:28",
+        "brands": [
+            "Woolworths",
+            "Spudshed"
+        ],
+        "comments": "2 spudshed and one Woolworths trolley under the tree",
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ],
+            "Spudshed": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-08-10T07:50:52+00:00"
+    },
+    {
+        "latitude": "-32.057486",
+        "longitude": "115.953726",
+        "timestamp": "2025-08-10T16:00:00",
+        "brands": [
+            "Spudshed"
+        ],
+        "conditions": {
+            "Spudshed": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-08-10T08:00:08+00:00"
+    },
+    {
+        "latitude": "-31.954889",
+        "longitude": "115.803304",
+        "timestamp": "2025-08-11T13:46:25",
+        "brands": [
+            "Coles"
+        ],
+        "conditions": {
+            "Coles": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Shenton Park",
+        "state": "Western Australia",
+        "lgaName": "City of Nedlands",
+        "lgaEmail": "council@nedlands.wa.gov.au",
+        "serverTimestampUTC": "2025-08-11T05:46:47+00:00"
+    },
+    {
+        "latitude": "-32.061462",
+        "longitude": "115.939235",
+        "timestamp": "2025-08-13T05:59:25",
+        "brands": [
+            "Coles"
+        ],
+        "comments": "Next to the petrol station",
+        "conditions": {
+            "Coles": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-08-12T21:59:40+00:00"
+    },
+    {
+        "latitude": "-32.050098",
+        "longitude": "115.953597",
+        "timestamp": "2025-08-14T06:26:04",
+        "brands": [
+            "Woolworths"
+        ],
+        "comments": "Outside number 54",
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-08-13T22:26:18+00:00"
+    },
+    {
+        "latitude": "-32.049865",
+        "longitude": "115.953518",
+        "timestamp": "2025-08-14T06:54:05",
+        "brands": [
+            "Woolworths"
+        ],
+        "comments": "Next to the bus stop",
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-08-13T22:54:23+00:00"
+    },
+    {
+        "latitude": "-32.054803",
+        "longitude": "115.944985",
+        "timestamp": "2025-08-14T16:04:05",
+        "brands": [
+            "IGA"
+        ],
+        "comments": "On the edge of the park",
+        "conditions": {
+            "IGA": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-08-14T08:04:13+00:00"
+    },
+    {
+        "latitude": "-32.058722",
+        "longitude": "115.939034",
+        "timestamp": "2025-08-14T16:17:47",
+        "brands": [
+            "IGA"
+        ],
+        "comments": "Under the gazebo in the park",
+        "conditions": {
+            "IGA": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-08-14T08:18:04+00:00"
+    },
+    {
+        "latitude": "-32.064858",
+        "longitude": "115.939309",
+        "timestamp": "2025-08-14T16:28:05",
+        "brands": [
+            "Woolworths"
+        ],
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-08-14T08:28:15+00:00"
+    },
+    {
+        "latitude": "-32.064618",
+        "longitude": "115.934450",
+        "timestamp": "2025-08-17T16:08:58",
+        "brands": [
+            "Spudshed"
+        ],
+        "conditions": {
+            "Spudshed": [
+                "Good Condition",
+                "Broken Handle"
+            ]
+        },
+        "suburb": "Canning Vale",
+        "state": "Western Australia",
+        "lgaName": "City of Canning",
+        "lgaEmail": "customer@canning.wa.gov.au",
+        "serverTimestampUTC": "2025-08-17T08:09:17+00:00"
+    },
+    {
+        "latitude": "-32.060646",
+        "longitude": "115.940509",
+        "timestamp": "2025-08-22T05:51:46",
+        "brands": [
+            "Coles"
+        ],
+        "comments": "Next to the bus stop",
+        "conditions": {
+            "Coles": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-08-21T21:52:01+00:00"
+    },
+    {
+        "latitude": "-32.065915",
+        "longitude": "115.942139",
+        "timestamp": "2025-08-22T06:23:55",
+        "brands": [
+            "Woolworths"
+        ],
+        "comments": "In the park on the basketball court",
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-08-21T22:24:11+00:00"
+    },
+    {
+        "latitude": "-32.047669",
+        "longitude": "115.952373",
+        "timestamp": "2025-08-26T16:54:00",
+        "brands": [
+            "Woolworths"
+        ],
+        "comments": "Next to the fire hydrant",
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-08-26T08:54:22+00:00"
+    },
+    {
+        "latitude": "-32.062644",
+        "longitude": "115.935826",
+        "timestamp": "2025-08-27T06:19:57",
+        "brands": [
+            "Coles"
+        ],
+        "comments": "Next to the green high voltage power box",
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-08-26T22:20:19+00:00"
+    },
+    {
+        "latitude": "-32.066515",
+        "longitude": "115.947152",
+        "timestamp": "2025-09-03T06:32:28",
+        "brands": [
+            "Woolworths"
+        ],
+        "comments": "Next to the wheelie bin",
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-09-02T22:32:51+00:00"
+    },
+    {
+        "latitude": "-32.070479",
+        "longitude": "116.000274",
+        "timestamp": "2025-09-04T05:48:14",
+        "brands": [
+            "Coles"
+        ],
+        "conditions": {
+            "Coles": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Gosnells",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-09-03T21:48:21+00:00"
+    },
+    {
+        "latitude": "-32.057179",
+        "longitude": "115.948320",
+        "timestamp": "2025-09-11T06:46:24",
+        "brands": [
+            "Spudshed"
+        ],
+        "comments": "Outside number 28",
+        "conditions": {
+            "Spudshed": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-09-10T22:46:41+00:00"
+    },
+    {
+        "latitude": "-32.063553",
+        "longitude": "115.935877",
+        "timestamp": "2025-09-15T16:07:32",
+        "brands": [
+            "Coles"
+        ],
+        "comments": "Outside the early learning centre",
+        "conditions": {
+            "Coles": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Canning Vale",
+        "state": "Western Australia",
+        "lgaName": "City of Canning",
+        "lgaEmail": "customer@canning.wa.gov.au",
+        "serverTimestampUTC": "2025-09-15T08:07:49+00:00"
+    },
+    {
+        "latitude": "-32.056051",
+        "longitude": "115.949509",
+        "timestamp": "2025-09-15T17:34:17",
+        "brands": [
+            "Spudshed"
+        ],
+        "comments": "At the entrance to the alleyway",
+        "conditions": {
+            "Spudshed": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-09-15T09:34:42+00:00"
+    },
+    {
+        "latitude": "-32.070003",
+        "longitude": "115.942134",
+        "timestamp": "2025-09-17T06:35:03",
+        "brands": [
+            "Coles"
+        ],
+        "comments": "Next to the bins in the park",
+        "conditions": {
+            "Coles": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-09-16T22:35:25+00:00"
+    },
+    {
+        "latitude": "-32.057377",
+        "longitude": "115.953435",
+        "timestamp": "2025-09-17T07:04:10",
+        "brands": [
+            "Woolworths"
+        ],
+        "comments": "Near the roundabout",
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-09-16T23:04:29+00:00"
+    },
+    {
+        "latitude": "-32.047404",
+        "longitude": "115.956914",
+        "timestamp": "2025-09-19T05:45:28",
+        "brands": [
+            "Woolworths"
+        ],
+        "comments": "Outside number 16",
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-09-18T21:45:53+00:00"
+    },
+    {
+        "latitude": "-32.047345",
+        "longitude": "115.957181",
+        "timestamp": "2025-09-19T05:46:10",
+        "brands": [
+            "Spudshed"
+        ],
+        "comments": "Outside number 14",
+        "conditions": {
+            "Spudshed": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-09-18T21:46:33+00:00"
+    },
+    {
+        "latitude": "-32.046202",
+        "longitude": "115.960218",
+        "timestamp": "2025-09-19T05:50:15",
+        "brands": [
+            "Woolworths"
+        ],
+        "comments": "Corner ",
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-09-18T21:50:36+00:00"
+    },
+    {
+        "latitude": "-32.045940",
+        "longitude": "115.962101",
+        "timestamp": "2025-09-19T05:52:01",
+        "brands": [
+            "Woolworths"
+        ],
+        "comments": "Next to the park",
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-09-18T21:52:36+00:00"
+    },
+    {
+        "latitude": "-32.047331",
+        "longitude": "115.967613",
+        "timestamp": "2025-09-19T06:01:40",
+        "brands": [
+            "Spudshed"
+        ],
+        "comments": "On the bend",
+        "conditions": {
+            "Spudshed": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-09-18T22:02:00+00:00"
+    },
+    {
+        "latitude": "-32.052026",
+        "longitude": "115.965542",
+        "timestamp": "2025-09-19T06:10:37",
+        "brands": [
+            "Spudshed"
+        ],
+        "comments": "3 trolleys outside #57",
+        "conditions": {
+            "Spudshed": [
+                "Good Condition",
+                "Bent Frame"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-09-18T22:11:14+00:00"
+    },
+    {
+        "latitude": "-32.052205",
+        "longitude": "115.965353",
+        "timestamp": "2025-09-19T06:11:45",
+        "brands": [
+            "Spudshed"
+        ],
+        "comments": "Outside 61A",
+        "conditions": {
+            "Spudshed": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-09-18T22:12:02+00:00"
+    },
+    {
+        "latitude": "-32.056387",
+        "longitude": "115.960539",
+        "timestamp": "2025-09-19T06:28:32",
+        "brands": [
+            "Spudshed"
+        ],
+        "comments": "3 trolleys outside the church car park",
+        "conditions": {
+            "Spudshed": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-09-18T22:28:51+00:00"
+    },
+    {
+        "latitude": "-32.056387",
+        "longitude": "115.960434",
+        "timestamp": "2025-09-19T06:29:39",
+        "brands": [
+            "Woolworths"
+        ],
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-09-18T22:29:44+00:00"
+    },
+    {
+        "latitude": "-32.057209",
+        "longitude": "115.959432",
+        "timestamp": "2025-09-19T06:31:23",
+        "brands": [
+            "Woolworths"
+        ],
+        "comments": "Outside number 18",
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-09-18T22:31:28+00:00"
+    },
+    {
+        "latitude": "-32.057274",
+        "longitude": "115.959488",
+        "timestamp": "2025-09-19T06:31:46",
+        "brands": [
+            "Spudshed"
+        ],
+        "conditions": {
+            "Spudshed": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-09-18T22:31:56+00:00"
+    },
+    {
+        "latitude": "-32.056080",
+        "longitude": "115.949453",
+        "timestamp": "2025-09-23T05:52:08",
+        "brands": [
+            "Spudshed"
+        ],
+        "comments": "At the entrance to the alleyway ",
+        "conditions": {
+            "Spudshed": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-09-22T21:52:28+00:00"
+    },
+    {
+        "latitude": "-32.047865",
+        "longitude": "115.953284",
+        "timestamp": "2025-09-23T16:55:48",
+        "brands": [
+            "IGA"
+        ],
+        "comments": "On the ramp up from the train station",
+        "conditions": {
+            "IGA": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-09-23T08:56:26+00:00"
+    },
+    {
+        "latitude": "-32.074399",
+        "longitude": "115.945186",
+        "timestamp": "2025-09-24T06:35:35",
+        "brands": [
+            "Coles"
+        ],
+        "conditions": {
+            "Coles": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-09-23T22:35:48+00:00"
+    },
+    {
+        "latitude": "-32.068122",
+        "longitude": "115.946214",
+        "timestamp": "2025-09-24T06:50:21",
+        "brands": [
+            "Woolworths"
+        ],
+        "comments": "Outside number 3",
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-09-23T22:50:37+00:00"
+    },
+    {
+        "latitude": "-32.066491",
+        "longitude": "115.946844",
+        "timestamp": "2025-09-24T06:53:05",
+        "brands": [
+            "Woolworths"
+        ],
+        "comments": "In the park next to the kids playground",
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-09-23T22:53:28+00:00"
+    },
+    {
+        "latitude": "-32.056120",
+        "longitude": "115.949561",
+        "timestamp": "2025-10-03T06:00:57",
+        "brands": [
+            "Spudshed"
+        ],
+        "comments": "Still in the alleyway from three weeks ago",
+        "conditions": {
+            "Spudshed": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-10-02T22:01:16+00:00"
+    },
+    {
+        "latitude": "-32.056476",
+        "longitude": "115.948960",
+        "timestamp": "2025-10-06T05:54:17",
+        "brands": [
+            "Spudshed"
+        ],
+        "comments": "This has been in the alleyway for at least three weeks",
+        "conditions": {
+            "Spudshed": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-10-05T21:54:47+00:00"
+    },
+    {
+        "latitude": "-32.047605",
+        "longitude": "115.952302",
+        "timestamp": "2025-10-06T06:10:49",
+        "brands": [
+            "Woolworths"
+        ],
+        "comments": "Add the train station ",
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-10-05T22:13:28+00:00"
+    },
+    {
+        "latitude": "-32.061782",
+        "longitude": "115.944993",
+        "timestamp": "2025-10-09T05:33:31",
+        "brands": [
+            "Kmart"
+        ],
+        "comments": "Near the fence in the cul-de-sac",
+        "conditions": {
+            "Kmart": [
+                "Good Condition",
+                "Needs Cleaning"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-10-08T21:33:48+00:00"
+    },
+    {
+        "latitude": "-32.050336",
+        "longitude": "115.953496",
+        "timestamp": "2025-10-11T12:02:08",
+        "brands": [
+            "Spudshed"
+        ],
+        "comments": "4 trollies outside number 49",
+        "conditions": {
+            "Spudshed": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-10-11T04:02:49+00:00"
+    },
+    {
+        "latitude": "-32.027712",
+        "longitude": "115.943050",
+        "timestamp": "2025-10-11T12:16:29",
+        "brands": [
+            "Coles"
+        ],
+        "comments": "At the beginning of the bicycle pathway",
+        "suburb": "Cannington",
+        "state": "Western Australia",
+        "lgaName": "City of Canning",
+        "lgaEmail": "customer@canning.wa.gov.au",
+        "serverTimestampUTC": "2025-10-11T04:16:50+00:00"
+    },
+    {
+        "latitude": "-32.056148",
+        "longitude": "115.946230",
+        "timestamp": "2025-10-16T05:32:34",
+        "brands": [
+            "Coles"
+        ],
+        "comments": "In the park next to the basketball hoop ",
+        "conditions": {
+            "Coles": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-10-15T21:33:09+00:00"
+    },
+    {
+        "latitude": "-32.064908",
+        "longitude": "115.939467",
+        "timestamp": "2025-10-16T06:17:03",
+        "brands": [
+            "Woolworths"
+        ],
+        "comments": "Near the child care centre",
+        "conditions": {
+            "Woolworths": [
+                "Good Condition"
+            ]
+        },
+        "suburb": "Thornlie",
+        "state": "Western Australia",
+        "lgaName": "City of Gosnells",
+        "lgaEmail": "council@gosnells.wa.gov.au",
+        "serverTimestampUTC": "2025-10-15T22:17:38+00:00"
     }
 ]

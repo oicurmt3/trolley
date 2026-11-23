@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+require_once __DIR__ . '/admin_api.php';
+
 const ADMIN_LOGIN_MAX_ATTEMPTS = 5;
 const ADMIN_LOGIN_LOCKOUT_SECONDS = 900;
 
@@ -32,8 +34,9 @@ function admin_extract_csrf_token(): string
     if (isset($_POST['admin_csrf']) && is_string($_POST['admin_csrf'])) {
         return $_POST['admin_csrf'];
     }
-    if (isset($_GET['csrf_token']) && is_string($_GET['csrf_token'])) {
-        return $_GET['csrf_token'];
+    $body = admin_read_json_body();
+    if (isset($body['admin_csrf']) && is_string($body['admin_csrf'])) {
+        return $body['admin_csrf'];
     }
     return '';
 }

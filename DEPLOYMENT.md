@@ -61,7 +61,9 @@ Never commit the real admin bcrypt hash. On the server:
 2. Paste the hash from your **existing** live `admin.php` before uploading the new `admin.php`
 3. Confirm `config.local.php` is gitignored and denied by `.htaccess`
 
-**Brand portal tokens:** After deploying, rotate any brand portal tokens that may have been exposed by the old public `api_brand_portals.php` endpoint. In **Admin → Brand accounts**, use **Regenerate all brand tokens** (confirm dialog) or **New Token** per account, then re-send portal links to each brand.
+**Brand portal tokens:** Portal links must **not** appear in reporter-facing pages or `mailto:` bodies. There is no `mail()` path for brand notification — the owner distributes portal URLs from **Admin → Brand accounts** only. After deploy, rotate leaked tokens via **Regenerate all brand tokens**, **Apply brand_tokens.local.json**, or `php rotate_brand_tokens.php --generate`, then email each brand its new link privately.
+
+**CORS:** Set `cors_allowed_origins` in `config.local.php` (see `config.local.example.php`). Defaults: `https://sandgroper.net` and `https://www.sandgroper.net`.
 
 **Admin CSRF / login throttle:** Deploy `includes/admin_security.php` and ensure the server can write `data/admin_login_throttle.json` (directory `data/` is blocked from HTTP by `.htaccess`). After login, keep the admin tab open or reload if you see CSRF errors on mutations.
 

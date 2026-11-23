@@ -24,12 +24,8 @@ header('Content-Type: application/json');
 header('Cache-Control: no-cache, must-revalidate');
 header('X-Content-Type-Options: nosniff');
 
-// CORS -- allow same-origin and sandgroper.net
-$allowedOrigins = ['https://sandgroper.net', 'https://www.sandgroper.net'];
-$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-if (in_array($origin, $allowedOrigins, true)) {
-    header('Access-Control-Allow-Origin: ' . $origin);
-}
+require_once __DIR__ . '/includes/app_config.php';
+applyConfiguredCors(['GET', 'OPTIONS'], ['Content-Type'], false);
 
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     http_response_code(405);

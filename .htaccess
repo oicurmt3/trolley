@@ -32,6 +32,17 @@ RewriteRule ^map_other\.html$ map_brand.html?brand=Other [R=302,L,QSA]
     </IfModule>
 </FilesMatch>
 
+# Untracked *.local.json / *.local.php on server (examples like brand_tokens.local.example.json stay public)
+<FilesMatch "\.local\.(json|php)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order deny,allow
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
 # --- Block web access to private directories (DirectoryMatch is not allowed in .htaccess on many hosts) ---
 RewriteRule ^(?:geocache|backups|data|includes)(?:/|$) - [F,L]
 
@@ -53,7 +64,7 @@ RewriteRule ^(?:geocache|backups|data|includes)(?:/|$) - [F,L]
 
 <IfModule mod_headers.c>
     Header unset X-Powered-By
-    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+    Header always set Strict-Transport-Security "max-age=31536000"
 
     # Prevent MIME type sniffing
     Header set X-Content-Type-Options "nosniff"

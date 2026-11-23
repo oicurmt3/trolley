@@ -22,8 +22,10 @@ Use this when deploying from the GitHub branch `cursor/live-sync-and-hardening-4
 | `config.local.php` | Create **on server** only |
 | `brand_tokens.local.json` | Create **on server** from example (optional) |
 | `brand_tokens.generated.json` | CLI export output |
-| `data/admin_login_throttle.json` | Created at runtime |
-| `rate_limits.json` | Created at runtime |
+| **`trolley_logs.json`** | **Live legacy/data file — do not overwrite** (SQLite is primary via `trolley_data.db`) |
+| **`brand_contacts.json`** | **Live data — do not overwrite** (edited via admin; copy from example only on fresh install) |
+| `data/admin_login_throttle.json` | Created at runtime (`data/` must be writable, chmod 755+) |
+| `rate_limits.json` | Created at runtime in webroot (submission rate limits) |
 | `geocache/` | Runtime cache |
 
 ---
@@ -48,8 +50,9 @@ Upload these from your local clone (match PR branch) into the live `trolley/` di
 
 **Data / config (public JSON)**
 
-- `brand_contacts.json`, `lga_contact_details.json`, `suburb_lga_mapping.json`
-- `trolley_logs.json` (if you still serve legacy JSON; optional if SQLite-only)
+- `brand_contacts.example.json` (template only — **not** `brand_contacts.json` on existing sites)
+- `trolley_logs.example.json` (template only — **not** `trolley_logs.json`)
+- `lga_contact_details.json`, `suburb_lga_mapping.json` (upload only if you intend to replace council mapping data)
 
 **Maintenance scripts (blocked from web by `.htaccess`)**
 
@@ -100,6 +103,15 @@ Remove obsolete files so old links do not bypass hardening:
 1. Create `trolley/data/` if missing.
 2. Permissions **755** on directory (or whatever your host requires for PHP writes).
 3. After first failed admin login, `data/admin_login_throttle.json` may appear — must **not** be web-accessible (`.htaccess` blocks `data/`).
+
+### 5.2b Brand contacts on fresh install only
+
+If the server has **no** `brand_contacts.json` yet, copy `brand_contacts.example.json` → `brand_contacts.json` once.  
+On an existing live site, **keep** the current `brand_contacts.json` — do not upload the repo copy.
+
+### 5.2c Brand portal links (reporters)
+
+Reporter `mailto:` emails **never** include portal tokens. After token rotation, email each brand its new portal URL from **Admin → Brand accounts** (Copy link). There is no server-sent brand email in this app.
 
 ### 5.3 Database migration (no manual DB editing)
 

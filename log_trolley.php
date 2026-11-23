@@ -16,33 +16,16 @@
  * Version: 1.4
  */
 
-// --- CORS Configuration ---
-// Restrict to production domain (was previously '*')
-$allowedOrigins = [
-    'https://sandgroper.net',
-    'https://www.sandgroper.net'
-];
-$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-if (in_array($origin, $allowedOrigins, true)) {
-    header('Access-Control-Allow-Origin: ' . $origin);
-} else {
-    // Allow same-origin requests (no Origin header sent)
-    // If Origin is set but not allowed, do not set CORS header (browser will block)
-    if (!empty($origin)) {
-        http_response_code(403);
-        echo json_encode(['status' => 'error', 'message' => 'Origin not allowed.']);
-        exit;
-    }
-}
-header('Access-Control-Allow-Methods: POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, X-CSRF-Token');
-header('Access-Control-Allow-Credentials: true');
+require_once __DIR__ . '/includes/app_config.php';
+require_once __DIR__ . '/includes/data_files.php';
+
+applyConfiguredCors(['GET', 'POST', 'OPTIONS'], ['Content-Type', 'X-CSRF-Token'], true);
 header('Content-Type: application/json');
 
 // --- Configuration ---
 $logDirectory = __DIR__;
-$jsonLogFileName = 'trolley_logs.json';
-$jsonLogFilePath = $logDirectory . '/' . $jsonLogFileName;
+$jsonLogFilePath = $logDirectory . '/trolley_logs.json';
+$brandContactsExamplePath = $logDirectory . '/brand_contacts.example.json';
 
 // LGA data file paths
 $suburbLgaMapFilePath = $logDirectory . '/suburb_lga_mapping.json';
@@ -249,14 +232,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $token = generateCsrfToken();
     $response = ['csrf_token' => $token];
 
-    // Also return brand contacts if the file exists
     $brandContactsFilePath = $logDirectory . '/brand_contacts.json';
-    if (file_exists($brandContactsFilePath)) {
-        $brandContactsJson = file_get_contents($brandContactsFilePath);
-        $brandContacts = json_decode($brandContactsJson, true);
-        if (json_last_error() === JSON_ERROR_NONE) {
-            $response['brandContacts'] = $brandContacts;
-        }
+    ensure_brand_contacts_file($brandContactsFilePath, $brandContactsExamplePath);
+    $brandContacts = read_json_file($brandContactsFilePath);
+    if ($brandContacts !== null) {
+        $response['brandContacts'] = reporter_safe_brand_contacts($brandContacts);
     }
 
     echo json_encode($response);
@@ -564,13 +544,11 @@ if (!empty($nearbyDuplicates)) {
     $response['message'] = 'Log saved. Note: ' . count($nearbyDuplicates) . ' similar report(s) found nearby in the last 7 days.';
 }
 
-// Include brand contacts in response (so client can use server-side config)
 $brandContactsFilePath2 = $logDirectory . '/brand_contacts.json';
-if (file_exists($brandContactsFilePath2)) {
-    $bc = json_decode(file_get_contents($brandContactsFilePath2), true);
-    if (json_last_error() === JSON_ERROR_NONE) {
-        $response['brandContacts'] = $bc;
-    }
+ensure_brand_contacts_file($brandContactsFilePath2, $brandContactsExamplePath);
+$bc = read_json_file($brandContactsFilePath2);
+if ($bc !== null) {
+    $response['brandContacts'] = reporter_safe_brand_contacts($bc);
 }
 
 http_response_code(200);

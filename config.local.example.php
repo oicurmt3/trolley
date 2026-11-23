@@ -1,14 +1,28 @@
 <?php
 /**
- * Local secrets for WA Trolley Report — copy to config.local.php on the server.
- * DO NOT commit config.local.php (it is gitignored and blocked by .htaccess).
+ * Local configuration for WA Trolley Report — copy to config.local.php on the server.
+ * DO NOT commit config.local.php (gitignored and blocked by .htaccess).
  *
- * Before uploading a new admin.php, copy your existing bcrypt hash from the
- * current server admin.php into config.local.php on the server.
+ * Document every key below before deploying.
  */
 declare(strict_types=1);
 
 return [
-    // password_hash('your-password', PASSWORD_BCRYPT) from the live server
+    /**
+     * admin_password_hash (required for admin.php)
+     * Bcrypt hash from your existing live admin.php:
+     *   password_hash('your-password', PASSWORD_BCRYPT)
+     */
     'admin_password_hash' => '$2y$10$REPLACE_WITH_YOUR_BCRYPT_HASH_FROM_LIVE_SERVER',
+
+    /**
+     * cors_allowed_origins (optional)
+     * Origins allowed to call JSON APIs with CORS (log_trolley.php, api_logs.php, etc.).
+     * Same-origin browser requests do not send Origin and are unaffected.
+     * Default when omitted: https://sandgroper.net and https://www.sandgroper.net
+     */
+    'cors_allowed_origins' => [
+        'https://sandgroper.net',
+        'https://www.sandgroper.net',
+    ],
 ];

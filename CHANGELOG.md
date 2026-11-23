@@ -19,6 +19,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - GitHub Actions PHP syntax lint workflow
 
 ### Changed
+- Admin state-changing actions require **POST** + CSRF (no GET mutations); CORS origins from `config.local.php`
+- HSTS `max-age` only (no `includeSubDomains` / preload); block `*.local.json` / `*.local.php` in `.htaccess`
+- `trolley_logs.json` / `brand_contacts.json` untracked — use `*.example.json`; reporter APIs strip non-email fields from brand contacts
 - `.htaccess`: proxy-safe HTTPS redirect, block `data/` and `includes/` via `RewriteRule` (fixes common 500 from `DirectoryMatch`)
 - Accessibility/contrast QA: location validation feedback, brand filter labels, OSM `https` attribution, WCAG-minded IGA/disclaimer colours
 - XSS fixes: `view_logs.php` detail rows and `index.html` submit summary modal use safe DOM/`textContent`

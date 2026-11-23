@@ -863,6 +863,8 @@
             return `${dayName} ${dayNum} ${monthName} ${yearNum} at ${displayHour}:${minute} ${period}${tzIndicator}`;
         }
 
+        // Reporter mailto bodies are client-side only — never include brand portal tokens/links.
+        // Portal URLs are shared by the site owner from admin.php only (no server mail() for brand email).
         function generateTrolleyEmailBody(entityName, submissionData, entityType = "Brand") { // entityType can be "Brand" or "LGA"
             const suburb = submissionData.suburb || '[Suburb Not Available]';
             const state = submissionData.state || '[State Not Available]';

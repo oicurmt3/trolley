@@ -27,6 +27,8 @@ if (function_exists('header_remove')) {
     header_remove('X-Powered-By');
 }
 
+require_once __DIR__ . '/includes/app_config.php';
+require_once __DIR__ . '/includes/data_files.php';
 require_once __DIR__ . '/includes/admin_security.php';
 $adminCsrfToken = admin_ensure_csrf_token();
 
@@ -37,17 +39,11 @@ $adminCsrfToken = admin_ensure_csrf_token();
 // File paths
 $logDirectory = __DIR__;
 
-// Admin password hash is loaded from config.local.php (never commit the real hash).
-$configLocalPath = $logDirectory . '/config.local.php';
-$adminPasswordHash = '';
-if (is_readable($configLocalPath)) {
-    $localConfig = require $configLocalPath;
-    if (is_array($localConfig) && !empty($localConfig['admin_password_hash']) && is_string($localConfig['admin_password_hash'])) {
-        $adminPasswordHash = $localConfig['admin_password_hash'];
-    }
-}
+$appConfig = loadAppConfig();
+$adminPasswordHash = (string) ($appConfig['admin_password_hash'] ?? '');
 $adminConfigMissing = ($adminPasswordHash === '');
 $brandContactsFilePath = $logDirectory . '/brand_contacts.json';
+$brandContactsExamplePath = $logDirectory . '/brand_contacts.example.json';
 $lgaContactsFilePath = $logDirectory . '/lga_contact_details.json';
 $errorLogFilePath = $logDirectory . '/error_log';
 $rateLimitFilePath = $logDirectory . '/rate_limits.json';
@@ -119,7 +115,8 @@ if ($isAuthenticated && isset($_SESSION['admin_login_time'])) {
 if ($isAuthenticated && isset($_GET['action'])) {
 
     // --- Delete a log entry ---
-    if ($_GET['action'] === 'delete' && isset($_GET['id'])) {
+    if ($_GET['action'] === 'delete') {
+        admin_require_post();
         admin_api_require_csrf();
         header('Content-Type: application/json');
         require_once __DIR__ . '/db.php';
@@ -129,7 +126,8 @@ if ($isAuthenticated && isset($_GET['action'])) {
             exit;
         }
 
-        $id = filter_var($_GET['id'], FILTER_VALIDATE_INT);
+        $input = admin_read_json_body();
+        $id = filter_var($input['id'] ?? 0, FILTER_VALIDATE_INT);
         if ($id === false || $id < 1) {
             echo json_encode(['status' => 'error', 'message' => 'Invalid ID.']);
             exit;
@@ -200,14 +198,16 @@ if ($isAuthenticated && isset($_GET['action'])) {
     }
 
     // --- Create brand account ---
-    if ($_GET['action'] === 'create_brand' && isset($_GET['brand_name'])) {
+    if ($_GET['action'] === 'create_brand') {
+        admin_require_post();
         admin_api_require_csrf();
         header('Content-Type: application/json');
         require_once __DIR__ . '/db.php';
         $db = getDatabase();
         if ($db === null) { echo json_encode(['status' => 'error', 'message' => 'Database unavailable.']); exit; }
 
-        $brandName = trim(strip_tags($_GET['brand_name']));
+        $input = admin_read_json_body();
+        $brandName = trim(strip_tags((string) ($input['brand_name'] ?? '')));
         if (empty($brandName)) { echo json_encode(['status' => 'error', 'message' => 'Brand name required.']); exit; }
 
         $result = createBrandAccount($db, $brandName);
@@ -220,15 +220,17 @@ if ($isAuthenticated && isset($_GET['action'])) {
     }
 
     // --- Toggle brand account active/inactive ---
-    if ($_GET['action'] === 'toggle_brand' && isset($_GET['id']) && isset($_GET['active'])) {
+    if ($_GET['action'] === 'toggle_brand') {
+        admin_require_post();
         admin_api_require_csrf();
         header('Content-Type: application/json');
         require_once __DIR__ . '/db.php';
         $db = getDatabase();
         if ($db === null) { echo json_encode(['status' => 'error', 'message' => 'Database unavailable.']); exit; }
 
-        $id = filter_var($_GET['id'], FILTER_VALIDATE_INT);
-        $active = $_GET['active'] === '1';
+        $input = admin_read_json_body();
+        $id = filter_var($input['id'] ?? 0, FILTER_VALIDATE_INT);
+        $active = ((string) ($input['active'] ?? '0')) === '1';
         if ($id && toggleBrandAccount($db, $id, $active)) {
             echo json_encode(['status' => 'success', 'message' => $active ? 'Account activated.' : 'Account suspended.']);
         } else {
@@ -238,14 +240,16 @@ if ($isAuthenticated && isset($_GET['action'])) {
     }
 
     // --- Delete brand account ---
-    if ($_GET['action'] === 'delete_brand' && isset($_GET['id'])) {
+    if ($_GET['action'] === 'delete_brand') {
+        admin_require_post();
         admin_api_require_csrf();
         header('Content-Type: application/json');
         require_once __DIR__ . '/db.php';
         $db = getDatabase();
         if ($db === null) { echo json_encode(['status' => 'error', 'message' => 'Database unavailable.']); exit; }
 
-        $id = filter_var($_GET['id'], FILTER_VALIDATE_INT);
+        $input = admin_read_json_body();
+        $id = filter_var($input['id'] ?? 0, FILTER_VALIDATE_INT);
         if ($id && deleteBrandAccount($db, $id)) {
             echo json_encode(['status' => 'success', 'message' => 'Brand account deleted.']);
         } else {
@@ -255,14 +259,16 @@ if ($isAuthenticated && isset($_GET['action'])) {
     }
 
     // --- Regenerate brand token ---
-    if ($_GET['action'] === 'regen_token' && isset($_GET['id'])) {
+    if ($_GET['action'] === 'regen_token') {
+        admin_require_post();
         admin_api_require_csrf();
         header('Content-Type: application/json');
         require_once __DIR__ . '/db.php';
         $db = getDatabase();
         if ($db === null) { echo json_encode(['status' => 'error', 'message' => 'Database unavailable.']); exit; }
 
-        $id = filter_var($_GET['id'], FILTER_VALIDATE_INT);
+        $input = admin_read_json_body();
+        $id = filter_var($input['id'] ?? 0, FILTER_VALIDATE_INT);
         $newToken = $id ? regenerateBrandToken($db, $id) : false;
         if ($newToken) {
             echo json_encode(['status' => 'success', 'message' => 'Token regenerated.', 'token' => $newToken]);
@@ -274,6 +280,7 @@ if ($isAuthenticated && isset($_GET['action'])) {
 
     // --- Regenerate ALL brand tokens (excludes ADMIN_INTERNAL) ---
     if ($_GET['action'] === 'regen_all_tokens') {
+        admin_require_post();
         admin_api_require_csrf();
         header('Content-Type: application/json');
         require_once __DIR__ . '/db.php';
@@ -293,6 +300,7 @@ if ($isAuthenticated && isset($_GET['action'])) {
 
     // --- Apply tokens from brand_tokens.local.json on server (no tokens in response) ---
     if ($_GET['action'] === 'apply_brand_tokens_local') {
+        admin_require_post();
         admin_api_require_csrf();
         header('Content-Type: application/json');
         require_once __DIR__ . '/db.php';
@@ -359,15 +367,17 @@ if ($isAuthenticated && isset($_GET['action'])) {
     }
 
     // --- Reverse a collection (via API, uses reportId) ---
-    if ($_GET['action'] === 'reverse_collection' && isset($_GET['id'])) {
+    if ($_GET['action'] === 'reverse_collection') {
+        admin_require_post();
         admin_api_require_csrf();
         header('Content-Type: application/json');
         require_once __DIR__ . '/db.php';
         $db = getDatabase();
         if ($db === null) { echo json_encode(['status' => 'error', 'message' => 'Database unavailable.']); exit; }
 
-        $reportId = filter_var($_GET['id'], FILTER_VALIDATE_INT);
-        $notes = trim(strip_tags($_GET['notes'] ?? 'Reversed by admin'));
+        $input = admin_read_json_body();
+        $reportId = filter_var($input['id'] ?? 0, FILTER_VALIDATE_INT);
+        $notes = trim(strip_tags((string) ($input['notes'] ?? 'Reversed by admin')));
         if ($reportId && reverseCollection($db, $reportId, $notes)) {
             echo json_encode(['status' => 'success', 'message' => 'Collection reversed for report #' . $reportId]);
         } else {
@@ -377,14 +387,16 @@ if ($isAuthenticated && isset($_GET['action'])) {
     }
 
     // --- Admin: mark a report as collected (creates collection without brand account) ---
-    if ($_GET['action'] === 'mark_collected' && isset($_GET['id'])) {
+    if ($_GET['action'] === 'mark_collected') {
+        admin_require_post();
         admin_api_require_csrf();
         header('Content-Type: application/json');
         require_once __DIR__ . '/db.php';
         $db = getDatabase();
         if ($db === null) { echo json_encode(['status' => 'error', 'message' => 'Database unavailable.']); exit; }
 
-        $reportId = filter_var($_GET['id'], FILTER_VALIDATE_INT);
+        $input = admin_read_json_body();
+        $reportId = filter_var($input['id'] ?? 0, FILTER_VALIDATE_INT);
         if (!$reportId || $reportId < 1) { echo json_encode(['status' => 'error', 'message' => 'Invalid ID.']); exit; }
 
         // Check for an existing active collection whose brand account may have been deleted
@@ -447,10 +459,12 @@ if ($isAuthenticated && isset($_GET['action'])) {
     }
 
     // --- Save brand contacts ---
-    if ($_GET['action'] === 'save_brand_contacts' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    if ($_GET['action'] === 'save_brand_contacts') {
+        admin_require_post();
         admin_api_require_csrf();
         header('Content-Type: application/json');
-        $input = json_decode(file_get_contents('php://input'), true);
+        ensure_brand_contacts_file($brandContactsFilePath, $brandContactsExamplePath);
+        $input = admin_read_json_body();
         if (!is_array($input)) { echo json_encode(['status' => 'error', 'message' => 'Invalid data']); exit; }
 
         // Sanitise each entry
@@ -473,10 +487,11 @@ if ($isAuthenticated && isset($_GET['action'])) {
     }
 
     // --- Save LGA contacts ---
-    if ($_GET['action'] === 'save_lga_contacts' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    if ($_GET['action'] === 'save_lga_contacts') {
+        admin_require_post();
         admin_api_require_csrf();
         header('Content-Type: application/json');
-        $input = json_decode(file_get_contents('php://input'), true);
+        $input = admin_read_json_body();
         if (!is_array($input)) { echo json_encode(['status' => 'error', 'message' => 'Invalid data']); exit; }
 
         // Sanitise
@@ -833,6 +848,14 @@ document.addEventListener('DOMContentLoaded', () => {
         headers['X-Admin-CSRF'] = ADMIN_CSRF;
         options.headers = headers;
         return fetch(url, options);
+    }
+
+    function adminPost(action, payload) {
+        return adminMutate('admin.php?action=' + encodeURIComponent(action), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload || {}),
+        });
     }
 
     // --- Tab switching ---
@@ -1283,7 +1306,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (act === 'delete') {
             if (!confirm('Delete report #' + id + '? This cannot be undone.')) return;
             try {
-                const resp = await adminMutate('admin.php?action=delete&id=' + id);
+                const resp = await adminPost('delete', { id: Number(id) });
                 const result = await resp.json();
                 if (result.status === 'success') { logsLoaded = false; loadLogs(); loadStats(); }
                 else { alert('Error: ' + result.message); }
@@ -1292,8 +1315,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (act === 'uncollect') {
+            if (!confirm('Mark report #' + id + ' as not collected?')) return;
             try {
-                const resp = await adminMutate('admin.php?action=reverse_collection&id=' + id + '&notes=Uncollected%20by%20admin');
+                const resp = await adminPost('reverse_collection', { id: Number(id), notes: 'Uncollected by admin' });
                 const result = await resp.json();
                 if (result.status === 'success') { logsLoaded = false; loadLogs(); loadStats(); }
                 else { alert('Error: ' + result.message); }
@@ -1303,7 +1327,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (act === 'collect') {
             try {
-                const resp = await adminMutate('admin.php?action=mark_collected&id=' + id);
+                const resp = await adminPost('mark_collected', { id: Number(id) });
                 const result = await resp.json();
                 if (result.status === 'success') { logsLoaded = false; loadLogs(); loadStats(); }
                 else { alert('Error: ' + result.message); }
@@ -1349,10 +1373,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function saveBrandContacts() {
         try {
-            const resp = await adminMutate('admin.php?action=save_brand_contacts', {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(brandContactsData)
-            });
+            const resp = await adminPost('save_brand_contacts', brandContactsData);
             const result = await resp.json();
             if (result.status === 'success') { showToast('Saved'); }
             else { console.error('Save brand contacts failed:', result.message); showToast('Save failed'); }
@@ -1416,10 +1437,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function saveLgaContacts() {
         try {
-            const resp = await adminMutate('admin.php?action=save_lga_contacts', {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(lgaContactsData)
-            });
+            const resp = await adminPost('save_lga_contacts', lgaContactsData);
             const result = await resp.json();
             if (result.status === 'success') { showToast('Saved'); }
             else { console.error('Save LGA contacts failed:', result.message); showToast('Save failed'); }
@@ -1510,7 +1528,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!confirm('Create portal account "' + brandName + '"?')) return;
 
         try {
-            const resp = await adminMutate('admin.php?action=create_brand&brand_name=' + encodeURIComponent(brandName));
+            const resp = await adminPost('create_brand', { brand_name: brandName });
             const result = await resp.json();
             if (result.status === 'success') {
                 alert('Account created: ' + brandName + '\n\nPortal link:\n' + window.location.origin + '/trolley/brand_portal.php?token=' + result.account.token);
@@ -1527,7 +1545,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.toggleBrand = async function(id, active) {
         if (!confirm(active ? 'Activate this account?' : 'Suspend this account?')) return;
         try {
-            const resp = await adminMutate('admin.php?action=toggle_brand&id=' + id + '&active=' + active);
+            const resp = await adminPost('toggle_brand', { id: id, active: active });
             const result = await resp.json();
             if (result.status === 'success') { brandAccountsLoaded = false; loadBrandAccounts(); }
             else { alert('Error: ' + result.message); }
@@ -1538,7 +1556,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.regenToken = async function(id) {
         if (!confirm('Regenerate access token? The old link will stop working.')) return;
         try {
-            const resp = await adminMutate('admin.php?action=regen_token&id=' + id);
+            const resp = await adminPost('regen_token', { id: id });
             const result = await resp.json();
             if (result.status === 'success') {
                 alert('New token generated. New portal link:\n' + window.location.origin + '/trolley/brand_portal.php?token=' + result.token);
@@ -1552,7 +1570,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.deleteBrand = async function(id) {
         if (!confirm('Delete this brand account permanently? This cannot be undone.')) return;
         try {
-            const resp = await adminMutate('admin.php?action=delete_brand&id=' + id);
+            const resp = await adminPost('delete_brand', { id: id });
             const result = await resp.json();
             if (result.status === 'success') { brandAccountsLoaded = false; loadBrandAccounts(); }
             else { alert('Error: ' + result.message); }
@@ -1564,7 +1582,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const msg = 'Apply tokens from brand_tokens.local.json on the server?\n\nAccounts without a valid token in the file will be auto-generated if generate_missing is true. Existing links stop working for updated accounts.';
         if (!confirm(msg)) return;
         try {
-            const resp = await adminMutate('admin.php?action=apply_brand_tokens_local');
+            const resp = await adminPost('apply_brand_tokens_local', {});
             const result = await resp.json();
             if (result.status === 'success') {
                 alert(result.message);
@@ -1581,7 +1599,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const msg = 'Regenerate tokens for ALL brand portal accounts?\n\nEvery existing portal link will stop working. You will need to copy and send new links to each brand.';
         if (!confirm(msg)) return;
         try {
-            const resp = await adminMutate('admin.php?action=regen_all_tokens');
+            const resp = await adminPost('regen_all_tokens', {});
             const result = await resp.json();
             if (result.status === 'success') {
                 alert(result.message || ('Regenerated ' + (result.count || 0) + ' token(s).'));

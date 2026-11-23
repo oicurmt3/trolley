@@ -6,6 +6,11 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased] - 2026-11 (GitHub sync / hardening)
 
+### Fixed (QA round 1)
+- Map legacy redirects: `RewriteBase /trolley/`, absolute `/trolley/map_brand.html` targets
+- `log_trolley.php`: WA bounds 400, invalid conditions/comments 400 (no silent strip), 25/hour rate-limit message, 10 KB body cap
+- Mailto recipients use commas (RFC 6068); deploy docs clarify no server email and public LGA JSON
+
 ### Added
 - `migrate_20261123.php` (CLI, idempotent schema + `schema_migrations` ledger)
 - `rotate_brand_tokens.php` CLI and `brand_tokens.local.example.json` for controlled token rotation

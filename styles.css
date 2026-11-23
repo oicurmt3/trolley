@@ -108,7 +108,10 @@ button {
     margin-right: 5px;
     margin-bottom: 5px;
 }
-button.primary { background-color: var(--button-bg); color: var(--button-text); width: 100%; margin-top: 10px; }
+button.primary {
+    background-color: var(--button-bg); color: var(--button-text); width: 100%;
+    margin-top: 10px; min-height: 44px; box-sizing: border-box;
+}
 button.primary:hover { background-color: var(--button-hover-bg); }
 button.secondary { background-color: var(--button-secondary-bg); color: var(--button-text); padding: 8px 12px; font-size: 0.9em; }
 button.secondary:hover { background-color: var(--button-secondary-hover-bg); }

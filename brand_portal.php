@@ -176,7 +176,15 @@ if ($account) {
             .detail-content h4 { font-size: 0.95em; }
             .detail-content span { font-size: 0.85em; }
             .time-part { display: none; }
-            .back-link { padding: 8px 12px; font-size: 0.9em; }
+            .back-link {
+                padding: 8px 12px; font-size: 0.9em;
+                min-height: 44px; box-sizing: border-box;
+                display: inline-flex; align-items: center; justify-content: center;
+            }
+            .pagination button {
+                min-height: 44px; box-sizing: border-box;
+                display: inline-flex; align-items: center; justify-content: center;
+            }
             .stat-grid { grid-template-columns: repeat(2, 1fr); }
         }
 

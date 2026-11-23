@@ -9,7 +9,7 @@
 declare(strict_types=1);
 
 if (!defined('TROLLEY_ASSET_VERSION')) {
-    define('TROLLEY_ASSET_VERSION', '20261124b');
+    define('TROLLEY_ASSET_VERSION', '20261124c');
 }
 
 function trolley_asset_version(): string

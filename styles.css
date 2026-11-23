@@ -134,44 +134,13 @@ button.full-width { width: 100%; }
     color: var(--input-text);
     max-width: 100%;
 }
-#filter-bar input[type="date"] {
-    box-sizing: border-box;
-    min-height: 44px;
-    padding: 8px 6px;
-    font-size: 0.95em;
-    font-family: inherit;
-    line-height: 1.35;
-    border: 1px solid #555;
-    border-radius: 5px;
-    background-color: #2a2a2a;
-    color: var(--input-text);
-    color-scheme: dark;
-    flex: 1 1 0;
-    min-width: 0;
-    width: auto;
-    max-width: 100%;
-}
-.app-input::placeholder,
-#filter-bar input[type="date"]::placeholder {
+.app-input::placeholder {
     color: #999;
 }
-.app-input:focus,
-#filter-bar input[type="date"]:focus {
+.app-input:focus {
     outline: 2px solid var(--highlight);
     outline-offset: 1px;
     border-color: var(--highlight);
-}
-#filter-bar input[type="date"]::-webkit-calendar-picker-indicator {
-    cursor: pointer;
-    opacity: 0.85;
-    padding: 2px;
-}
-#filter-bar input[type="date"]::-webkit-datetime-edit {
-    padding: 0;
-    min-width: 0;
-}
-#filter-bar input[type="date"]::-webkit-datetime-edit-fields-wrapper {
-    min-width: 0;
 }
 #filter-bar {
     min-width: 0;
@@ -185,24 +154,20 @@ button.full-width { width: 100%; }
     box-sizing: border-box;
 }
 .filter-date-row {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 44px;
-    align-items: center;
-    gap: 6px;
-    width: 100%;
-    min-width: 0;
-    max-width: 100%;
-}
-.filter-date-pair {
     display: flex;
     flex-wrap: nowrap;
     align-items: center;
-    gap: 0;
-    min-width: 0;
-    overflow: hidden;
+    gap: 8px;
+    width: max-content;
+    max-width: 100%;
 }
-/* Native date control supplies the calendar icon; keep sr-only label text only */
-.filter-date-icon-label {
+.filter-date-trigger-wrap {
+    position: relative;
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+}
+.filter-date-native-input {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -212,12 +177,12 @@ button.full-width { width: 100%; }
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border: 0;
+    opacity: 0;
+    font-size: 16px;
+    color-scheme: dark;
 }
-.filter-date-icon {
-    display: none;
-}
-#filter-bar .filter-date-clear {
-    flex: 0 0 44px;
+#filter-bar .filter-date-icon-btn {
+    box-sizing: border-box;
     width: 44px;
     height: 44px;
     min-width: 44px;
@@ -227,61 +192,54 @@ button.full-width { width: 100%; }
     border: 1px solid #555;
     border-radius: 5px;
     background-color: #2a2a2a;
-    color: var(--input-text);
+    color: #e0e0e0;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: background-color 0.2s ease, border-color 0.2s ease;
+    position: relative;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
-#filter-bar .filter-date-clear:hover {
-    background-color: var(--button-secondary-hover-bg);
+#filter-bar .filter-date-icon-btn:hover {
+    background-color: #3a3a3a;
+    border-color: #777;
+}
+#filter-bar .filter-date-icon-btn:focus {
+    outline: none;
+}
+#filter-bar .filter-date-icon-btn:focus-visible {
+    outline: 2px solid var(--highlight);
+    outline-offset: 2px;
     border-color: var(--highlight);
 }
-.filter-date-clear-icon {
+#filter-bar .filter-date-icon-btn.has-value {
+    border-color: var(--highlight);
+    color: var(--highlight);
+}
+.filter-date-btn-icon {
     display: block;
     pointer-events: none;
 }
-.filter-date-count {
+.filter-date-active-dot {
+    display: none;
+    position: absolute;
+    right: 5px;
+    bottom: 5px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--highlight);
+}
+#filter-bar .filter-date-icon-btn.has-value .filter-date-active-dot {
     display: block;
-    margin-top: 8px;
+}
+.filter-date-hint {
+    margin: 8px 0 0 0;
     font-size: 0.85em;
-    color: #aaa;
-    width: 100%;
-}
-@media (min-width: 768px) {
-    .filter-date-fieldset {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 8px 12px;
-    }
-    .filter-date-row {
-        flex: 1 1 auto;
-    }
-    .filter-date-count {
-        margin-top: 0;
-        width: auto;
-        margin-left: auto;
-        text-align: right;
-    }
-}
-@media (max-width: 768px) {
-    #filter-bar input[type="date"] {
-        font-size: 16px;
-    }
-}
-@media (max-width: 420px) {
-    .filter-date-row {
-        gap: 4px;
-    }
-    #filter-bar input[type="date"] {
-        padding: 6px 4px;
-    }
-    #filter-bar input[type="date"]::-webkit-calendar-picker-indicator {
-        margin-left: 0;
-        padding: 0;
-    }
+    line-height: 1.4;
+    color: #b0b0b0;
+    max-width: 100%;
+    word-wrap: break-word;
 }
 
 

@@ -3,6 +3,17 @@
 Quick deployment reference. For full detail see [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md).
 
 
+## Asset cache busting
+
+Local stylesheets and scripts (`styles.css`, `map_my_location.css`, `map_my_location.js`) are served with a `?v=` query string so browsers pick up changes after deploy.
+
+1. Bump **`TROLLEY_ASSET_VERSION`** in `includes/asset_version.php` whenever those files change.
+2. PHP pages use `trolley_asset_href()` automatically.
+3. Static `.html` pages: run `php tools/apply_asset_version.php` from the repo root to sync `?v=` on all HTML files (or match the constant manually).
+
+Do not change the version for unrelated edits (avoids unnecessary cache churn).
+
+
 ## Requirements
 
 - Apache or nginx with PHP 7.4+

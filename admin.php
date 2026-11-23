@@ -30,6 +30,7 @@ if (function_exists('header_remove')) {
 require_once __DIR__ . '/includes/app_config.php';
 require_once __DIR__ . '/includes/data_files.php';
 require_once __DIR__ . '/includes/admin_security.php';
+require_once __DIR__ . '/includes/asset_version.php';
 $adminCsrfToken = admin_ensure_csrf_token();
 
 // =============================================================================
@@ -573,6 +574,7 @@ if ($isAuthenticated && isset($_GET['action'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>Admin - WA Trolley Report</title>
+    <link rel="icon" href="<?php echo trolley_asset_href('favicon.svg'); ?>" type="image/svg+xml">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
      crossorigin=""/>
@@ -588,7 +590,7 @@ if ($isAuthenticated && isset($_GET['action'])) {
     <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"
      integrity="sha256-WL6HHfYfbFEkZOFdsJQeY7lJG/E5airjvqbznghUzRw="
      crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="<?php echo trolley_asset_href('styles.css'); ?>">
     <style>
         body { padding: 10px; }
         .container { max-width: 1000px; padding: 20px; }
@@ -688,6 +690,22 @@ if ($isAuthenticated && isset($_GET['action'])) {
         .tab-content .log-table-container { width: 100%; overflow-x: auto; }
 
         @media (max-width: 768px) {
+            .nav-link, .tab-btn {
+                min-height: 44px;
+                padding: 10px 16px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                box-sizing: border-box;
+            }
+            .login-form .back-link {
+                min-height: 44px;
+                padding: 12px 16px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                box-sizing: border-box;
+            }
             .stat-grid { grid-template-columns: repeat(2, 1fr); }
             table { font-size: 0.8em; }
             th, td { padding: 6px; }
@@ -709,7 +727,8 @@ if ($isAuthenticated && isset($_GET['action'])) {
         <?php endif; ?>
         <form method="POST">
             <input type="hidden" name="admin_csrf" value="<?php echo htmlspecialchars($adminCsrfToken, ENT_QUOTES, 'UTF-8'); ?>">
-            <input type="password" name="admin_password" placeholder="Admin password" required autofocus autocomplete="current-password">
+            <label for="admin_password" class="visually-hidden">Admin password</label>
+            <input type="password" id="admin_password" name="admin_password" placeholder="Admin password" required autofocus autocomplete="current-password">
             <button type="submit" class="primary" style="margin-top:5px;">Login</button>
         </form>
         <a href="index.html" class="back-link" style="margin-top:20px;">Back to Report</a>
@@ -822,8 +841,8 @@ if ($isAuthenticated && isset($_GET['action'])) {
         <!-- Create new account -->
         <div style="margin-bottom:15px; padding:10px; background-color:#333; border-radius:5px; border:1px solid var(--border-color);">
             <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-                <label style="font-size:0.85em; font-weight:bold;">New Account:</label>
-                <input type="text" id="new-brand-name" placeholder="e.g. Coles 1, Woolworths Perth" style="padding:6px 10px; font-size:0.85em; border-radius:4px; border:1px solid var(--border-color); background-color:var(--input-bg); color:var(--input-text); width:200px;">
+                <label for="new-brand-name" style="font-size:0.85em; font-weight:bold;">New Account:</label>
+                <input type="text" id="new-brand-name" name="new_brand_name" autocomplete="off" placeholder="e.g. Coles 1, Woolworths Perth" style="padding:6px 10px; font-size:0.85em; border-radius:4px; border:1px solid var(--border-color); background-color:var(--input-bg); color:var(--input-text); width:200px;">
                 <button type="button" id="create-brand-btn" style="padding:6px 12px; font-size:0.85em; border-radius:4px; border:none; cursor:pointer; background-color:#28a745; color:white;">Create</button>
             </div>
         </div>

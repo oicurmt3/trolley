@@ -4,7 +4,33 @@ All notable changes to this project are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 
-## [1.3] - 2025-05 (Current)
+## [Unreleased] - 2026-11 (GitHub sync / hardening)
+
+### Added
+- Git sync from live site snapshot (2026-10-20): SQLite storage, admin panel, brand portals, `api_logs.php`, consolidated `map_brand.html`
+- `config.local.example.php` for admin bcrypt hash (real hash only on server in `config.local.php`)
+- `map_my_location.js` / `.css` — “Go to my location” on `map_view.html` and `map_brand.html`
+- Legacy `map_*.html` redirect stubs and `.htaccess` rules → `map_brand.html`
+- GitHub Actions PHP syntax lint workflow
+
+### Changed
+- XSS fixes: `view_logs.php` detail rows and `index.html` submit summary modal use safe DOM/`textContent`
+- Server rate limit: 25 submissions per hour per hashed IP (existing `rate_limits.json` mechanism)
+- Generic 500 responses from `log_trolley.php` (no log payload on errors)
+- Keyed suburb→LGA lookup via `getSuburbLgaKeyByName()` in `db.php`
+- `privacy.html` aligned with SQLite + hashed-IP rate limiting
+- `.htaccess`: HSTS, unset `X-Powered-By`, block `*.md`, block `api_brand_portals.php` and `config.local.php`
+- Fixed `brand_contacts.json` IGA/Bunnings mailto lists; removed APK footer link
+- Removed unused `lga_emails.json` and empty `test.html`
+
+### Security
+- **Disabled public `api_brand_portals.php`** — portal tokens no longer sent to browsers or reporter email bodies (share links via admin only)
+
+### Removed
+- APK/zip binaries from repository (owner keeps local copies)
+
+
+## [1.3] - 2025-05
 
 ### Added
 - **LGA email integration** -- two-step suburb-to-LGA lookup (via `suburb_lga_mapping.json` and `lga_contact_details.json`) enables emailing local councils after submission

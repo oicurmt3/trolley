@@ -14,18 +14,19 @@ Quick deployment reference. For full detail see [DEPLOYMENT_GUIDE.md](DEPLOYMENT
 ## Deploy
 
 ```bash
-# 1. Upload files to server
+# 1. Upload files to server (excluding config.local.php — create on server only)
 scp -r trolley/ user@server:/public_html/trolley/
 
-# 2. Initialise empty data file (fresh deploy only)
-ssh user@server "echo '[]' > /public_html/trolley/trolley_logs.json"
+# 2. BEFORE replacing admin.php on an existing site: copy the bcrypt line from the
+#    current server admin.php into a new config.local.php (see config.local.example.php).
+ssh user@server "cp /public_html/trolley/config.local.example.php /public_html/trolley/config.local.php"
+# Edit config.local.php on the server and paste your real admin_password_hash.
 
-# 3. Set permissions
-ssh user@server "chmod 755 /public_html/trolley/ && chmod 664 /public_html/trolley/trolley_logs.json"
+# 3. Writable paths (SQLite is the write target; db is created on first submission)
+ssh user@server "chmod 755 /public_html/trolley/ && touch /public_html/trolley/trolley_data.db && chmod 664 /public_html/trolley/trolley_data.db"
 
-# 4. Test
-curl -s https://yourdomain.com/trolley/trolley_logs.json
-# Should return: []
+# 4. Test read API
+curl -s https://yourdomain.com/trolley/api_logs.php | head -c 80
 ```
 
 
@@ -37,11 +38,13 @@ curl -s https://yourdomain.com/trolley/trolley_logs.json
 | `log_trolley.php`          | No       | Yes    | API endpoint                    |
 | `view_logs.php`            | No       | Yes    | Log viewer                      |
 | `map_view.html`            | No       | Yes    | All-brands map                  |
-| `map_<brand>.html` (x9)   | No       | Yes    | Per-brand maps                  |
-| `trolley_logs.json`        | Yes      | Yes    | Data store -- must be writable  |
+| `map_brand.html`           | No       | Yes    | Consolidated per-brand map      |
+| `map_<brand>.html` (x9)   | No       | Yes    | Legacy redirects to map_brand   |
+| `trolley_data.db`          | Yes      | No     | SQLite store (blocked by .htaccess) |
+| `trolley_logs.json`        | No*      | Yes*   | Legacy snapshot; maps use api_logs.php |
+| `config.local.php`         | No       | No     | Admin bcrypt hash — server only |
 | `suburb_lga_mapping.json`  | No       | Yes    | Suburb-to-LGA lookup            |
 | `lga_contact_details.json` | No       | Yes    | LGA name/email lookup           |
-| `lga_emails.json`          | No       | No*    | Legacy -- consider restricting  |
 | `privacy.html`             | No       | Yes    | Privacy policy                  |
 | `terms.html`               | No       | Yes    | Terms & conditions              |
 | `faq.html`                 | No       | Yes    | FAQ                             |
@@ -50,9 +53,19 @@ curl -s https://yourdomain.com/trolley/trolley_logs.json
 *Recommended: block direct HTTP access via `.htaccess`.
 
 
+## Admin secrets (`config.local.php`)
+
+Never commit the real admin bcrypt hash. On the server:
+
+1. Copy `config.local.example.php` → `config.local.php`
+2. Paste the hash from your **existing** live `admin.php` before uploading the new `admin.php`
+3. Confirm `config.local.php` is gitignored and denied by `.htaccess`
+
+**Brand portal tokens:** After deploying, rotate any brand portal tokens that may have been exposed by the old public `api_brand_portals.php` endpoint (Admin → Brand accounts → New Token).
+
 ## Environment Variables / Config
 
-All configuration is inline in source files. Key values to update for a new deployment:
+Most configuration is inline in source files. Key values to update for a new deployment:
 
 | Setting                      | File              | Current Value                                                |
 |------------------------------|-------------------|--------------------------------------------------------------|

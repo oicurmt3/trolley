@@ -27,7 +27,8 @@ After submission, users can optionally email the report to the trolley's brand o
 - **Email integration** -- generates pre-filled `mailto:` links for brand owners and LGA councils
 - **Public log viewer** -- sortable, paginated table of all reports (`view_logs.php`)
 - **Interactive maps** -- Leaflet.js maps with marker clustering for all reports and per-brand filtered views
-- **Rate limiting** -- cookie-based submission cap (20 per 12 hours)
+- **Rate limiting** -- cookie-based client cap plus server hashed-IP limit (`rate_limits.json`)
+- **SQLite storage** -- writes via `log_trolley.php`; public reads via `api_logs.php`
 - **Mobile-first design** -- dark theme, responsive layout, 44px+ touch targets
 - **No login required** -- anonymous reporting with no user accounts
 
@@ -38,7 +39,7 @@ After submission, users can optionally email the report to the trolley's brand o
 |-------------|---------------------------------------------------------------|
 | Frontend    | Vanilla HTML5, CSS3, JavaScript (ES6+)                        |
 | Backend     | PHP 7.4+                                                      |
-| Data Store  | JSON flat file (`trolley_logs.json`)                          |
+| Data Store  | SQLite (`trolley_data.db`); public reads via `api_logs.php`   |
 | Geocoding   | Nominatim (OpenStreetMap) reverse geocoding API               |
 | Maps        | Leaflet.js 1.9.4 + Leaflet.markercluster 1.4.1               |
 | Hosting     | Shared hosting (Apache) at `sandgroper.net/trolley/`          |
@@ -70,17 +71,18 @@ trolley/
 |-- terms.html                  # Terms and conditions page
 |-- faq.html                    # Frequently asked questions page
 |-- error_log                   # PHP error log (server-side)
-|-- test.html                   # Empty test file
+|-- config.local.example.php    # Template for server-only admin hash
 ```
 
 
 ## Quick Start
 
 1. Upload all files to a PHP-enabled web server (Apache recommended)
-2. Ensure the `trolley/` directory and `trolley_logs.json` are writable by the web server
-3. Navigate to `https://yourdomain.com/trolley/index.html`
-4. Grant location permissions when prompted
-5. Report your first trolley
+2. Create `config.local.php` on the server from the example (see `DEPLOYMENT.md`)
+3. Ensure the web directory is writable so SQLite can create/update `trolley_data.db`
+4. Navigate to `https://yourdomain.com/trolley/index.html`
+5. Grant location permissions when prompted
+6. Report your first trolley
 
 
 ## Configuration

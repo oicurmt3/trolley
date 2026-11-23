@@ -443,20 +443,52 @@ tr.detail-row td { background-color: var(--detail-row-bg); white-space: normal; 
          if (existingDetailRow) { return; }
          const logData = filteredLogs.find(log => log._rowId === targetRowId); if (!logData) return;
          try {
-             const detailRow = document.createElement('tr'); detailRow.id = `detail-${targetRowId}-${brand}`; detailRow.classList.add('detail-row');
-             const detailCell = document.createElement('td'); detailCell.colSpan = 3;
-             const conditions = (typeof logData.conditions === 'object' && logData.conditions !== null) ? logData.conditions : {};
-             const brandConditions = conditions[brand] || []; const comments = logData.comments || '';
-             let detailHtml = '<div class="detail-content">'; detailHtml += `<h4>Details for ${brand} Trolley</h4>`;
-             if (brandConditions.length > 0) { const conditionsText = brandConditions.join(', '); const escapedConditionsText = conditionsText.replace(/</g, "<").replace(/>/g, ">"); detailHtml += `<span class="conditions_yes"><strong>Conditions Reported:</strong> ${escapedConditionsText}</span>`; }
-             else { detailHtml += `<span class="no-details">No specific conditions reported.</span>`; }
-             if (comments) { const escapedComments = comments.replace(/</g, "<").replace(/>/g, ">"); detailHtml += `<span class="add_comments"><strong>General Comments:</strong> ${escapedComments.replace(/\n/g, '<br>')}</span>`; }
+             const detailRow = document.createElement('tr');
+             detailRow.id = `detail-${targetRowId}-${brand}`;
+             detailRow.classList.add('detail-row');
+             const detailCell = document.createElement('td');
+             detailCell.colSpan = 3;
 
-             // Status section -- uses .report_status class (same styling as .conditions_yes)
+             const wrapper = document.createElement('div');
+             wrapper.className = 'detail-content';
+
+             const heading = document.createElement('h4');
+             heading.textContent = `Details for ${brand} Trolley`;
+             wrapper.appendChild(heading);
+
+             const conditions = (typeof logData.conditions === 'object' && logData.conditions !== null) ? logData.conditions : {};
+             const brandConditions = conditions[brand] || [];
+             const comments = logData.comments || '';
+
+             if (brandConditions.length > 0) {
+                 const condSpan = document.createElement('span');
+                 condSpan.className = 'conditions_yes';
+                 const condStrong = document.createElement('strong');
+                 condStrong.textContent = 'Conditions Reported:';
+                 condSpan.appendChild(condStrong);
+                 condSpan.appendChild(document.createTextNode(' ' + brandConditions.join(', ')));
+                 wrapper.appendChild(condSpan);
+             } else {
+                 const noCond = document.createElement('span');
+                 noCond.className = 'no-details';
+                 noCond.textContent = 'No specific conditions reported.';
+                 wrapper.appendChild(noCond);
+             }
+
+             if (comments) {
+                 const commSpan = document.createElement('span');
+                 commSpan.className = 'add_comments';
+                 const commStrong = document.createElement('strong');
+                 commStrong.textContent = 'General Comments:';
+                 commSpan.appendChild(commStrong);
+                 commSpan.appendChild(document.createTextNode(' ' + comments));
+                 wrapper.appendChild(commSpan);
+             }
+
              const hasNotifiedBrands = logData.notifiedBrands && logData.notifiedBrands.length > 0;
              const hasNotifiedLga = logData.notifiedLga;
              const isCollected = logData.collectedBy && !logData.collectionReversed;
-             let statusParts = [];
+             const statusParts = [];
 
              if (hasNotifiedBrands) {
                  const dateStr = logData.serverTimestampUTC ? formatDisplayDate(logData.serverTimestampUTC) : '';
@@ -471,10 +503,17 @@ tr.detail-row td { background-color: var(--detail-row-bg); white-space: normal; 
                  statusParts.push('Reported as "collected" by ' + logData.collectedBy + (collectedDate ? ' at ' + collectedDate : ''));
              }
              if (statusParts.length > 0) {
-                 detailHtml += `<span class="report_status"><strong>Status:</strong> ${statusParts.join('; ')}</span>`;
+                 const statusSpan = document.createElement('span');
+                 statusSpan.className = 'report_status';
+                 const statusStrong = document.createElement('strong');
+                 statusStrong.textContent = 'Status:';
+                 statusSpan.appendChild(statusStrong);
+                 statusSpan.appendChild(document.createTextNode(' ' + statusParts.join('; ')));
+                 wrapper.appendChild(statusSpan);
              }
 
-             detailHtml += '</div>'; detailCell.innerHTML = detailHtml; detailRow.appendChild(detailCell);
+             detailCell.appendChild(wrapper);
+             detailRow.appendChild(detailCell);
              mainRow.parentNode.insertBefore(detailRow, mainRow.nextSibling);
          } catch (error) { console.error("Error occurred during detail row creation/insertion:", error); alert("An error occurred while trying to show details."); }
       }

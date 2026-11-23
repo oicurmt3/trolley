@@ -961,13 +961,31 @@
             if(modalTitle) modalTitle.textContent = "Email This Report?";
             if(modalPara) modalPara.innerHTML = "Would you like to email this report to the trolley owner(s) and/or the local council?";
 
-            submissionSummaryModalDiv.innerHTML = `
-                <p><strong>Date:</strong> ${formatDateForEmail(submissionData.timestamp, false)}</p>
-                <p><strong>GPS:</strong> Lat: ${submissionData.latitude}, Lon: ${submissionData.longitude}</p>
-                ${submissionData.suburb && submissionData.state ? `<p><strong>Location:</strong> ${submissionData.suburb}, ${submissionData.state}</p>` : '<p><strong>Approx. Area:</strong> Suburb/State not determined.</p>'}
-                ${submissionData.lgaName ? `<p><strong>LGA:</strong> ${submissionData.lgaName}</p>` : ''}
-                ${submissionData.comments ? `<p><strong>Comment:</strong> ${submissionData.comments.length > 70 ? submissionData.comments.substring(0, 70) + '...' : submissionData.comments}</p>` : ''}
-            `;
+            submissionSummaryModalDiv.textContent = '';
+            function appendSummaryLine(label, value) {
+                const p = document.createElement('p');
+                const strong = document.createElement('strong');
+                strong.textContent = label;
+                p.appendChild(strong);
+                p.appendChild(document.createTextNode(' ' + value));
+                submissionSummaryModalDiv.appendChild(p);
+            }
+            appendSummaryLine('Date:', formatDateForEmail(submissionData.timestamp, false));
+            appendSummaryLine('GPS:', `Lat: ${submissionData.latitude}, Lon: ${submissionData.longitude}`);
+            if (submissionData.suburb && submissionData.state) {
+                appendSummaryLine('Location:', `${submissionData.suburb}, ${submissionData.state}`);
+            } else {
+                appendSummaryLine('Approx. Area:', 'Suburb/State not determined.');
+            }
+            if (submissionData.lgaName) {
+                appendSummaryLine('LGA:', submissionData.lgaName);
+            }
+            if (submissionData.comments) {
+                const preview = submissionData.comments.length > 70
+                    ? submissionData.comments.substring(0, 70) + '...'
+                    : submissionData.comments;
+                appendSummaryLine('Comment:', preview);
+            }
             submissionSummaryModalDiv.style.display = 'block';
 
             emailOptionsContainerModalDiv.innerHTML = ''; // Clear previous options

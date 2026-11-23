@@ -1,0 +1,30 @@
+# Secrets and local config
+config.local.php
+config*.local.php
+brand_tokens.local.json
+brand_tokens.generated.json
+brand_contacts.json
+trolley_logs.json
+
+# Database and runtime data
+trolley_data.db
+*.db
+error_log
+rate_limits.json
+
+# Runtime dirs — ignore contents, track only .htaccess (LiteSpeed deny)
+data/*
+!data/.htaccess
+backups/*
+!backups/.htaccess
+geocache/*
+!geocache/.htaccess
+
+# Binaries (owner keeps APK copies locally)
+*.apk
+*.zip
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*~

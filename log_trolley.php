@@ -1,41 +1,275 @@
 <?php
-// Allow requests from any origin (adjust in production if needed)
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST, OPTIONS'); // Allow OPTIONS for preflight
-header('Access-Control-Allow-Headers: Content-Type');
+/**
+ * log_trolley.php -- Backend API for WA Trolley Report
+ *
+ * Receives trolley report submissions, validates input, performs reverse
+ * geocoding (with caching), looks up LGA details, and saves to JSON log.
+ *
+ * Security features:
+ * - CORS restricted to sandgroper.net
+ * - CSRF token verification
+ * - Server-side rate limiting (per IP)
+ * - Input sanitisation and validation
+ * - Coordinate bounds checking
+ * - Geocode response caching (reduces Nominatim load)
+ *
+ * Version: 1.4
+ */
+
+require_once __DIR__ . '/includes/app_config.php';
+require_once __DIR__ . '/includes/data_files.php';
+
+applyConfiguredCors(['GET', 'POST', 'OPTIONS'], ['Content-Type', 'X-CSRF-Token'], true);
 header('Content-Type: application/json');
 
 // --- Configuration ---
 $logDirectory = __DIR__;
-$jsonLogFileName = 'trolley_logs.json';
-$jsonLogFilePath = $logDirectory . '/' . $jsonLogFileName;
+$jsonLogFilePath = $logDirectory . '/trolley_logs.json';
+$brandContactsExamplePath = $logDirectory . '/brand_contacts.example.json';
 
-// New file paths for LGA data
+// LGA data file paths
 $suburbLgaMapFilePath = $logDirectory . '/suburb_lga_mapping.json';
 $lgaContactsFilePath = $logDirectory . '/lga_contact_details.json';
 
-$nominatimBaseUrl = 'https://nominatim.openstreetmap.org/reverse';
-$nominatimUserAgent = 'TrolleyReportApp/1.3 (sandgroper.net; admin@sandgroper.net)'; // Updated version
+// Rate limiting config
+$rateLimitFilePath = $logDirectory . '/rate_limits.json';
+$rateLimitMaxRequests = 25;        // Max submissions per window (per hashed IP)
+$rateLimitWindowSeconds = 3600;    // 1 hour
 
-// --- Function to Send JSON Response ---
+// Geocode cache config
+$geocacheDirPath = $logDirectory . '/geocache';
+$geocacheTtlSeconds = 604800; // Cache geocode results for 7 days
+
+// Nominatim config
+$nominatimBaseUrl = 'https://nominatim.openstreetmap.org/reverse';
+$nominatimUserAgent = 'TrolleyReportApp/1.4 (sandgroper.net; admin@sandgroper.net)';
+
+// Valid brands (whitelist for server-side validation)
+$validBrands = ['Coles', 'Woolworths', 'Aldi', 'IGA', 'Kmart', 'BigW', 'Bunnings', 'Spudshed', 'Other'];
+
+// Valid condition values (whitelist)
+$validConditions = [
+    'Good Condition', 'Needs Cleaning', 'Rusty Frame', 'Damaged Wheel(s)',
+    'Bent Frame', 'Broken Handle', 'Child Seat Issue', 'Other Damage'
+];
+
+
+// ==========================================================================
+// HELPER FUNCTIONS
+// ==========================================================================
+
+/**
+ * Send a JSON response and terminate execution
+ */
 function sendJsonResponse($status, $message, $httpStatusCode = 200, $returnedData = null) {
     http_response_code($httpStatusCode);
     $response = ['status' => $status, 'message' => $message];
-    if ($returnedData !== null) {
+    if ($returnedData !== null && $status === 'success') {
         $response['logData'] = $returnedData;
     }
     echo json_encode($response);
     exit;
 }
 
-// --- Handle OPTIONS request (for CORS preflight) ---
-if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-    sendJsonResponse('success', 'OPTIONS request allowed', 200);
+
+/**
+ * Server-side rate limiting using a JSON file keyed by IP address.
+ * Returns true if the request is allowed, false if rate-limited.
+ */
+function checkRateLimit($filePath, $maxRequests, $windowSeconds) {
+    $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+    // Hash the IP for privacy (we do not store raw IPs)
+    $ipHash = hash('sha256', $ip . 'trolley_salt_2026');
+
+    $now = time();
+    $limits = [];
+
+    // Read existing rate limit data
+    if (file_exists($filePath) && filesize($filePath) > 0) {
+        $json = file_get_contents($filePath);
+        if ($json !== false) {
+            $decoded = json_decode($json, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                $limits = $decoded;
+            }
+        }
+    }
+
+    // Clean up expired entries (older than window)
+    foreach ($limits as $key => $entry) {
+        if (($now - ($entry['first'] ?? 0)) > $windowSeconds) {
+            unset($limits[$key]);
+        }
+    }
+
+    // Check current IP
+    if (isset($limits[$ipHash])) {
+        $entry = $limits[$ipHash];
+        if (($now - $entry['first']) <= $windowSeconds) {
+            if ($entry['count'] >= $maxRequests) {
+                // Save cleaned data before returning
+                file_put_contents($filePath, json_encode($limits, JSON_PRETTY_PRINT), LOCK_EX);
+                return false; // Rate limited
+            }
+            $limits[$ipHash]['count'] = $entry['count'] + 1;
+        } else {
+            // Window expired, reset
+            $limits[$ipHash] = ['first' => $now, 'count' => 1];
+        }
+    } else {
+        // New IP
+        $limits[$ipHash] = ['first' => $now, 'count' => 1];
+    }
+
+    // Save updated rate limit data
+    file_put_contents($filePath, json_encode($limits, JSON_PRETTY_PRINT), LOCK_EX);
+    return true;
 }
 
-// --- Check Request Method ---
+
+/**
+ * Generate a CSRF token and store it in the session.
+ * Called via GET request to provide a token to the frontend.
+ */
+function generateCsrfToken() {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['csrf_token'];
+}
+
+
+/**
+ * Verify the CSRF token from the request header.
+ */
+function verifyCsrfToken() {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    $headerToken = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+    $sessionToken = $_SESSION['csrf_token'] ?? '';
+
+    if (empty($headerToken) || empty($sessionToken)) {
+        return false;
+    }
+    return hash_equals($sessionToken, $headerToken);
+}
+
+
+/**
+ * Sanitise a string value: trim, strip tags, limit length, ASCII-safe.
+ */
+function sanitiseString($value, $maxLength = 500) {
+    if (!is_string($value)) {
+        return '';
+    }
+    $value = trim($value);
+    $value = strip_tags($value);
+    $value = htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    if (mb_strlen($value) > $maxLength) {
+        $value = mb_substr($value, 0, $maxLength);
+    }
+    return $value;
+}
+
+
+/**
+ * Get cached geocode result for given coordinates.
+ * Returns associative array or null if not cached / expired.
+ */
+function getGeocodeCache($lat, $lon, $cacheDir, $ttlSeconds) {
+    if (!is_dir($cacheDir)) {
+        return null;
+    }
+    // Round coordinates to 3 decimal places (~111m precision) for cache key
+    $cacheKey = round($lat, 3) . '_' . round($lon, 3);
+    $cacheFile = $cacheDir . '/' . preg_replace('/[^a-zA-Z0-9_\-.]/', '_', $cacheKey) . '.json';
+
+    if (file_exists($cacheFile)) {
+        $mtime = filemtime($cacheFile);
+        if ((time() - $mtime) < $ttlSeconds) {
+            $data = json_decode(file_get_contents($cacheFile), true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                return $data;
+            }
+        } else {
+            // Expired, delete
+            @unlink($cacheFile);
+        }
+    }
+    return null;
+}
+
+
+/**
+ * Save geocode result to cache.
+ */
+function setGeocodeCache($lat, $lon, $cacheDir, $data) {
+    if (!is_dir($cacheDir)) {
+        @mkdir($cacheDir, 0755, true);
+    }
+    $cacheKey = round($lat, 3) . '_' . round($lon, 3);
+    $cacheFile = $cacheDir . '/' . preg_replace('/[^a-zA-Z0-9_\-.]/', '_', $cacheKey) . '.json';
+    file_put_contents($cacheFile, json_encode($data), LOCK_EX);
+}
+
+
+// ==========================================================================
+// REQUEST HANDLING
+// ==========================================================================
+
+// --- Handle OPTIONS request (CORS preflight) ---
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit;
+}
+
+// --- Handle GET request (CSRF token + brand contacts endpoint) ---
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    $token = generateCsrfToken();
+    $response = ['csrf_token' => $token];
+
+    $brandContactsFilePath = $logDirectory . '/brand_contacts.json';
+    ensure_brand_contacts_file($brandContactsFilePath, $brandContactsExamplePath);
+    $brandContacts = read_json_file($brandContactsFilePath);
+    if ($brandContacts !== null) {
+        $response['brandContacts'] = reporter_safe_brand_contacts($brandContacts);
+    }
+
+    echo json_encode($response);
+    exit;
+}
+
+
+// --- Check Request Method (POST only beyond this point) ---
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     sendJsonResponse('error', 'Invalid request method. Only POST is accepted.', 405);
+}
+
+// --- Verify CSRF Token (log failures) ---
+if (!verifyCsrfToken()) {
+    $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+    error_log("PHP Security: CSRF token verification failed from IP $ip at " . gmdate('Y-m-d H:i:s') . " UTC");
+    sendJsonResponse('error', 'Invalid or missing security token. Please reload the page and try again.', 403);
+}
+
+// --- Validate Referer Header ---
+$referer = $_SERVER['HTTP_REFERER'] ?? '';
+if (!empty($referer)) {
+    $refererHost = parse_url($referer, PHP_URL_HOST);
+    if ($refererHost && !in_array($refererHost, ['sandgroper.net', 'www.sandgroper.net'], true)) {
+        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        error_log("PHP Security: Invalid Referer '$refererHost' from IP $ip");
+        sendJsonResponse('error', 'Request origin not permitted.', 403);
+    }
+}
+
+// --- Server-Side Rate Limiting ---
+if (!checkRateLimit($rateLimitFilePath, $rateLimitMaxRequests, $rateLimitWindowSeconds)) {
+    sendJsonResponse('error', 'Submission limit reached (25 per hour). Please try again later.', 429);
 }
 
 // --- Get & Decode JSON Data ---
@@ -43,12 +277,32 @@ $jsonPayload = file_get_contents('php://input');
 if (empty($jsonPayload)) {
     sendJsonResponse('error', 'No data received.', 400);
 }
+
+// Limit payload size — 10_000 bytes fits all legitimate submissions
+if (strlen($jsonPayload) > 10000) {
+    sendJsonResponse('error', 'Request payload too large (maximum 10,000 bytes).', 413);
+}
+
 $logDataFromClient = json_decode($jsonPayload, true);
 if (json_last_error() !== JSON_ERROR_NONE) {
     sendJsonResponse('error', 'Invalid JSON data received: ' . json_last_error_msg(), 400);
 }
 
-// --- Basic Data Validation (Server-Side) ---
+// --- Honeypot Check (silent rejection) ---
+// If the hidden field 'website_url' has any value, it was filled by a bot
+if (!empty($logDataFromClient['website_url'])) {
+    // Silently reject -- return success to not tip off the bot
+    $fakeEntry = $logDataFromClient;
+    $fakeEntry['serverTimestampUTC'] = gmdate(DateTime::ATOM);
+    sendJsonResponse('success', 'Log saved successfully.', 200, $fakeEntry);
+}
+
+
+// ==========================================================================
+// INPUT VALIDATION AND SANITISATION
+// ==========================================================================
+
+// --- Validate required fields ---
 if (!isset($logDataFromClient['latitude']) || !isset($logDataFromClient['longitude']) || !isset($logDataFromClient['timestamp'])) {
     sendJsonResponse('error', 'Missing required location data (latitude, longitude, timestamp).', 400);
 }
@@ -56,15 +310,120 @@ if (!isset($logDataFromClient['brands']) || !is_array($logDataFromClient['brands
     sendJsonResponse('error', 'Missing or invalid brand data.', 400);
 }
 
-// --- Perform Reverse Geocoding using Nominatim ---
+// --- Validate and sanitise latitude/longitude ---
 $latitude = filter_var($logDataFromClient['latitude'], FILTER_VALIDATE_FLOAT);
 $longitude = filter_var($logDataFromClient['longitude'], FILTER_VALIDATE_FLOAT);
+
+if ($latitude === false || $longitude === false) {
+    sendJsonResponse('error', 'Invalid coordinate format.', 400);
+}
+
+// Coordinate bounds check (valid GPS range)
+if ($latitude < -90.0 || $latitude > 90.0 || $longitude < -180.0 || $longitude > 180.0) {
+    sendJsonResponse('error', 'Coordinates out of valid GPS range.', 400);
+}
+
+// Western Australia bounds (approximate)
+$waLatMin = -35.5;
+$waLatMax = -13.5;
+$waLonMin = 112.5;
+$waLonMax = 129.5;
+if ($latitude < $waLatMin || $latitude > $waLatMax || $longitude < $waLonMin || $longitude > $waLonMax) {
+    sendJsonResponse('error', 'Location must be within Western Australia. Move to the trolley and try again.', 400);
+}
+
+// Sanitise latitude/longitude to string with 6 decimal places
+$logDataFromClient['latitude'] = number_format($latitude, 6, '.', '');
+$logDataFromClient['longitude'] = number_format($longitude, 6, '.', '');
+
+// --- Validate timestamp ---
+$timestamp = $logDataFromClient['timestamp'];
+if (!is_string($timestamp) || !preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/', $timestamp)) {
+    sendJsonResponse('error', 'Invalid timestamp format. Expected ISO 8601 (YYYY-MM-DDTHH:MM:SS).', 400);
+}
+
+// --- Validate and whitelist brands ---
+$sanitisedBrands = [];
+foreach ($logDataFromClient['brands'] as $brand) {
+    if (is_string($brand) && in_array($brand, $validBrands, true)) {
+        $sanitisedBrands[] = $brand;
+    }
+}
+if (empty($sanitisedBrands)) {
+    sendJsonResponse('error', 'No valid brands provided.', 400);
+}
+$logDataFromClient['brands'] = $sanitisedBrands;
+
+// --- Validate and whitelist conditions ---
+if (isset($logDataFromClient['conditions']) && is_array($logDataFromClient['conditions'])) {
+    $sanitisedConditions = [];
+    foreach ($logDataFromClient['conditions'] as $brand => $conditionArray) {
+        if (!is_string($brand) || !in_array($brand, $sanitisedBrands, true)) {
+            continue;
+        }
+        if (!is_array($conditionArray)) {
+            sendJsonResponse('error', 'Invalid conditions format for ' . $brand . '.', 400);
+        }
+        $validBrandConditions = [];
+        foreach ($conditionArray as $condition) {
+            if (!is_string($condition) || !in_array($condition, $validConditions, true)) {
+                sendJsonResponse('error', 'Invalid condition value for ' . $brand . '.', 400);
+            }
+            $validBrandConditions[] = $condition;
+        }
+        if ($validBrandConditions !== []) {
+            $sanitisedConditions[$brand] = $validBrandConditions;
+        }
+    }
+    $logDataFromClient['conditions'] = $sanitisedConditions;
+} else {
+    unset($logDataFromClient['conditions']);
+}
+
+// --- Comments (max 200 characters; reject, do not truncate) ---
+if (isset($logDataFromClient['comments'])) {
+    if (!is_string($logDataFromClient['comments'])) {
+        sendJsonResponse('error', 'Comments must be plain text.', 400);
+    }
+    if (mb_strlen($logDataFromClient['comments']) > 200) {
+        sendJsonResponse('error', 'Comments must be 200 characters or fewer.', 400);
+    }
+    $logDataFromClient['comments'] = sanitiseString($logDataFromClient['comments'], 200);
+    if ($logDataFromClient['comments'] === '') {
+        unset($logDataFromClient['comments']);
+    }
+} else {
+    unset($logDataFromClient['comments']);
+}
+
+// --- Strip any unexpected fields from client data ---
+$allowedClientFields = ['latitude', 'longitude', 'timestamp', 'brands', 'conditions', 'comments'];
+$cleanedClientData = [];
+foreach ($allowedClientFields as $field) {
+    if (isset($logDataFromClient[$field])) {
+        $cleanedClientData[$field] = $logDataFromClient[$field];
+    }
+}
+
+
+// ==========================================================================
+// REVERSE GEOCODING (with caching)
+// ==========================================================================
+
 $suburbName = null;
 $stateName = null;
-$lgaName = null; // This will be the LGAFullName from lga_contact_details.json
+$lgaName = null;
 $lgaEmail = null;
 
-if ($latitude !== false && $longitude !== false) {
+// Check geocode cache first
+$cachedGeo = getGeocodeCache($latitude, $longitude, $geocacheDirPath, $geocacheTtlSeconds);
+
+if ($cachedGeo !== null) {
+    // Use cached result
+    $suburbName = $cachedGeo['suburb'] ?? null;
+    $stateName = $cachedGeo['state'] ?? null;
+} else {
+    // Call Nominatim API
     $nominatimApiUrl = $nominatimBaseUrl . '?format=jsonv2&addressdetails=1&lat=' . $latitude . '&lon=' . $longitude . '&accept-language=en';
     $context = stream_context_create([
         'http' => [
@@ -91,136 +450,116 @@ if ($latitude !== false && $longitude !== false) {
                 $suburbName = $address['suburb'] ?? $address['village'] ?? $address['town'] ?? $address['city_district'] ?? $address['hamlet'] ?? null;
                 $stateName = $address['state'] ?? null;
 
-                // --- LGA Lookup (Two-step process) ---
-                if ($suburbName) {
-                    $lgaIdentifier = null;
-                    // Step 1: Get LGA Identifier from suburb mapping
-                    if (file_exists($suburbLgaMapFilePath)) {
-                        $suburbMapJson = file_get_contents($suburbLgaMapFilePath);
-                        $suburbLgaList = json_decode($suburbMapJson, true);
-                        if (json_last_error() === JSON_ERROR_NONE && is_array($suburbLgaList)) {
-                            foreach ($suburbLgaList as $mappingEntry) {
-                                if (isset($mappingEntry['Suburb']) && strcasecmp($mappingEntry['Suburb'], $suburbName) == 0) {
-                                    $lgaIdentifier = $mappingEntry['LGAKey'] ?? null;
-                                    break;
-                                }
-                            }
-                        } else {
-                            error_log("PHP Warning: Suburb-LGA mapping file '$suburbLgaMapFilePath' might be corrupted. JSON Error: " . json_last_error_msg());
-                        }
-                    } else {
-                        error_log("PHP Warning: Suburb-LGA mapping file not found at: " . $suburbLgaMapFilePath);
-                    }
-
-                    // Step 2: Get LGA details using the identifier
-                    if ($lgaIdentifier && file_exists($lgaContactsFilePath)) {
-                        $lgaContactsJson = file_get_contents($lgaContactsFilePath);
-                        $lgaContacts = json_decode($lgaContactsJson, true); // Contacts are an associative array (object)
-                        if (json_last_error() === JSON_ERROR_NONE && is_array($lgaContacts)) {
-                            if (isset($lgaContacts[$lgaIdentifier])) {
-                                $lgaDetails = $lgaContacts[$lgaIdentifier];
-                                $lgaName = $lgaDetails['LGAFullName'] ?? $lgaIdentifier; // Fallback to identifier if FullName is missing
-                                $lgaEmail = $lgaDetails['Email'] ?? null;
-                            } else {
-                                error_log("PHP Warning: LGA Identifier '$lgaIdentifier' for suburb '$suburbName' not found in '$lgaContactsFilePath'.");
-                            }
-                        } else {
-                            error_log("PHP Warning: LGA contacts file '$lgaContactsFilePath' might be corrupted. JSON Error: " . json_last_error_msg());
-                        }
-                    } elseif ($lgaIdentifier && !file_exists($lgaContactsFilePath)) {
-                         error_log("PHP Warning: LGA contacts file not found at: " . $lgaContactsFilePath);
-                    } elseif (!$lgaIdentifier) {
-                        error_log("PHP Info: No LGAKey found for suburb '$suburbName' in '$suburbLgaMapFilePath'.");
-                    }
-                }
-                // --- End LGA Lookup ---
-
+                // Cache the result
+                setGeocodeCache($latitude, $longitude, $geocacheDirPath, [
+                    'suburb' => $suburbName,
+                    'state' => $stateName
+                ]);
             } else {
-                 error_log("PHP Nominatim JSON decode error or missing address for $latitude, $longitude. Response: " . substr($geoResponseJson, 0, 250));
+                error_log("PHP Nominatim JSON decode error or missing address for $latitude, $longitude. Response: " . substr($geoResponseJson, 0, 250));
             }
         } else {
-             error_log("PHP Nominatim API request failed ($geoStatusCode) for $latitude, $longitude. Response: " . substr($geoResponseJson, 0, 250));
+            error_log("PHP Nominatim API request failed ($geoStatusCode) for $latitude, $longitude. Response: " . substr($geoResponseJson, 0, 250));
         }
     } else {
         error_log("PHP Failed to contact Nominatim API for $latitude, $longitude. Error: " . (error_get_last()['message'] ?? 'Unknown file_get_contents error'));
     }
 }
 
-// Create the final log entry object
-$finalLogEntry = $logDataFromClient;
+
+// ==========================================================================
+// LGA LOOKUP (two-step: suburb -> LGA key -> LGA details)
+// ==========================================================================
+
+if ($suburbName) {
+    require_once __DIR__ . '/db.php';
+    $lgaIdentifier = getSuburbLgaKeyByName($suburbName);
+
+    // Step 2: Get LGA details from contact details file
+    if ($lgaIdentifier && file_exists($lgaContactsFilePath)) {
+        $lgaContactsJson = file_get_contents($lgaContactsFilePath);
+        $lgaContacts = json_decode($lgaContactsJson, true);
+        if (json_last_error() === JSON_ERROR_NONE && is_array($lgaContacts)) {
+            if (isset($lgaContacts[$lgaIdentifier])) {
+                $lgaDetails = $lgaContacts[$lgaIdentifier];
+                $lgaName = $lgaDetails['LGAFullName'] ?? $lgaIdentifier;
+                $lgaEmail = $lgaDetails['Email'] ?? null;
+            } else {
+                error_log("PHP Warning: LGA Identifier '$lgaIdentifier' for suburb '$suburbName' not found in '$lgaContactsFilePath'.");
+            }
+        } else {
+            error_log("PHP Warning: LGA contacts file '$lgaContactsFilePath' might be corrupted. JSON Error: " . json_last_error_msg());
+        }
+    } elseif ($lgaIdentifier && !file_exists($lgaContactsFilePath)) {
+        error_log("PHP Warning: LGA contacts file not found at: " . $lgaContactsFilePath);
+    } elseif (!$lgaIdentifier) {
+        error_log("PHP Info: No LGAKey found for suburb '$suburbName'.");
+    }
+}
+
+
+// ==========================================================================
+// BUILD FINAL LOG ENTRY
+// ==========================================================================
+
+$finalLogEntry = $cleanedClientData;
 $finalLogEntry['suburb'] = $suburbName;
 $finalLogEntry['state'] = $stateName;
-$finalLogEntry['lgaName'] = $lgaName;   // This is the LGAFullName
+$finalLogEntry['lgaName'] = $lgaName;
 $finalLogEntry['lgaEmail'] = $lgaEmail;
 
-// --- Add Server-Side Metadata ---
+// Server-side timestamp (UTC, ATOM format)
 try {
     $dateTime = new DateTime('now', new DateTimeZone('UTC'));
     $finalLogEntry['serverTimestampUTC'] = $dateTime->format(DateTime::ATOM);
 } catch (Exception $e) {
-     $finalLogEntry['serverTimestampUTC'] = gmdate(DateTime::ATOM);
-}
-// $finalLogEntry['ipAddress'] = $_SERVER['REMOTE_ADDR'] ?? 'Unknown';
-
-
-// --- JSON Logging ---
-// (The logging part remains the same as your previous version)
-if (!is_writable($logDirectory)) {
-     error_log("PHP Error: Log directory not writable: " . $logDirectory);
-     sendJsonResponse('error', 'Server configuration error: Cannot write to log directory.', 500, $finalLogEntry);
-}
-if (file_exists($jsonLogFilePath) && (!is_readable($jsonLogFilePath) || !is_writable($jsonLogFilePath))) {
-    error_log("PHP Error: JSON log file not readable/writable: " . $jsonLogFilePath);
-    sendJsonResponse('error', 'Server config error: Cannot read/write JSON log file.', 500, $finalLogEntry);
+    $finalLogEntry['serverTimestampUTC'] = gmdate(DateTime::ATOM);
 }
 
-$logs = [];
-if (file_exists($jsonLogFilePath) && filesize($jsonLogFilePath) > 0) {
-    $existingJson = file_get_contents($jsonLogFilePath);
-    if ($existingJson !== false) {
-        $decodedLogs = json_decode($existingJson, true);
-        if (json_last_error() === JSON_ERROR_NONE && is_array($decodedLogs)) {
-            $logs = $decodedLogs;
-        } else {
-            error_log("PHP Warning: JSON log file '$jsonLogFilePath' might be corrupted. Resetting. Error: " . json_last_error_msg());
-            $logs = [];
-        }
-    } else {
-         error_log("PHP Warning: Could not read existing JSON log file: " . $jsonLogFilePath);
-         $logs = [];
-    }
+
+// ==========================================================================
+// SAVE TO SQLITE DATABASE
+// ==========================================================================
+
+require_once __DIR__ . '/db.php';
+
+$db = getDatabase();
+if ($db === null) {
+    error_log("PHP Error: Could not connect to SQLite database.");
+    sendJsonResponse('error', 'Server error: Database unavailable.', 500);
 }
 
-$logs[] = $finalLogEntry;
+// --- Check for nearby duplicate reports (within 50m, last 7 days) ---
+$nearbyDuplicates = findNearbyDuplicates($db, $latitude, $longitude, 50, 604800);
 
-$fileHandle = fopen($jsonLogFilePath, 'c');
-if ($fileHandle === false) {
-    error_log("PHP Error: Could not open JSON log file for writing: " . $jsonLogFilePath);
-    sendJsonResponse('error', 'Server error: Could not open JSON log file.', 500, $finalLogEntry);
+// Insert the new report
+$newId = insertReport($db, $finalLogEntry);
+if ($newId === false) {
+    sendJsonResponse('error', 'Server error: Failed to save log data.', 500);
 }
-$logWriteSuccess = false;
-if (flock($fileHandle, LOCK_EX)) {
-    if (ftruncate($fileHandle, 0)) {
-        rewind($fileHandle);
-        $updatedJson = json_encode($logs, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-        if ($updatedJson !== false && fwrite($fileHandle, $updatedJson) !== false) {
-            fflush($fileHandle);
-            $logWriteSuccess = true;
-        } else {
-            error_log("PHP Error: Failed to write/encode JSON to: " . $jsonLogFilePath . ". JSON Error: " . json_last_error_msg());
-        }
-    } else {
-        error_log("PHP Error: Failed to truncate JSON file: " . $jsonLogFilePath);
-    }
-    flock($fileHandle, LOCK_UN);
-} else {
-    error_log("PHP Warning: Could not lock JSON file for writing: " . $jsonLogFilePath);
-}
-fclose($fileHandle);
+$finalLogEntry['id'] = $newId;
 
-if (!$logWriteSuccess) {
-    sendJsonResponse('error', 'Server error: Failed to save log data.', 500, $finalLogEntry);
+// Regenerate CSRF token after successful submission (one-time use)
+if (session_status() === PHP_SESSION_ACTIVE) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-sendJsonResponse('success', 'Log saved successfully.', 200, $finalLogEntry);
+// Build response with optional duplicate info and brand contacts
+$response = ['status' => 'success', 'message' => 'Log saved successfully.', 'logData' => $finalLogEntry];
+
+if (!empty($nearbyDuplicates)) {
+    $response['nearbyDuplicates'] = $nearbyDuplicates;
+    $response['message'] = 'Log saved. Note: ' . count($nearbyDuplicates) . ' similar report(s) found nearby in the last 7 days.';
+}
+
+$brandContactsFilePath2 = $logDirectory . '/brand_contacts.json';
+ensure_brand_contacts_file($brandContactsFilePath2, $brandContactsExamplePath);
+$bc = read_json_file($brandContactsFilePath2);
+if ($bc !== null) {
+    $response['brandContacts'] = reporter_safe_brand_contacts($bc);
+}
+
+http_response_code(200);
+echo json_encode($response);
+exit;
 ?>

@@ -1,0 +1,355 @@
+/* =============================================================================
+ * styles.css -- WA Trolley Report Shared Stylesheet
+ *
+ * Core theme variables, typography, layout, brand colours, and responsive
+ * breakpoints shared across all pages. Page-specific styles remain inline.
+ *
+ * Version: 1.4
+ * ============================================================================= */
+
+/* --- CSS Custom Properties (Theme) --- */
+:root {
+    --bg-color: #1a1a1a;
+    --text-color: #e0e0e0;
+    --card-bg: #2c2c2c;
+    --border-color: #444;
+    --input-bg: #333;
+    --input-text: #e0e0e0;
+    --button-bg: #007bff;
+    --button-text: #ffffff;
+    --button-hover-bg: #0056b3;
+    --button-secondary-bg: #555;
+    --button-secondary-hover-bg: #777;
+    --button-thirdly-bg: #097969;
+    --button-thirdly-hover-bg: #555;
+    --rating-active-bg: #bf9000;
+    --rating-active-text: #fff;
+    --rating-inactive-bg: #444;
+    --rating-inactive-text: #ccc;
+    --error-color: #dc3545;
+    --error-bg: #401010;
+    --active-border-color: #fff;
+    --highlight: #ff9800;
+    --link-color: #00aaff;
+    --link-hover-color: #0077cc;
+
+    /* Modal variables */
+    --modal-bg: rgba(0, 0, 0, 0.7);
+    --modal-content-bg: var(--card-bg);
+    --modal-header-bg: #333;
+    --modal-button-action-bg: #28a745;
+    --modal-button-action-hover-bg: #218838;
+    --modal-button-lga-bg: #17a2b8;
+    --modal-button-lga-hover-bg: #138496;
+    --modal-button-close-bg: var(--button-secondary-bg);
+    --modal-button-close-hover-bg: var(--button-secondary-hover-bg);
+    --copy-button-bg: #6c757d;
+    --copy-button-hover-bg: #5a6268;
+    --modal-button-spacing: 10px;
+
+    /* Brand colours */
+    --coles-bg: #ed1c22;
+    --coles-hover-bg: #c8191e;
+    --woolworths-bg: #54b848;
+    --woolworths-hover-bg: #47a03d;
+    --aldi-bg: #00005F;
+    --aldi-hover-bg: #00004a;
+    --iga-bg: #c4ad7a;
+    --iga-text: #1a1a1a;
+    --iga-hover-bg: #c2b28d;
+    --kmart-bg: #E92A28;
+    --kmart-hover-bg: #c72321;
+    --bigw-bg: #0046C8;
+    --bigw-hover-bg: #0037a0;
+    --bunnings-bg: #0d5257;
+    --bunnings-hover-bg: #0b494e;
+    --spudshed-bg: #a6cf4d;
+    --spudshed-text: #8b380a;
+    --spudshed-hover-bg: #84a53d;
+    --other-bg: #444;
+    --other-hover-bg: #555;
+
+    /* Detail row */
+    --detail-row-bg: #4a4a4a;
+}
+
+
+/* --- Reset and Base --- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+    height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+}
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 5px;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+
+/* --- Links --- */
+a { color: var(--link-color); text-decoration: none; }
+a:hover { color: var(--link-hover-color); text-decoration: underline; }
+
+
+/* --- Buttons (shared base) --- */
+button {
+    padding: 12px 20px;
+    font-size: 1em;
+    font-weight: normal;
+    border: 0;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+button.primary { background-color: var(--button-bg); color: var(--button-text); width: 100%; margin-top: 10px; }
+button.primary:hover { background-color: var(--button-hover-bg); }
+button.secondary { background-color: var(--button-secondary-bg); color: var(--button-text); padding: 8px 12px; font-size: 0.9em; }
+button.secondary:hover { background-color: var(--button-secondary-hover-bg); }
+button.thirdly { background-color: var(--button-thirdly-bg); color: var(--button-text); padding: 8px 12px; font-size: 0.9em; border: none; }
+button.thirdly:hover { background-color: var(--button-thirdly-hover-bg); color: var(--button-text); }
+button.full-width { width: 100%; }
+
+
+/* --- Back Link (used on content pages) --- */
+.back-link {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 15px;
+    background-color: var(--button-secondary-bg);
+    color: var(--button-text);
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+}
+.back-link:hover {
+    background-color: var(--button-secondary-hover-bg);
+    text-decoration: none;
+    color: var(--button-text);
+}
+
+
+/* --- Content Page Styles (privacy, terms, faq) --- */
+.content-page h1, .content-page h2, .content-page h3 {
+    color: var(--text-color);
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+}
+.content-page h1 {
+    font-size: 2em;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-top: 0.5em;
+}
+.content-page h2 { font-size: 1.5em; }
+.content-page h3 { font-size: 1.2em; }
+.content-page p { margin-bottom: 1em; }
+.content-page ul { margin-left: 20px; margin-bottom: 1em; }
+.content-page li { margin-bottom: 0.5em; }
+.content-page strong, .content-page b { font-weight: bold; color: var(--text-color); }
+.content-page hr { border: 0; border-top: 1px solid var(--border-color); margin: 2em 0; }
+.content-page .warning { color: #ffcc00; font-weight: bold; }
+.content-page .contact-info {
+    margin-top: 15px;
+    padding: 15px;
+    background-color: var(--input-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+}
+
+
+/* --- Brand Link Buttons (used on map_view and view_logs) --- */
+.brand-links-container {
+    margin-top: 5px;
+    padding-top: 5px;
+    border-top: 1px dashed var(--border-color);
+    text-align: center;
+}
+.brand-links-container h2 {
+    font-size: 1.1em;
+    color: var(--text-color);
+    margin-bottom: 10px;
+    font-weight: normal;
+}
+.brand-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    padding: 0;
+    list-style: none;
+}
+.brand-link-button {
+    display: inline-block;
+    padding: 5px 10px;
+    font-size: 0.9em;
+    text-align: center;
+    border-radius: 5px;
+    border: 1px solid transparent;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 100px;
+    color: var(--button-text);
+}
+.brand-link-button.brand-coles { background-color: var(--coles-bg); color: white; border-color: var(--coles-bg); }
+.brand-link-button.brand-coles:hover { background-color: var(--coles-hover-bg); border-color: var(--coles-hover-bg); }
+.brand-link-button.brand-woolworths { background-color: var(--woolworths-bg); color: white; border-color: var(--woolworths-bg); }
+.brand-link-button.brand-woolworths:hover { background-color: var(--woolworths-hover-bg); border-color: var(--woolworths-hover-bg); }
+.brand-link-button.brand-aldi { background-color: var(--aldi-bg); color: white; border-color: var(--aldi-bg); }
+.brand-link-button.brand-aldi:hover { background-color: var(--aldi-hover-bg); border-color: var(--aldi-hover-bg); }
+.brand-link-button.brand-iga { background-color: var(--iga-bg); color: var(--iga-text); border-color: var(--iga-bg); }
+.brand-link-button.brand-iga:hover { background-color: var(--iga-hover-bg); border-color: var(--iga-hover-bg); }
+.brand-link-button.brand-kmart { background-color: var(--kmart-bg); color: white; border-color: var(--kmart-bg); }
+.brand-link-button.brand-kmart:hover { background-color: var(--kmart-hover-bg); border-color: var(--kmart-hover-bg); }
+.brand-link-button.brand-bigw { background-color: var(--bigw-bg); color: white; border-color: var(--bigw-bg); }
+.brand-link-button.brand-bigw:hover { background-color: var(--bigw-hover-bg); border-color: var(--bigw-hover-bg); }
+.brand-link-button.brand-bunnings { background-color: var(--bunnings-bg); color: white; border-color: var(--bunnings-bg); }
+.brand-link-button.brand-bunnings:hover { background-color: var(--bunnings-hover-bg); border-color: var(--bunnings-hover-bg); }
+.brand-link-button.brand-spudshed { background-color: var(--spudshed-bg); color: var(--spudshed-text); border-color: var(--bunnings-bg); }
+.brand-link-button.brand-spudshed:hover { background-color: var(--spudshed-hover-bg); border-color: var(--bunnings-hover-bg); }
+.brand-link-button.brand-other { background-color: var(--rating-inactive-bg); color: var(--rating-inactive-text); border-color: var(--border-color); }
+.brand-link-button.brand-other:hover { background-color: var(--button-secondary-bg); border-color: var(--button-secondary-bg); }
+
+
+/* --- Brand Toggle Buttons (used in tables) --- */
+.brand-toggle {
+    padding: 5px 8px;
+    border-radius: 4px;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 1em;
+    background-color: var(--brand-button-bg, #6c757d);
+    transition: background-color 0.2s;
+    min-width: 40px;
+    text-align: center;
+    display: inline-block;
+}
+.brand-toggle:hover { background-color: var(--brand-button-hover-bg, #5a6268); }
+.brand-toggle[data-brand="Coles"] { background-color: var(--coles-bg); }
+.brand-toggle[data-brand="Coles"]:hover { background-color: var(--coles-hover-bg); }
+.brand-toggle[data-brand="Woolworths"] { background-color: var(--woolworths-bg); }
+.brand-toggle[data-brand="Woolworths"]:hover { background-color: var(--woolworths-hover-bg); }
+.brand-toggle[data-brand="Aldi"] { background-color: var(--aldi-bg); }
+.brand-toggle[data-brand="Aldi"]:hover { background-color: var(--aldi-hover-bg); }
+.brand-toggle[data-brand="IGA"] { background-color: var(--iga-bg); color: var(--iga-text); }
+.brand-toggle[data-brand="IGA"]:hover { background-color: var(--iga-hover-bg); }
+.brand-toggle[data-brand="Kmart"] { background-color: var(--kmart-bg); }
+.brand-toggle[data-brand="Kmart"]:hover { background-color: var(--kmart-hover-bg); }
+.brand-toggle[data-brand="BigW"] { background-color: var(--bigw-bg); }
+.brand-toggle[data-brand="BigW"]:hover { background-color: var(--bigw-hover-bg); }
+.brand-toggle[data-brand="Bunnings"] { background-color: var(--bunnings-bg); }
+.brand-toggle[data-brand="Bunnings"]:hover { background-color: var(--bunnings-hover-bg); }
+.brand-toggle[data-brand="Spudshed"] { background-color: var(--spudshed-bg); color: var(--spudshed-text); }
+.brand-toggle[data-brand="Spudshed"]:hover { background-color: var(--spudshed-hover-bg); }
+.brand-toggle[data-brand="Other"] { background-color: var(--other-bg); }
+.brand-toggle[data-brand="Other"]:hover { background-color: var(--other-hover-bg); }
+
+
+/* --- Detail Row (used in log tables) --- */
+.detail-content { padding: 8px; background-color: var(--detail-row-bg); }
+.detail-content h4 { margin-top: 0; margin-bottom: 8px; color: var(--highlight); font-size: 1.1em; }
+.detail-content span { display: inline; margin-bottom: 5px; font-size: 0.95em; line-height: 1.4; margin-right: 5px; }
+.detail-content strong { color: var(--highlight); margin-right: 5px; }
+.no-details { font-style: italic; color: #aaa; display: inline; }
+.report_status { display: inline; margin-bottom: 5px; font-size: 0.95em; line-height: 1.4; margin-right: 5px; }
+
+
+/* --- Error States --- */
+.error-highlight { border: 1px solid var(--error-color) !important; }
+.error-label { color: var(--error-color) !important; }
+.error-group { border: 1px solid var(--error-color); padding: 5px; border-radius: 4px; }
+
+
+/* --- Loading / Messages --- */
+.loading-message { text-align: center; padding: 20px; font-size: 1.1em; }
+.bottom-message { font-size: 0.8em; color: #aaa; text-align: center; margin-top: 15px; }
+
+
+/* --- Disclaimer (footer text) --- */
+.skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    z-index: 10000;
+    padding: 10px 16px;
+    background: var(--button-bg);
+    color: var(--button-text);
+    border-radius: 0 0 6px 0;
+    font-weight: bold;
+}
+.skip-link:focus {
+    left: 0;
+    outline: 2px solid var(--highlight);
+}
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* --- Leaflet map pages (map_view.html, map_brand.html) --- */
+body.map-page {
+    align-items: stretch;
+    min-height: 100%;
+}
+body.map-page > .container {
+    flex: 1 1 auto;
+    width: 100%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+body.map-page main {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+body.map-page #map {
+    width: 100%;
+    min-height: 400px;
+    height: calc(100vh - 240px);
+    flex: 1 1 auto;
+}
+
+.disclaimer { font-size: 12px; text-align: center; margin-top: 40px; color: #9a9a9a; }
+.disclaimer a { color: #b0b0b0; text-decoration: none; }
+.disclaimer a:hover { color: var(--link-color); }
+
+
+/* --- Responsive Base --- */
+@media (max-width: 768px) {
+    body { padding: 5px; }
+    .disclaimer { font-size: 12px; margin-top: 30px; }
+    .bottom-message { font-size: 0.6em; }
+    .back-link { padding: 8px 12px; font-size: 0.9em; }
+
+    /* Content pages */
+    .content-page h1 { font-size: 1.6em; }
+    .content-page h2 { font-size: 1.3em; }
+    .content-page h3 { font-size: 1.1em; }
+
+    /* Detail rows - stack vertically on mobile */
+    .detail-content { padding: 5px; }
+    .detail-content h4 { font-size: 0.95em; }
+    .detail-content span { font-size: 0.85em; display: block; margin-bottom: 5px; }
+    .no-details { display: block; }
+    .report_status { font-size: 0.85em; display: block; margin-bottom: 5px; }
+}

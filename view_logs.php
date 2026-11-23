@@ -5,228 +5,117 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="View logged abandoned shopping trolleys">
     <title>Trolley List - Reported Abandoned Trolleys in WA</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="styles.css">
 <style>
-/* ... CSS ... */
-:root {
-    --bg-color: #2a2a2a;
-    --text-color: #e0e0e0;
-    --card-bg: #3c3c3c;
-    --border-color: #555;
-    --button-bg: #007bff; /* Default primary button (used by Map button & Pagination buttons) */
-    --button-hover-bg: #0056b3; /* Hover for primary/Map button & Pagination buttons */
-    --button-text: #ffffff;
-    --highlight: #ff9800;
-    --highlight-hover: #e68a00;
-    --detail-row-bg: #4a4a4a;
-    --brand-button-bg: #6c757d; /* Default grey for toggles */
-    --brand-button-hover-bg: #5a6268;
-    --button-secondary-bg: #555; /* Used for other secondary actions if needed */
-    --button-secondary-hover-bg: #777;
-    --error-color: #dc3545;
-
-    /* Define Brand Colors */
-    --coles-bg: #ed1c22;
-    --coles-hover-bg: #c8191e;
-    --woolworths-bg: #54b848;
-    --woolworths-hover-bg: #47a03d;
-    --aldi-bg: #00005F;
-    --aldi-hover-bg: #00004a;
-    --iga-bg: #30302f;
-    --iga-hover-bg: #20201f;
-    --kmart-bg: #E92A28;
-    --kmart-hover-bg: #c72321;
-    --bigw-bg: #0046C8;
-    --bigw-hover-bg: #0037a0;
-    --bunnings-bg: #0d5257;
-    --bunnings-hover-bg: #0b494e;
-    --spudshed-bg: #a6cf4d;
-    --spudshed-color:#8b380a;
-    --spudshed-hover-bg:#84a53d;
-}
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg-color); color: var(--text-color); padding: 5px; }
-.container { max-width: 1200px; margin: 0px auto; padding: 5px; border-radius: 8px; background-color: var(--card-bg); border: 1px solid var(--border-color); box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); overflow-x: auto; }
+/* --- view_logs.php page-specific styles --- */
+body { padding: 5px; }
+.container { width: 100%; max-width: 1200px; margin: 10px auto; padding: 5px; border-radius: 8px; background-color: var(--card-bg); border: 1px solid var(--border-color); box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); }
 header { text-align: center; margin-bottom: 20px; margin-top: 10px; }
 h1 { font-size: 1.8em; color: var(--highlight); }
-h1 span { display: block; font-weight: normal; font-size: 0.47em; color: var(--text-color); margin-top:5px;}
-    h1 icon {font-weight: normal; font-size: 0.9em; margin: -8px 0px 0px 0px; }
-    .form-group { margin-bottom: 20px; }
-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+h1 span { display: block; font-weight: normal; font-size: 0.47em; color: var(--text-color); margin-top: 5px; }
+h1 icon { font-weight: normal; font-size: 0.9em; }
+
+/* Table */
+table { width: 100%; border-collapse: collapse; margin-bottom: 0; }
 th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border-color); white-space: nowrap; }
-th { background-color: #444; position: sticky; top: 0; color: var(--highlight); z-index: 1; font-size: 0.95em; }
+th { background-color: #444; color: var(--highlight); z-index: 1; font-size: 0.95em; }
 th.sortable { cursor: pointer; }
 th:hover { background-color: #555; }
 td { background-color: var(--card-bg); vertical-align: middle; }
 tr.detail-row td { background-color: var(--detail-row-bg); white-space: normal; }
-/* Use simpler default sort icon '↕' */
 .sortable::after { content: var(--sort-icon, " \2195"); font-size: 0.8em; opacity: 0.8; margin-left: 4px; }
 .map-btn {
-    padding: 6px 10px; background-color: var(--button-bg); color: var(--button-text); border: none; border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-block; font-size: 1em; text-align: center; white-space: normal; line-height: 1.2; min-width: 80px;
+    padding: 6px 10px; background-color: var(--button-bg); color: var(--button-text);
+    border: none; border-radius: 5px; cursor: pointer; text-decoration: none;
+    display: inline-block; font-size: 1em; text-align: center; white-space: normal;
+    line-height: 1.2; min-width: 80px;
 }
 .map-btn:hover { background-color: var(--button-hover-bg); }
 .brand-button-group { display: flex; flex-wrap: wrap; gap: 5px; }
 
-/* Default Brand Toggle Style */
-.brand-toggle {
-    padding: 5px 8px; border-radius: 4px; color: #fff; border: none; cursor: pointer; font-size: 1em; background-color: var(--brand-button-bg); transition: background-color 0.2s; min-width: 60px; text-align: center; display: inline-block;
+/* Pagination -- sticky to bottom of viewport */
+.pagination {
+    position: sticky; bottom: 0; z-index: 10;
+    margin: 0; padding: 10px 0;
+    text-align: center;
+    background-color: var(--card-bg);
+    border-top: 1px solid var(--border-color);
 }
-.brand-toggle:hover { background-color: var(--brand-button-hover-bg); }
-
-/* Brand Specific Colors */
-.brand-toggle[data-brand="Coles"] { background-color: var(--coles-bg); }
-.brand-toggle[data-brand="Coles"]:hover { background-color: var(--coles-hover-bg); }
-.brand-toggle[data-brand="Woolworths"] { background-color: var(--woolworths-bg); }
-.brand-toggle[data-brand="Woolworths"]:hover { background-color: var(--woolworths-hover-bg); }
-.brand-toggle[data-brand="Aldi"] { background-color: var(--aldi-bg); }
-.brand-toggle[data-brand="Aldi"]:hover { background-color: var(--aldi-hover-bg); }
-.brand-toggle[data-brand="IGA"] { background-color: var(--iga-bg); }
-.brand-toggle[data-brand="IGA"]:hover { background-color: var(--iga-hover-bg); }
-.brand-toggle[data-brand="Kmart"] { background-color: var(--kmart-bg); }
-.brand-toggle[data-brand="Kmart"]:hover { background-color: var(--kmart-hover-bg); }
-.brand-toggle[data-brand="BigW"] { background-color: var(--bigw-bg); }
-.brand-toggle[data-brand="BigW"]:hover { background-color: var(--bigw-hover-bg); }
-.brand-toggle[data-brand="Bunnings"] { background-color: var(--bunnings-bg); }
-.brand-toggle[data-brand="Bunnings"]:hover { background-color: var(--bunnings-hover-bg); }
-.brand-toggle[data-brand="Spudshed"] { background-color: var(--spudshed-bg); }
-.brand-toggle[data-brand="Spudshed"] { color: var(--spudshed-color); }
-.brand-toggle[data-brand="Spudshed"]:hover { background-color: var(--spudshed-hover-bg); }
-
-.pagination { margin: 20px 0; text-align: center; }
-/* *** MODIFICATION: Use primary blue for these links *** */
 .pagination a.back-to-form {
-    background-color: var(--button-bg); /* Use primary color */
-    color: var(--button-text);
-    text-decoration: none;
-    padding: 8px 16px; /* Match button padding */
-    font-size: 1em; /* Match button font size */
-    border-radius: 5px;
-    transition: background-color 0.2s ease;
-    display: inline-block;
-    vertical-align: middle;
-    margin: 0 5px; /* Match button margin */
+    background-color: var(--button-bg); color: var(--button-text);
+    text-decoration: none; padding: 8px 16px; font-size: 1em;
+    border-radius: 5px; transition: background-color 0.2s ease;
+    display: inline-block; vertical-align: middle; margin: 0 5px;
 }
-.pagination a.back-to-form:hover {
-    background-color: var(--button-hover-bg); /* Use primary hover color */
-    color: var(--button-text);
-}
+.pagination a.back-to-form:hover { background-color: var(--button-hover-bg); color: var(--button-text); }
 .pagination button, .pagination span { vertical-align: middle; margin: 0 5px; }
-.pagination button { padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer; font-size: 1em; transition: background-color 0.2s ease; display: inline-block; }
-.pagination button { background-color: var(--button-bg); color: var(--button-text); }
+.pagination button { padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer; font-size: 1em; transition: background-color 0.2s ease; display: inline-block; background-color: var(--button-bg); color: var(--button-text); }
 .pagination button:disabled { background-color: #666; cursor: not-allowed; opacity: 0.7; }
 .pagination button:hover:not(:disabled) { background-color: var(--button-hover-bg); }
 .pagination span { margin: 0 10px; display: inline-block; }
-.pagination p { margin-top:5px;}
+.pagination p { margin-top: 5px; }
 
+/* Time display */
+.time-part { display: inline; margin-left: 5px; font-size: 0.9em; opacity: 0.8; }
 
-        /* Styles for Brand Links Section */
-        .brand-links-container {
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 1px dashed var(--border-color);
-            text-align: center;
-        }
-        .brand-links-container h2 {
-             font-size: 1.1em;
-             color: var(--text-color);
-             margin-bottom: 5px;
-             font-weight: normal;
-        }
-        .brand-links {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px;
-            padding: 0;
-            list-style: none;
-        }
-        .brand-link-button {
-            display: inline-block;
-            padding: 10px 15px;
-            font-size: 0.9em;
-            text-align: center;
-            border-radius: 5px;
-            border: 1px solid transparent;
-            text-decoration: none;
-            cursor: pointer;
-            transition: background-color 0.2s ease, border-color 0.2s ease;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            min-width: 100px;
-            color: var(--button-text);
-        }
-        /* Brand Specific Colors for Links */
-        .brand-link-button.brand-coles { background-color: #ed1c22; color: white; border-color: #ed1c22; }
-        .brand-link-button.brand-coles:hover { background-color: #c8191e; border-color: #c8191e;}
-        .brand-link-button.brand-woolworths { background-color: #54b848; color: white; border-color: #54b848; }
-        .brand-link-button.brand-woolworths:hover { background-color: #47a03d; border-color: #47a03d;}
-        .brand-link-button.brand-aldi { background-color: #00005F; color: white; border-color: #00005F; }
-        .brand-link-button.brand-aldi:hover { background-color: #00004a; border-color: #00004a;}
-        .brand-link-button.brand-iga { background-color: #D8C69D; color: #333333; border-color: #D8C69D; }
-        .brand-link-button.brand-iga:hover { background-color: #c2b28d; border-color: #c2b28d;}
-        .brand-link-button.brand-kmart { background-color: #E92A28; color: white; border-color: #E92A28; }
-        .brand-link-button.brand-kmart:hover { background-color: #c72321; border-color: #c72321;}
-        .brand-link-button.brand-bigw { background-color: #0046C8; color: white; border-color: #0046C8; }
-        .brand-link-button.brand-bigw:hover { background-color: #0037a0; border-color: #0037a0;}
-        .brand-link-button.brand-bunnings { background-color: #0d5257; color: white; border-color: #0d5257; }
-        .brand-link-button.brand-bunnings:hover { background-color: #0b494e; border-color: #0b494e;}
-        .brand-link-button.brand-spudshed { background-color: #a6cf4d; color: #8b380a; border-color: #0d5257; }
-        .brand-link-button.brand-spudshed:hover { background-color: #84a53d; border-color: #0b494e;}
-        .brand-link-button.brand-other { background-color: var(--rating-inactive-bg); color: var(--rating-inactive-text); border-color: var(--border-color);}
-        .brand-link-button.brand-other:hover { background-color: var(--button-secondary-bg); border-color: var(--button-secondary-bg);}
-        /* End Brand Specific Colors */
-
-
-
-
-.detail-content { padding: 10px; background-color: var(--detail-row-bg); }
-.detail-content h4 { margin-top: 0; margin-bottom: 10px; color: var(--highlight); font-size: 1.1em; }
-.detail-content span { display: inline; margin-bottom: 8px; font-size: 0.95em; line-height: 1.4; margin-right: 5px;}
-.detail-content strong { color: var(--highlight); margin-right: 5px; }
-.no-details { font-style: italic; color: #aaa; display: block;}
-
-.bottom-message { font-size: 0.8em; color: #aaa; text-align: center; margin-top: 15px; }
-.loading-message { text-align: center; padding: 20px; font-size: 1.1em; }
-
-.time-part {
-    display: inline; margin-left: 5px; font-size: 0.9em; opacity: 0.8;
-}
+/* Condition detail rows - no negative margins needed with block display */
 
 @media (max-width: 768px) {
-     body { padding: 10px; }
-     .container { padding: 5px; }
-     table { font-size: 0.9em; }
-     th, td { padding: 8px 6px; white-space: normal; }
-     th { white-space: nowrap; font-size: 0.9em; }
-     td:nth-child(1) { width: 20%; } /* Brand column */
-     td:nth-child(2) { width: 22%; } /* Date column */
-     td:nth-child(3) { width: 58%; white-space: normal; } /* Location column */
-     .sortable::after { font-size: 1em; }
-     .map-btn { padding: 5px 8px; font-size: 0.9em; min-width: 70px; }
-     .brand-toggle { font-size: 0.9em; padding: 5px 6px; }
-     .pagination button, .pagination a.back-to-form { padding: 6px 12px; font-size: 0.9em; margin-bottom: 8px; margin-left: 3px; margin-right: 3px; }
-     .bottom-message {font-size: 0.75em;}
-     h1 { font-size: 1.6em; }
-     h1 span { font-size: 0.45em; margin-top: 3px;}
-     .detail-content { padding: 3px; }
-     .detail-content h4 { font-size: 1em; }
-     .detail-content span { font-size: 10px; display: block; margin-bottom: 5px;}
-     .no-details { display: block; }
-     span.conditions_yes {margin-bottom:0px;}
-     span.add_comments {margin-top:-15px;}
-     .bottom-message { font-size: 0.6em; }
-     .time-part { display: none; }
+    body { padding: 10px; }
+    .container { padding: 5px; }
+    table { font-size: 0.9em; }
+    th, td { padding: 8px 6px; white-space: normal; }
+    th { white-space: nowrap; font-size: 0.9em; }
+    td:nth-child(1) { width: 20%; }
+    td:nth-child(2) { width: 22%; }
+    td:nth-child(3) { width: 58%; white-space: normal; }
+    .sortable::after { font-size: 1em; }
+    .map-btn { padding: 5px 8px; font-size: 0.9em; min-width: 70px; }
+    .brand-toggle { font-size: 0.9em; padding: 5px 6px; }
+    .pagination button, .pagination a.back-to-form { padding: 6px 12px; font-size: 0.9em; margin-bottom: 8px; margin-left: 3px; margin-right: 3px; }
+    h1 { font-size: 1.6em; }
+    h1 span { font-size: 0.45em; margin-top: 3px; }
+    .time-part { display: none; }
 }
 </style>
 </head>
 <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
     <div class="container">
         <header>
             <h1>WA Trolley List <icon>🛒️</icon><span>Reported Abandoned Trolleys in WA</span></h1>
         </header>
 
+        <main id="main-content">
         <div id="loading" class="loading-message">Loading...</div>
         <div id="table-container" style="display: none;">
+
+            <!-- Filter Controls -->
+            <div id="filter-bar" style="margin-bottom:15px; padding:10px; background-color:#333; border-radius:5px; border:1px solid var(--border-color);">
+                <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+                    <label style="font-size:0.85em; font-weight:bold; margin-right:5px;">Filter:</label>
+                    <button type="button" class="brand-filter-btn active" data-brand="all" aria-label="Show all brands" style="padding:5px 10px; font-size:0.85em; border-radius:4px; border:none; cursor:pointer; background-color:var(--button-bg); color:var(--button-text); font-weight:bold;">All</button>
+                    <button type="button" class="brand-filter-btn" data-brand="Coles" aria-label="Filter Coles" style="padding:5px 10px; font-size:0.85em; border-radius:4px; border:none; cursor:pointer; background-color:var(--coles-bg); color:white;">CO</button>
+                    <button type="button" class="brand-filter-btn" data-brand="Woolworths" aria-label="Filter Woolworths" style="padding:5px 10px; font-size:0.85em; border-radius:4px; border:none; cursor:pointer; background-color:var(--woolworths-bg); color:white;">WO</button>
+                    <button type="button" class="brand-filter-btn" data-brand="Aldi" aria-label="Filter Aldi" style="padding:5px 10px; font-size:0.85em; border-radius:4px; border:none; cursor:pointer; background-color:var(--aldi-bg); color:white;">AL</button>
+                    <button type="button" class="brand-filter-btn" data-brand="IGA" aria-label="Filter IGA" style="padding:5px 10px; font-size:0.85em; border-radius:4px; border:none; cursor:pointer; background-color:var(--iga-bg); color:var(--iga-text);">IG</button>
+                    <button type="button" class="brand-filter-btn" data-brand="Kmart" aria-label="Filter Kmart" style="padding:5px 10px; font-size:0.85em; border-radius:4px; border:none; cursor:pointer; background-color:var(--kmart-bg); color:white;">KM</button>
+                    <button type="button" class="brand-filter-btn" data-brand="BigW" aria-label="Filter Big W" style="padding:5px 10px; font-size:0.85em; border-radius:4px; border:none; cursor:pointer; background-color:var(--bigw-bg); color:white;">BI</button>
+                    <button type="button" class="brand-filter-btn" data-brand="Bunnings" aria-label="Filter Bunnings" style="padding:5px 10px; font-size:0.85em; border-radius:4px; border:none; cursor:pointer; background-color:var(--bunnings-bg); color:white;">BU</button>
+                    <button type="button" class="brand-filter-btn" data-brand="Spudshed" aria-label="Filter Spudshed" style="padding:5px 10px; font-size:0.85em; border-radius:4px; border:none; cursor:pointer; background-color:var(--spudshed-bg); color:var(--spudshed-text);">SP</button>
+                    <button type="button" class="brand-filter-btn" data-brand="Other" aria-label="Filter other brands" style="padding:5px 10px; font-size:0.85em; border-radius:4px; border:none; cursor:pointer; background-color:#555; color:#ccc;">OT</button>
+                </div>
+                <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-top:10px;">
+                    <label for="date-from" style="font-size:0.85em; font-weight:bold;">From</label>
+                    <input type="date" id="date-from" aria-label="Filter from date">
+                    <label for="date-to" style="font-size:0.85em; font-weight:bold;">To</label>
+                    <input type="date" id="date-to" aria-label="Filter to date">
+                    <button type="button" id="clear-dates-btn" aria-label="Clear date filters">Clear dates</button>
+                    <span id="filter-count" aria-live="polite"></span>
+                </div>
+            </div>
+
             <table id="logs-table">
                 <thead>
                     <tr>
@@ -265,6 +154,7 @@ tr.detail-row td { background-color: var(--detail-row-bg); white-space: normal; 
             <p class="bottom-message">*Location accuracy depends on device GPS.</p>
         </div>
          <div id="error-loading" class="loading-message" style="display: none; color: var(--error-color);"></div>
+        </main>
     </div>
 
 <script>
@@ -287,12 +177,99 @@ tr.detail-row td { background-color: var(--detail-row-bg); white-space: normal; 
 
     // --- Data Loading and Initialization ---
     let allLogs = [];
+    let filteredLogs = []; // Subset of allLogs after brand/date filtering
     const itemsPerPage = 30;
     let currentPage = 1;
     let sortColumn = "timestamp";
     let sortDirection = -1;
 
-    document.addEventListener('DOMContentLoaded', () => { fetchLogs(); });
+    // --- Filter State ---
+    let activeBrandFilter = 'all'; // 'all' or a brand identifier
+    let dateFromFilter = ''; // YYYY-MM-DD or empty
+    let dateToFilter = '';   // YYYY-MM-DD or empty
+
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchLogs();
+        setupFilterListeners();
+    });
+
+    /** Apply brand and date filters to allLogs, store in filteredLogs */
+    function applyFilters() {
+        filteredLogs = allLogs.filter(log => {
+            // Brand filter
+            if (activeBrandFilter !== 'all') {
+                const brands = Array.isArray(log.brands) ? log.brands : [];
+                if (!brands.includes(activeBrandFilter)) return false;
+            }
+            // Date range filter
+            if (dateFromFilter || dateToFilter) {
+                const ts = log.serverTimestampUTC || log.timestamp || '';
+                const logDate = ts.substring(0, 10); // YYYY-MM-DD
+                if (!logDate) return false;
+                if (dateFromFilter && logDate < dateFromFilter) return false;
+                if (dateToFilter && logDate > dateToFilter) return false;
+            }
+            return true;
+        });
+
+        // Update filter count display
+        const filterCount = document.getElementById('filter-count');
+        if (filterCount) {
+            if (activeBrandFilter !== 'all' || dateFromFilter || dateToFilter) {
+                filterCount.textContent = filteredLogs.length + ' of ' + allLogs.length + ' reports';
+            } else {
+                filterCount.textContent = allLogs.length + ' reports';
+            }
+        }
+
+        sortLogs();
+        currentPage = 1;
+        updateTable();
+    }
+
+    /** Set up filter button and date input event listeners */
+    function setupFilterListeners() {
+        // Brand filter buttons -- bold the active one, normal weight for the rest
+        document.querySelectorAll('.brand-filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.brand-filter-btn').forEach(b => {
+                    b.classList.remove('active');
+                    b.style.fontWeight = 'normal';
+                });
+                btn.classList.add('active');
+                btn.style.fontWeight = 'bold';
+                activeBrandFilter = btn.dataset.brand;
+                applyFilters();
+            });
+        });
+
+        // Date range filters
+        const dateFrom = document.getElementById('date-from');
+        const dateTo = document.getElementById('date-to');
+        const clearDatesBtn = document.getElementById('clear-dates-btn');
+
+        if (dateFrom) {
+            dateFrom.addEventListener('change', () => {
+                dateFromFilter = dateFrom.value || '';
+                applyFilters();
+            });
+        }
+        if (dateTo) {
+            dateTo.addEventListener('change', () => {
+                dateToFilter = dateTo.value || '';
+                applyFilters();
+            });
+        }
+        if (clearDatesBtn) {
+            clearDatesBtn.addEventListener('click', () => {
+                dateFromFilter = '';
+                dateToFilter = '';
+                if (dateFrom) dateFrom.value = '';
+                if (dateTo) dateTo.value = '';
+                applyFilters();
+            });
+        }
+    }
 
     function generateStableRowId(log, index) { /* ... */
          const tsPart = log.serverTimestampUTC || log.timestamp || `no-ts-${index}`;
@@ -305,16 +282,17 @@ tr.detail-row td { background-color: var(--detail-row-bg); white-space: normal; 
          const errorDiv = document.getElementById('error-loading');
          const tableContainer = document.getElementById('table-container');
          try {
-             const response = await fetch('trolley_logs.json?_=' + new Date().getTime());
+             const response = await fetch('api_logs.php');
              if (!response.ok) { throw new Error(`HTTP error! Status: ${response.status}`); }
              let data = await response.json();
              if (!Array.isArray(data)) { throw new Error("Invalid data format received."); }
              data = data.map((log, index) => { log._rowId = generateStableRowId(log, index); return log; });
              allLogs = data;
              sortLogs(); // Initial sort
+             filteredLogs = allLogs.slice(); // Start with all logs
+             applyFilters(); // Apply any active filters and render
              loadingDiv.style.display = 'none';
              tableContainer.style.display = 'block';
-             updateTable(); // Render table first time
              setupEventListeners();
          } catch (error) {
              console.error("Error loading logs:", error);
@@ -348,10 +326,9 @@ tr.detail-row td { background-color: var(--detail-row-bg); white-space: normal; 
          } catch (e) { console.error("Time formatting error for:", isoTimestamp, e); return ''; }
      }
 
-    function sortLogs() { /* ... Sorting logic (unchanged) ... */
+    function sortLogs() {
          if (!sortColumn) return;
-         allLogs.sort((a, b) => {
-              let valA = a[sortColumn]; let valB = b[sortColumn];
+         filteredLogs.sort((a, b) => {
               if (sortColumn === 'brands') {
                   const brandsA = Array.isArray(a.brands) ? a.brands : []; const brandsB = Array.isArray(b.brands) ? b.brands : [];
                   const firstBrandA = brandsA.length > 0 ? String(brandsA[0]).toLowerCase() : ''; const firstBrandB = brandsB.length > 0 ? String(brandsB[0]).toLowerCase() : '';
@@ -362,7 +339,16 @@ tr.detail-row td { background-color: var(--detail-row-bg); white-space: normal; 
                   const validTimeA = isNaN(timeA) ? 0 : timeA; const validTimeB = isNaN(timeB) ? 0 : timeB;
                   return (validTimeA - validTimeB) * sortDirection;
               }
-              valA = String(valA || '').toLowerCase(); valB = String(valB || '').toLowerCase();
+              if (sortColumn === 'status') {
+                  const statusOrder = { 'collected': 3, 'notified': 2, 'reported': 1 };
+                  function getStatusRank(log) {
+                      if (log.collectedBy && !log.collectionReversed) return statusOrder.collected;
+                      if ((log.notifiedBrands && log.notifiedBrands.length > 0) || log.notifiedLga) return statusOrder.notified;
+                      return statusOrder.reported;
+                  }
+                  return (getStatusRank(a) - getStatusRank(b)) * sortDirection;
+              }
+              const valA = String(a[sortColumn] || '').toLowerCase(); const valB = String(b[sortColumn] || '').toLowerCase();
               if (valA < valB) return -1 * sortDirection; if (valA > valB) return 1 * sortDirection; return 0;
          });
      }
@@ -371,7 +357,7 @@ tr.detail-row td { background-color: var(--detail-row-bg); white-space: normal; 
     function updateSortDirection(column) { /* ... Update sort state (unchanged) ... */
          if (sortColumn === column) { sortDirection *= -1; }
          else { sortColumn = column; sortDirection = (column === 'timestamp') ? -1 : 1; }
-         sortLogs(); currentPage = 1; updateTable();
+         sortLogs(); currentPage = 1; renderTable(); updateSortIndicators();
      }
 
      function updateSortIndicators() {
@@ -386,18 +372,18 @@ tr.detail-row td { background-color: var(--detail-row-bg); white-space: normal; 
      }
 
 
-    function renderTable() { /* ... Render table rows (unchanged structure) ... */
+    function renderTable() { /* ... Render table rows ... */
          const tbody = document.getElementById('table-body');
          tbody.innerHTML = '';
          document.querySelectorAll('.detail-row').forEach(row => row.remove());
-         const totalPages = Math.max(1, Math.ceil(allLogs.length / itemsPerPage));
+         const totalPages = Math.max(1, Math.ceil(filteredLogs.length / itemsPerPage));
          currentPage = Math.max(1, Math.min(currentPage, totalPages));
          const start = (currentPage - 1) * itemsPerPage;
          const end = start + itemsPerPage;
-         const pageData = allLogs.slice(start, end);
+         const pageData = filteredLogs.slice(start, end);
 
-         if (pageData.length === 0 && allLogs.length > 0) { currentPage = Math.max(1, currentPage - 1); renderTable(); return; }
-         else if (pageData.length === 0) { tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 20px;">No logs found.</td></tr>'; }
+         if (pageData.length === 0 && filteredLogs.length > 0) { currentPage = Math.max(1, currentPage - 1); renderTable(); return; }
+         else if (pageData.length === 0) { tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 20px;">No logs found matching filters.</td></tr>'; }
 
          pageData.forEach((log) => {
              if (typeof log !== 'object' || log === null || !log._rowId) { console.warn("Skipping invalid log entry:", log); return; }
@@ -450,28 +436,89 @@ tr.detail-row td { background-color: var(--detail-row-bg); white-space: normal; 
              tbody.appendChild(tr);
          });
          updatePagination(totalPages);
-         updateSortIndicators(); // Update indicators after rendering
+         updateSortIndicators();
      }
 
 
-     function toggleDetailRow(button) { /* ... Toggle detail row (unchanged structure) ... */
+     function toggleDetailRow(button) {
          const brand = button.dataset.brand; const targetRowId = button.dataset.targetRowId;
-         const mainRow = document.querySelector(`tr[data-row-id="${targetRowId}"]`); if (!mainRow) { console.error("Could not find main row for ID:", targetRowId); return; }
-         const existingDetailRow = document.getElementById(`detail-${targetRowId}-${brand}`); // Unique ID per brand
-         document.querySelectorAll('.detail-row').forEach(row => row.remove()); // Close all details
-         if (existingDetailRow) { return; } // If it was already open, just close it
-         const logData = allLogs.find(log => log._rowId === targetRowId); if (!logData) { console.error("Could not find data for rowId:", targetRowId); alert("Error: Could not retrieve details."); return; }
+         const mainRow = document.querySelector(`tr[data-row-id="${targetRowId}"]`); if (!mainRow) return;
+         const existingDetailRow = document.getElementById(`detail-${targetRowId}-${brand}`);
+         document.querySelectorAll('.detail-row').forEach(row => row.remove());
+         if (existingDetailRow) { return; }
+         const logData = filteredLogs.find(log => log._rowId === targetRowId); if (!logData) return;
          try {
-             const detailRow = document.createElement('tr'); detailRow.id = `detail-${targetRowId}-${brand}`; detailRow.classList.add('detail-row');
-             const detailCell = document.createElement('td'); detailCell.colSpan = 3;
+             const detailRow = document.createElement('tr');
+             detailRow.id = `detail-${targetRowId}-${brand}`;
+             detailRow.classList.add('detail-row');
+             const detailCell = document.createElement('td');
+             detailCell.colSpan = 3;
+
+             const wrapper = document.createElement('div');
+             wrapper.className = 'detail-content';
+
+             const heading = document.createElement('h4');
+             heading.textContent = `Details for ${brand} Trolley`;
+             wrapper.appendChild(heading);
+
              const conditions = (typeof logData.conditions === 'object' && logData.conditions !== null) ? logData.conditions : {};
-             const brandConditions = conditions[brand] || []; const comments = logData.comments || '';
-             let detailHtml = '<div class="detail-content">'; detailHtml += `<h4>Details for ${brand} Trolley</h4>`;
-             if (brandConditions.length > 0) { const conditionsText = brandConditions.join(', '); const escapedConditionsText = conditionsText.replace(/</g, "<").replace(/>/g, ">"); detailHtml += `<span class="conditions_yes"><strong>Condition (${brand}):</strong> ${escapedConditionsText}</span><br>`; }
-             else { detailHtml += `<span class="no-details">No specific conditions reported for ${brand} trolley.</span><br>`; }
-             if (comments) { const escapedComments = comments.replace(/</g, "<").replace(/>/g, ">"); detailHtml += `<span class="add_comments" style="display:block;"><strong>General Comments:</strong> ${escapedComments.replace(/\n/g, '<br>')}</span>`; }
-             else { detailHtml += '<span class="no-details">No general comments submitted.</span>'; }
-             detailHtml += '</div>'; detailCell.innerHTML = detailHtml; detailRow.appendChild(detailCell);
+             const brandConditions = conditions[brand] || [];
+             const comments = logData.comments || '';
+
+             if (brandConditions.length > 0) {
+                 const condSpan = document.createElement('span');
+                 condSpan.className = 'conditions_yes';
+                 const condStrong = document.createElement('strong');
+                 condStrong.textContent = 'Conditions Reported:';
+                 condSpan.appendChild(condStrong);
+                 condSpan.appendChild(document.createTextNode(' ' + brandConditions.join(', ')));
+                 wrapper.appendChild(condSpan);
+             } else {
+                 const noCond = document.createElement('span');
+                 noCond.className = 'no-details';
+                 noCond.textContent = 'No specific conditions reported.';
+                 wrapper.appendChild(noCond);
+             }
+
+             if (comments) {
+                 const commSpan = document.createElement('span');
+                 commSpan.className = 'add_comments';
+                 const commStrong = document.createElement('strong');
+                 commStrong.textContent = 'General Comments:';
+                 commSpan.appendChild(commStrong);
+                 commSpan.appendChild(document.createTextNode(' ' + comments));
+                 wrapper.appendChild(commSpan);
+             }
+
+             const hasNotifiedBrands = logData.notifiedBrands && logData.notifiedBrands.length > 0;
+             const hasNotifiedLga = logData.notifiedLga;
+             const isCollected = logData.collectedBy && !logData.collectionReversed;
+             const statusParts = [];
+
+             if (hasNotifiedBrands) {
+                 const dateStr = logData.serverTimestampUTC ? formatDisplayDate(logData.serverTimestampUTC) : '';
+                 statusParts.push('Reported to ' + logData.notifiedBrands.join(', ') + (dateStr ? ' at ' + dateStr : ''));
+             }
+             if (hasNotifiedLga && logData.lgaName) {
+                 const dateStr = logData.serverTimestampUTC ? formatDisplayDate(logData.serverTimestampUTC) : '';
+                 statusParts.push('Reported to ' + logData.lgaName + (dateStr ? ' at ' + dateStr : ''));
+             }
+             if (isCollected) {
+                 const collectedDate = logData.collectedAt ? formatDisplayDate(logData.collectedAt) : '';
+                 statusParts.push('Reported as "collected" by ' + logData.collectedBy + (collectedDate ? ' at ' + collectedDate : ''));
+             }
+             if (statusParts.length > 0) {
+                 const statusSpan = document.createElement('span');
+                 statusSpan.className = 'report_status';
+                 const statusStrong = document.createElement('strong');
+                 statusStrong.textContent = 'Status:';
+                 statusSpan.appendChild(statusStrong);
+                 statusSpan.appendChild(document.createTextNode(' ' + statusParts.join('; ')));
+                 wrapper.appendChild(statusSpan);
+             }
+
+             detailCell.appendChild(wrapper);
+             detailRow.appendChild(detailCell);
              mainRow.parentNode.insertBefore(detailRow, mainRow.nextSibling);
          } catch (error) { console.error("Error occurred during detail row creation/insertion:", error); alert("An error occurred while trying to show details."); }
       }
@@ -481,9 +528,9 @@ tr.detail-row td { background-color: var(--detail-row-bg); white-space: normal; 
          pageInfo.textContent = `Page ${currentPage} of ${totalPages}`; prevButton.disabled = currentPage === 1; nextButton.disabled = currentPage === totalPages || totalPages === 0;
       }
 
-    function changePage(direction) { /* ... Handle page change (unchanged) ... */
+    function changePage(direction) { /* ... Handle page change ... */
          const oldPage = currentPage; currentPage += direction;
-         const totalPages = Math.max(1, Math.ceil(allLogs.length / itemsPerPage)); currentPage = Math.max(1, Math.min(currentPage, totalPages));
+         const totalPages = Math.max(1, Math.ceil(filteredLogs.length / itemsPerPage)); currentPage = Math.max(1, Math.min(currentPage, totalPages));
          if (currentPage !== oldPage) { document.querySelectorAll('.detail-row').forEach(row => row.remove()); renderTable(); }
       }
 

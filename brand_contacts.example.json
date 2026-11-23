@@ -1,0 +1,38 @@
+{
+    "Coles": {
+        "email": "ccccontactus@coles.com.au",
+        "phone": "1800 876 553"
+    },
+    "Woolworths": {
+        "email": "info@trolleytracker.com.au",
+        "phone": "1800 641 497"
+    },
+    "Aldi": {
+        "email": "customer@service.aldi.com.au",
+        "phone": ""
+    },
+    "IGA": {
+        "email": "hostmaster@metcash.com,privacy@metcash.com",
+        "phone": "0297413000"
+    },
+    "Kmart": {
+        "email": "info@wesfarmers.com.au",
+        "phone": "1800 876 553"
+    },
+    "BigW": {
+        "email": "info@trolleytracker.com.au",
+        "phone": "1800 641 497"
+    },
+    "Bunnings": {
+        "email": "support@bunnings.com.au,info@bunnings.com.au,scamwatch@bunnings.com.au,info@wesfarmers.com.au,customersupport@bunnings.com.au,privacy@bunnings.com.au",
+        "phone": "1300 554 777"
+    },
+    "Spudshed": {
+        "email": "CustomerService@spudshed.com.au",
+        "phone": "(08) 9446 5736"
+    },
+    "Other": {
+        "email": "",
+        "phone": ""
+    }
+}

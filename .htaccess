@@ -11,6 +11,12 @@ RewriteBase /trolley/
 # Block private directories (LiteSpeed/cPanel: DirectoryMatch is invalid in .htaccess)
 RewriteRule ^(geocache|backups|data|includes)/ - [F,L]
 
+# SQLite DB files and WAL/SHM/journal sidecars (mod_rewrite fallback if FilesMatch is skipped)
+RewriteRule ^.+\.(db|sqlite|sqlite3|db3)(-wal|-shm|-journal)?$ - [F,L,NC]
+RewriteRule ^trolley_data\.db(-wal|-shm|-journal)?$ - [F,L,NC]
+RewriteRule ^.+\.(bak|sql|old|swp)$ - [F,L,NC]
+RewriteRule ^.+~$ - [F,L]
+
 RewriteCond %{HTTPS} off
 RewriteCond %{HTTP:X-Forwarded-Proto} !https [NC]
 RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
@@ -29,6 +35,48 @@ RewriteRule ^map_other\.html$ /trolley/map_brand.html?brand=Other [R=302,L,QSA]
 # --- Block access to sensitive files ---
 # Error log, rate limit data, legacy files, and this .htaccess itself
 <FilesMatch "^(error_log|rate_limits\.json|lga_emails\.json|test\.html|\.htaccess|backup\.sh|trolley_data\.db|db\.php|migrate_to_sqlite\.php|migrate_20261123\.php|rotate_brand_tokens\.php|config\.local\.php|brand_tokens\.local\.json|brand_tokens\.generated\.json|api_brand_portals\.php)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order deny,allow
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# SQLite database files and WAL/SHM/journal sidecars
+<FilesMatch "(?i)\.(db|sqlite|sqlite3|db3)(-wal|-shm|-journal)?$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order deny,allow
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+<FilesMatch "^(?i)trolley_data\.db(-wal|-shm|-journal)?$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order deny,allow
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# Editor / dump backup artifacts
+<FilesMatch "(?i)\.(bak|sql|old|swp)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order deny,allow
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+<FilesMatch "~$">
     <IfModule mod_authz_core.c>
         Require all denied
     </IfModule>

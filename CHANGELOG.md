@@ -6,6 +6,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased] - 2026-11 (GitHub sync / hardening)
 
+### Security
+- `.htaccess`: deny SQLite WAL/SHM/journal sidecars (`trolley_data.db-wal`, `-shm`, etc.) and backup extensions (`*.bak`, `*.sql`, `*.old`, `*~`, `*.swp`); `RewriteRule` + `FilesMatch` for LiteSpeed
+
 ### Fixed / Ops
 - PHP CI matrix 8.1 + 8.3; cron-safe CLI (`chdir(__DIR__)`); token export `--export` with 0600, no token output on stdout
 - Deploy manifest: cPanel ea-php81 one-shot cron commands

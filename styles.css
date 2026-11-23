@@ -121,8 +121,7 @@ button.full-width { width: 100%; }
 
 
 /* --- Form controls (admin / portal / list filters) --- */
-.app-input,
-#filter-bar input[type="date"] {
+.app-input {
     box-sizing: border-box;
     min-height: 44px;
     padding: 10px 12px;
@@ -132,6 +131,19 @@ button.full-width { width: 100%; }
     border: 1px solid var(--border-color);
     border-radius: 5px;
     background-color: var(--input-bg);
+    color: var(--input-text);
+    max-width: 100%;
+}
+#filter-bar input[type="date"] {
+    box-sizing: border-box;
+    min-height: 44px;
+    padding: 10px 12px;
+    font-size: 0.95em;
+    font-family: inherit;
+    line-height: 1.35;
+    border: 1px solid #555;
+    border-radius: 5px;
+    background-color: #2a2a2a;
     color: var(--input-text);
     color-scheme: dark;
     max-width: 100%;
@@ -149,24 +161,46 @@ button.full-width { width: 100%; }
 #filter-bar input[type="date"]::-webkit-calendar-picker-indicator {
     cursor: pointer;
     opacity: 0.85;
-    filter: invert(0.85);
     padding: 2px;
 }
 #filter-bar input[type="date"]::-webkit-datetime-edit {
     padding: 0;
 }
 #filter-bar fieldset + fieldset > div {
-    row-gap: 12px;
-    column-gap: 12px;
+    display: grid !important;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 10px 12px;
+    align-items: center;
+    width: 100%;
+}
+#filter-bar fieldset + fieldset label {
+    white-space: nowrap;
+}
+#filter-bar #clear-dates-btn,
+#filter-bar #filter-count {
+    grid-column: 1 / -1;
+}
+#filter-bar #clear-dates-btn {
+    justify-self: start;
+}
+@media (min-width: 600px) {
+    #filter-bar fieldset + fieldset > div {
+        grid-template-columns: auto minmax(9rem, 12rem) auto minmax(9rem, 12rem);
+    }
+    #filter-bar #clear-dates-btn {
+        grid-column: auto;
+        grid-row: 1;
+    }
+    #filter-bar #filter-count {
+        grid-column: auto;
+        grid-row: 1;
+    }
 }
 @media (max-width: 768px) {
     #filter-bar input[type="date"] {
         font-size: 16px;
-        flex: 1 1 9.5rem;
-        min-width: 9rem;
-    }
-    #filter-bar fieldset + fieldset label {
-        flex: 0 0 auto;
+        width: 100%;
+        min-width: 0;
     }
 }
 

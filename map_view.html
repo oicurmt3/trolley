@@ -46,7 +46,7 @@
             border-bottom: 1px solid var(--border-color); padding-bottom: 10px;
         }
         #map {
-            width: 100%; flex-grow: 1; border-radius: 5px;
+            width: 100%; border-radius: 5px;
             border: 1px solid var(--border-color); margin-bottom: 15px;
         }
         .back-link-container {
@@ -82,7 +82,7 @@
         .marker-cluster { border-radius: 50%; box-shadow: 0 0 5px rgba(0,0,0,0.5); }
     </style>
 </head>
-<body>
+<body class="map-page">
     <a class="skip-link" href="#main-content">Skip to main content</a>
     <div class="container">
         <main id="main-content">
@@ -138,8 +138,10 @@
             map.addLayer(markerClusterGroup);
             attachMapMyLocationControl(map);
 
-            // Invalidate map size after a short delay to ensure proper rendering
-            setTimeout(() => { map.invalidateSize(); }, 200);
+            const refreshMapSize = () => { map.invalidateSize(); };
+            requestAnimationFrame(refreshMapSize);
+            setTimeout(refreshMapSize, 200);
+            window.addEventListener('resize', refreshMapSize);
 
             async function loadMarkers() {
                 try {

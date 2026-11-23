@@ -142,6 +142,30 @@ if ($isAuthenticated && isset($_GET['action'])) {
     }
 
     // --- Get stats (JSON) ---
+    if (!function_exists('admin_report_day_perth')) {
+        /**
+         * @return ?string Y-m-d in Australia/Perth
+         */
+        function admin_report_day_perth(string $ts): ?string
+        {
+            $ts = trim($ts);
+            if ($ts === '') {
+                return null;
+            }
+            try {
+                $dt = new DateTime($ts, new DateTimeZone('UTC'));
+            } catch (Exception $e) {
+                try {
+                    $dt = new DateTime($ts);
+                } catch (Exception $e2) {
+                    return null;
+                }
+            }
+            $dt->setTimezone(new DateTimeZone('Australia/Perth'));
+            return $dt->format('Y-m-d');
+        }
+    }
+
     if ($_GET['action'] === 'stats') {
         header('Content-Type: application/json');
         require_once __DIR__ . '/db.php';
@@ -167,7 +191,7 @@ if ($isAuthenticated && isset($_GET['action'])) {
             $suburb = $log['suburb'] ?? 'Unknown';
             $suburbCounts[$suburb] = ($suburbCounts[$suburb] ?? 0) + 1;
             $ts = $log['serverTimestampUTC'] ?? $log['timestamp'] ?? '';
-            $date = substr($ts, 0, 10);
+            $date = admin_report_day_perth((string) $ts);
             if ($date) {
                 $dailyCounts[$date] = ($dailyCounts[$date] ?? 0) + 1;
             }
@@ -187,11 +211,25 @@ if ($isAuthenticated && isset($_GET['action'])) {
         arsort($conditionCounts);
         ksort($dailyCounts);
 
+        $perthTz = new DateTimeZone('Australia/Perth');
+        $endPerth = new DateTime('now', $perthTz);
+        $todayPerth = $endPerth->format('Y-m-d');
+        $last30Days = [];
+        for ($i = 29; $i >= 0; $i--) {
+            $day = clone $endPerth;
+            $day->modify('-' . $i . ' days');
+            $key = $day->format('Y-m-d');
+            $label = $day->format('d/m');
+            $last30Days[$label] = $dailyCounts[$key] ?? 0;
+        }
+
         echo json_encode([
             'totalReports' => $totalReports,
             'brandCounts' => $brandCounts,
             'suburbCounts' => array_slice($suburbCounts, 0, 20, true),
             'dailyCounts' => $dailyCounts,
+            'last30Days' => $last30Days,
+            'todayPerth' => $todayPerth,
             'conditionCounts' => $conditionCounts
         ]);
         exit;
@@ -558,7 +596,8 @@ if ($isAuthenticated && isset($_GET['action'])) {
         h2 { font-size: 1.2em; margin: 20px 0 10px 0; color: var(--text-color); border-bottom: 1px solid var(--border-color); padding-bottom: 5px; }
 
         /* Admin map */
-        #admin-map { width: 100%; height: 350px; border-radius: 5px; border: 1px solid var(--border-color); margin-bottom: 15px; display: none; }
+        #admin-map { width: 100%; height: 350px; border-radius: 5px; border: 1px solid var(--border-color); margin-bottom: 15px; position: relative; z-index: 0; }
+        .tab-content { position: relative; isolation: isolate; }
         .marker-cluster-small { background-color: rgba(181, 226, 140, 0.6); }
         .marker-cluster-small div { background-color: rgba(110, 204, 57, 0.6); }
         .marker-cluster-medium { background-color: rgba(241, 211, 87, 0.6); }
@@ -695,15 +734,22 @@ if ($isAuthenticated && isset($_GET['action'])) {
     </div>
     <?php endif; ?>
 
+    <?php
+    $adminErrorLogText = 'No errors logged (or the server error log is not readable from here).';
+    if (file_exists($errorLogFilePath) && is_readable($errorLogFilePath)) {
+        $errorLines = file($errorLogFilePath, FILE_IGNORE_NEW_LINES);
+        if ($errorLines !== false && count($errorLines) > 0) {
+            $adminErrorLogText = implode("\n", array_slice($errorLines, -50));
+        }
+    }
+    ?>
+
     <div class="toolbar">
         <a href="index.html" class="nav-link">Report</a>
         <a href="view_logs.php" class="nav-link">List</a>
         <a href="map_view.html" class="nav-link">Map</a>
         <a href="admin.php?action=logout" class="nav-link" style="background-color:var(--error-color);">Logout</a>
     </div>
-
-    <!-- Map (visible only on Manage Logs tab) -->
-    <div id="admin-map"></div>
 
     <!-- TABS -->
     <div class="tab-bar">
@@ -750,6 +796,7 @@ if ($isAuthenticated && isset($_GET['action'])) {
 
     <!-- LOGS TAB -->
     <div class="tab-content" id="tab-logs">
+        <div id="admin-map" role="region" aria-label="Map of reported trolleys"></div>
         <h2>All Log Entries</h2>
         <p style="font-size:0.85em;color:#aaa;margin-bottom:10px;">Click a brand button to expand details. "Del" permanently removes an entry.</p>
         <div class="log-table-container">
@@ -844,7 +891,8 @@ if ($isAuthenticated && isset($_GET['action'])) {
     <!-- ERROR LOG TAB -->
     <div class="tab-content" id="tab-errors">
         <h2>Recent Error Log (last 50 lines)</h2>
-        <pre class="error-log-pre" id="error-log-content">Loading...</pre>
+        <p style="font-size:0.85em;color:#aaa;margin-bottom:8px;">From the application error log in this directory (not cPanel&#39;s global log).</p>
+        <pre class="error-log-pre" id="error-log-content"><?php echo htmlspecialchars($adminErrorLogText, ENT_QUOTES, 'UTF-8'); ?></pre>
     </div>
 
 <script>window.ADMIN_CSRF = <?php echo json_encode($adminCsrfToken, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;</script>
@@ -880,15 +928,10 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.classList.add('active');
             document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
 
-            // Show map only on logs tab
-            const mapEl = document.getElementById('admin-map');
             if (btn.dataset.tab === 'logs') {
-                mapEl.style.display = 'block';
+                initAdminMap();
                 if (!logsLoaded) loadLogs();
-                // Invalidate map size after display change
-                if (adminMap) { setTimeout(() => { adminMap.invalidateSize(); }, 200); }
-            } else {
-                mapEl.style.display = 'none';
+                else if (adminMap) { setTimeout(() => { adminMap.invalidateSize(); }, 200); }
             }
 
             // Lazy load other tabs
@@ -929,15 +972,22 @@ document.addEventListener('DOMContentLoaded', () => {
         shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png'
     });
 
-    const adminMap = L.map('admin-map').setView([-31.9523, 115.8613], 10);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    }).addTo(adminMap);
-
-    const adminCluster = L.markerClusterGroup();
-    adminMap.addLayer(adminCluster);
+    let adminMap = null;
+    let adminCluster = null;
     const adminMarkerMap = {}; // Maps rowId to Leaflet marker
+
+    function initAdminMap() {
+        if (adminMap) return;
+        const mapEl = document.getElementById('admin-map');
+        if (!mapEl || typeof L === 'undefined') return;
+        adminMap = L.map('admin-map').setView([-31.9523, 115.8613], 10);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(adminMap);
+        adminCluster = L.markerClusterGroup();
+        adminMap.addLayer(adminCluster);
+    }
 
     /** Coloured marker icons */
     const adminMarkerIcons = {
@@ -971,6 +1021,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /** Populate admin map markers from log data */
     function populateAdminMap(logs) {
+        initAdminMap();
+        if (!adminMap || !adminCluster) return;
         adminCluster.clearLayers();
         // Clear old marker refs
         Object.keys(adminMarkerMap).forEach(k => delete adminMarkerMap[k]);
@@ -1056,21 +1108,14 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('stat-brands').textContent = Object.keys(data.brandCounts).length;
             document.getElementById('stat-suburbs').textContent = Object.keys(data.suburbCounts).length;
 
-            // Today's count
-            const today = new Date().toISOString().slice(0, 10);
-            document.getElementById('stat-today').textContent = data.dailyCounts[today] || 0;
+            const todayPerth = data.todayPerth || '';
+            document.getElementById('stat-today').textContent = data.dailyCounts[todayPerth] || 0;
 
             renderBarChart('brand-chart', data.brandCounts, 15);
             renderBarChart('suburb-chart', data.suburbCounts, 10);
             renderBarChart('condition-chart', data.conditionCounts, 10);
 
-            // Last 30 days only
-            const dailyEntries = Object.entries(data.dailyCounts);
-            const last30 = {};
-            dailyEntries.slice(-30).forEach(([date, count]) => {
-                last30[date.slice(5)] = count; // MM-DD format
-            });
-            renderBarChart('daily-chart', last30, 30);
+            renderBarChart('daily-chart', data.last30Days || {}, 30);
         } catch (e) { console.error('Stats load error:', e); }
 
         // Also load collection stats into the same tab
@@ -1477,12 +1522,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Load Error Log ---
     let errorsLoaded = false;
     async function loadErrorLog() {
-        try {
-            const resp = await fetch('admin.php?action=errorlog');
-            const pre = document.getElementById('error-log-content');
-            pre.textContent = document.getElementById('error-log-data')?.textContent || 'Error log not available via AJAX. See the inline content below.';
-            errorsLoaded = true;
-        } catch (e) { console.error('Error log load error:', e); }
+        errorsLoaded = true;
     }
 
     // --- Load Brand Accounts ---
@@ -1624,27 +1664,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 
-});
-</script>
-
-<?php
-// Inline error log data (last 50 lines) so we don't need an AJAX endpoint
-$errorLogContent = '';
-if (file_exists($errorLogFilePath) && is_readable($errorLogFilePath)) {
-    $lines = file($errorLogFilePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    if ($lines !== false) {
-        $lastLines = array_slice($lines, -50);
-        $errorLogContent = htmlspecialchars(implode("\n", $lastLines), ENT_QUOTES, 'UTF-8');
-    }
-}
-?>
-<script>
-// Inject error log data from PHP
-document.addEventListener('DOMContentLoaded', () => {
-    const pre = document.getElementById('error-log-content');
-    if (pre) {
-        pre.textContent = <?php echo json_encode(strip_tags($errorLogContent ?: 'No errors logged.')); ?>;
-    }
 });
 </script>
 

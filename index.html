@@ -16,7 +16,10 @@
     h1 span { display: block; font-weight: normal; font-size: 0.5em; margin: -8px 0px 0px 0px; }
     h1 icon { font-weight: normal; font-size: 0.9em; margin: -8px 0px 0px 0px; }
     .form-group { margin-bottom: 20px; }
-    label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.95em; }
+    label, .field-label, .fieldset-legend, .condition-legend {
+        display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.95em;
+    }
+    .fieldset-legend, .condition-legend { padding: 0; width: 100%; }
     p.notice { font-size: 1em; color: #fc9992; padding-bottom: 2px; }
     p.notice2 { font-size: 1em; color: #fc9992; padding-bottom: 2px; }
     span.latlon { color: #fc9992; }
@@ -75,13 +78,16 @@
     .button-grid button[data-value="Spudshed"].active { background-color: var(--rating-active-bg); color: white; padding: 10px; font-weight: bold; }
 
     /* Condition sections */
-    .condition-section .button-grid button.active {
-        background-color: var(--rating-active-bg); color: var(--rating-active-text);
-        border: 0px solid var(--rating-active-bg); padding: 10px; font-weight: bold;
+    .condition-section .button-grid button.active,
+    .condition-section .button-grid button[aria-pressed="true"] {
+        background-color: var(--rating-active-bg); color: #ffffff;
+        border: 2px solid var(--highlight); padding: 10px; font-weight: bold;
+        box-shadow: inset 0 0 0 1px #1a1a1a;
+        outline: 2px solid var(--active-border-color); outline-offset: 1px;
     }
     .condition-section { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border-color); }
     .condition-section.visible { display: block; }
-    .condition-section label { font-size: 0.9em; margin-bottom: 8px; }
+    .condition-section .condition-legend { font-size: 0.9em; margin-bottom: 8px; }
     #char-counter { margin-top: 2px; font-size: 0.8em; margin-bottom: -20px; }
     #confirmation-message { margin-top: 20px; padding: 15px; border-radius: 5px; display: none; white-space: pre-wrap; word-wrap: break-word; font-size: 0.9em; border: 1px solid var(--border-color); background-color: var(--input-bg); color: var(--input-text); }
     .button-group-actions { display: flex; gap: 8px; margin-top: 10px; }
@@ -168,10 +174,10 @@
             <form id="trolley-form">
 
                 <section class="form-group">
-                    <label for="get-location-btn">Trolley Location*</label>
+                    <p id="location-section-label" class="field-label">Trolley Location*</p>
                    <p class="notice">You must be at the same location as the trolley when reporting</p>
                     <div class="location-group">
-                        <button type="button" id="get-location-btn" class="secondary full-width">Get Trolley Location</button>
+                        <button type="button" id="get-location-btn" class="secondary full-width" aria-labelledby="location-section-label">Get Trolley Location</button>
                         <span id="location-display"></span>
                         <p id="location-feedback" class="notice2" role="status" aria-live="polite"></p>
                     </div>
@@ -182,8 +188,7 @@
 
                 <section class="form-group brand-section required-group" data-group-name="brand">
                     <fieldset style="border:none;padding:0;margin:0;">
-                    <legend class="visually-hidden">Trolley brands (select at least one)</legend>
-                    <label id="brand-selection-label">Trolley Brands*</label>
+                    <legend class="fieldset-legend">Trolley Brands*</legend>
                     <div class="button-grid">
                         <button type="button" data-value="Coles">Coles</button>
                         <button type="button" data-value="Woolworths">Woolworths</button>
@@ -201,7 +206,8 @@
 
                 <div id="condition-sections-container">
                     <section class="form-group condition-section" data-brand="Coles">
-                        <label>Coles Trolley Condition</label>
+                        <fieldset class="condition-fieldset" style="border:none;padding:0;margin:0;">
+                        <legend class="condition-legend">Coles Trolley Condition</legend>
                         <div class="button-grid condition-buttons">
                             <button type="button" data-value="Good Condition">Good</button>
                             <button type="button" data-value="Needs Cleaning">Needs Cleaning</button>
@@ -213,9 +219,11 @@
                             <button type="button" data-value="Other Damage">Other</button>
                         </div>
                         <input type="hidden" name="conditions[Coles]" class="group-value condition-value">
+                        </fieldset>
                     </section>
                      <section class="form-group condition-section" data-brand="Woolworths">
-                        <label>Woolworths Trolley Condition</label>
+                        <fieldset class="condition-fieldset" style="border:none;padding:0;margin:0;">
+                        <legend class="condition-legend">Woolworths Trolley Condition</legend>
                          <div class="button-grid condition-buttons">
                             <button type="button" data-value="Good Condition">Good</button>
                             <button type="button" data-value="Needs Cleaning">Needs Cleaning</button>
@@ -227,9 +235,11 @@
                             <button type="button" data-value="Other Damage">Other</button>
                         </div>
                         <input type="hidden" name="conditions[Woolworths]" class="group-value condition-value">
+                        </fieldset>
                     </section>
                     <section class="form-group condition-section" data-brand="Aldi">
-                        <label>Aldi Trolley Condition</label>
+                        <fieldset class="condition-fieldset" style="border:none;padding:0;margin:0;">
+                        <legend class="condition-legend">Aldi Trolley Condition</legend>
                          <div class="button-grid condition-buttons">
                             <button type="button" data-value="Good Condition">Good</button>
                             <button type="button" data-value="Needs Cleaning">Needs Cleaning</button>
@@ -241,9 +251,11 @@
                             <button type="button" data-value="Other Damage">Other</button>
                         </div>
                         <input type="hidden" name="conditions[Aldi]" class="group-value condition-value">
+                        </fieldset>
                     </section>
                     <section class="form-group condition-section" data-brand="IGA">
-                        <label>IGA Trolley Condition</label>
+                        <fieldset class="condition-fieldset" style="border:none;padding:0;margin:0;">
+                        <legend class="condition-legend">IGA Trolley Condition</legend>
                          <div class="button-grid condition-buttons">
                             <button type="button" data-value="Good Condition">Good</button>
                             <button type="button" data-value="Needs Cleaning">Needs Cleaning</button>
@@ -255,9 +267,11 @@
                             <button type="button" data-value="Other Damage">Other</button>
                         </div>
                         <input type="hidden" name="conditions[IGA]" class="group-value condition-value">
+                        </fieldset>
                     </section>
                     <section class="form-group condition-section" data-brand="Kmart">
-                        <label>Kmart Trolley Condition</label>
+                        <fieldset class="condition-fieldset" style="border:none;padding:0;margin:0;">
+                        <legend class="condition-legend">Kmart Trolley Condition</legend>
                          <div class="button-grid condition-buttons">
                             <button type="button" data-value="Good Condition">Good</button>
                             <button type="button" data-value="Needs Cleaning">Needs Cleaning</button>
@@ -269,9 +283,11 @@
                             <button type="button" data-value="Other Damage">Other</button>
                         </div>
                         <input type="hidden" name="conditions[Kmart]" class="group-value condition-value">
+                        </fieldset>
                     </section>
                     <section class="form-group condition-section" data-brand="BigW">
-                        <label>Big W Trolley Condition</label>
+                        <fieldset class="condition-fieldset" style="border:none;padding:0;margin:0;">
+                        <legend class="condition-legend">Big W Trolley Condition</legend>
                         <div class="button-grid condition-buttons">
                             <button type="button" data-value="Good Condition">Good</button>
                             <button type="button" data-value="Needs Cleaning">Needs Cleaning</button>
@@ -283,9 +299,11 @@
                             <button type="button" data-value="Other Damage">Other</button>
                         </div>
                         <input type="hidden" name="conditions[BigW]" class="group-value condition-value">
+                        </fieldset>
                     </section>
                     <section class="form-group condition-section" data-brand="Bunnings">
-                        <label>Bunnings Trolley Condition</label>
+                        <fieldset class="condition-fieldset" style="border:none;padding:0;margin:0;">
+                        <legend class="condition-legend">Bunnings Trolley Condition</legend>
                          <div class="button-grid condition-buttons">
                             <button type="button" data-value="Good Condition">Good</button>
                             <button type="button" data-value="Needs Cleaning">Needs Cleaning</button>
@@ -297,9 +315,11 @@
                             <button type="button" data-value="Other Damage">Other</button>
                         </div>
                         <input type="hidden" name="conditions[Bunnings]" class="group-value condition-value">
+                        </fieldset>
                     </section>
                     <section class="form-group condition-section" data-brand="Spudshed">
-                        <label>Spudshed Trolley Condition</label>
+                        <fieldset class="condition-fieldset" style="border:none;padding:0;margin:0;">
+                        <legend class="condition-legend">Spudshed Trolley Condition</legend>
                          <div class="button-grid condition-buttons">
                             <button type="button" data-value="Good Condition">Good</button>
                             <button type="button" data-value="Needs Cleaning">Needs Cleaning</button>
@@ -311,9 +331,11 @@
                             <button type="button" data-value="Other Damage">Other</button>
                         </div>
                         <input type="hidden" name="conditions[Spudshed]" class="group-value condition-value">
+                        </fieldset>
                     </section>
                     <section class="form-group condition-section" data-brand="Other">
-                        <label>Other Trolley Condition</label>
+                        <fieldset class="condition-fieldset" style="border:none;padding:0;margin:0;">
+                        <legend class="condition-legend">Other Trolley Condition</legend>
                          <div class="button-grid condition-buttons">
                             <button type="button" data-value="Good Condition">Good</button>
                             <button type="button" data-value="Needs Cleaning">Needs Cleaning</button>
@@ -325,6 +347,7 @@
                             <button type="button" data-value="Other Damage">Other</button>
                         </div>
                         <input type="hidden" name="conditions[Other]" class="group-value condition-value">
+                        </fieldset>
                     </section>
                 </div>
 
@@ -540,15 +563,18 @@
         function handleMultiSelectGroup(groupElement) {
             const buttons = groupElement.querySelectorAll('.button-grid button');
             buttons.forEach(button => {
+                button.setAttribute('aria-pressed', 'false');
+                button.setAttribute('type', 'button');
                 button.addEventListener('click', () => {
                     button.classList.toggle('active');
+                    button.setAttribute('aria-pressed', button.classList.contains('active') ? 'true' : 'false');
                     updateGroupValue(groupElement);
                     if (groupElement.classList.contains('brand-section')) {
                         toggleConditionSectionVisibility(button.dataset.value, button.classList.contains('active'));
                     }
                     groupElement.classList.remove('error-group'); // Clear error on interaction
-                    const label = groupElement.querySelector('label');
-                    if (label) label.classList.remove('error-label');
+                    const caption = groupElement.querySelector('label, legend');
+                    if (caption) caption.classList.remove('error-label');
                 });
             });
         }
@@ -565,7 +591,10 @@
              if (conditionSection) {
                 conditionSection.classList.toggle('visible', isActive);
                 if (!isActive) { // If de-selecting brand, clear its conditions
-                    conditionSection.querySelectorAll('.button-grid button.active').forEach(btn => btn.classList.remove('active'));
+                    conditionSection.querySelectorAll('.button-grid button.active').forEach(btn => {
+                        btn.classList.remove('active');
+                        btn.setAttribute('aria-pressed', 'false');
+                    });
                     updateGroupValue(conditionSection); // Update the hidden input for conditions
                 }
             }
@@ -631,8 +660,8 @@
                 isValid = false;
                 const locationGroup = getLocationBtn.parentElement;
                 locationGroup.classList.add('error-group');
-                const label = locationGroup.previousElementSibling; // Get the <label>
-                 if (label) label.classList.add('error-label');
+                const locationLabel = document.getElementById('location-section-label');
+                if (locationLabel) locationLabel.classList.add('error-label');
                  if (locationFeedback) locationFeedback.textContent = 'Tap “Get Trolley Location” and allow GPS access before submitting.';
             }
 
@@ -640,8 +669,8 @@
             if (!brandHiddenInput.value || brandHiddenInput.value === '[]') {
                  isValid = false;
                  brandSection.classList.add('error-group');
-                 const label = brandSection.querySelector('label');
-                 if (label) label.classList.add('error-label');
+                 const legend = brandSection.querySelector('legend');
+                 if (legend) legend.classList.add('error-label');
             }
 
             // Generic required field check (though most are handled by button groups or location logic)

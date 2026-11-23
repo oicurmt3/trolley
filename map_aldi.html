@@ -9,11 +9,13 @@
      crossorigin=""/>
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+    <link rel="stylesheet" href="map_my_location.css" />
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
      crossorigin=""></script>
     <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+    <script src="map_my_location.js"></script>
 
     <style>
         /* Styles adapted from your existing files */
@@ -207,6 +209,7 @@
             // ** NEW: Initialize MarkerClusterGroup **
             const markerClusterGroup = L.markerClusterGroup();
             map.addLayer(markerClusterGroup); // Add group to map
+            attachMapMyLocationControl(map);
 
             // Invalidate map size after delay
             setTimeout(() => { map.invalidateSize(); }, 200);

@@ -65,6 +65,10 @@ Never commit the real admin bcrypt hash. On the server:
 
 **Admin CSRF / login throttle:** Deploy `includes/admin_security.php` and ensure the server can write `data/admin_login_throttle.json` (directory `data/` is blocked from HTTP by `.htaccess`). After login, keep the admin tab open or reload if you see CSRF errors on mutations.
 
+**Database migration:** After uploading files, run `php migrate_20261123.php` once from cPanel Terminal (see `UPLOAD_CHECKLIST.md`). No manual editing of `trolley_data.db` is required.
+
+**Token rotation (CLI):** `php rotate_brand_tokens.php --generate` or use `--from-file brand_tokens.local.json`. Web access to migration/rotation scripts and `*.local.json` token files is denied by `.htaccess`.
+
 ## Environment Variables / Config
 
 Most configuration is inline in source files. Key values to update for a new deployment:

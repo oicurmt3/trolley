@@ -1,6 +1,8 @@
 # Secrets and local config
 config.local.php
 config*.local.php
+brand_tokens.local.json
+brand_tokens.generated.json
 
 # Database and runtime data
 trolley_data.db

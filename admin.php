@@ -291,6 +291,40 @@ if ($isAuthenticated && isset($_GET['action'])) {
         exit;
     }
 
+    // --- Apply tokens from brand_tokens.local.json on server (no tokens in response) ---
+    if ($_GET['action'] === 'apply_brand_tokens_local') {
+        admin_api_require_csrf();
+        header('Content-Type: application/json');
+        require_once __DIR__ . '/db.php';
+        require_once __DIR__ . '/includes/brand_token_rotation.php';
+        $db = getDatabase();
+        if ($db === null) {
+            echo json_encode(['status' => 'error', 'message' => 'Database unavailable.']);
+            exit;
+        }
+        $localPath = __DIR__ . '/brand_tokens.local.json';
+        $fileData = loadBrandTokensLocalFile($localPath);
+        if ($fileData === null) {
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'brand_tokens.local.json not found or invalid. Copy brand_tokens.local.example.json and upload as brand_tokens.local.json.',
+            ]);
+            exit;
+        }
+        $result = rotateBrandPortalTokensFromFile($db, $fileData);
+        if ($result['updated'] < 1 && $result['errors'] !== []) {
+            echo json_encode(['status' => 'error', 'message' => 'No tokens applied.', 'errors' => $result['errors']]);
+        } else {
+            echo json_encode([
+                'status' => 'success',
+                'message' => 'Applied tokens for ' . $result['updated'] . ' account(s). Skipped ' . $result['skipped'] . '.',
+                'count' => $result['updated'],
+                'skipped' => $result['skipped'],
+            ]);
+        }
+        exit;
+    }
+
     // --- Get brand accounts list ---
     if ($_GET['action'] === 'brand_accounts') {
         header('Content-Type: application/json');
@@ -721,7 +755,8 @@ if ($isAuthenticated && isset($_GET['action'])) {
         </div>
         <div style="margin-bottom:15px;">
             <button type="button" id="regen-all-tokens-btn" class="destructive" style="padding:8px 14px; font-size:0.85em; border-radius:4px; border:none; cursor:pointer;">Regenerate all brand tokens</button>
-            <p style="font-size:0.8em;color:#aaa;margin-top:6px;">Rotates every portal link at once (except the internal admin account). Existing links stop working immediately.</p>
+            <button type="button" id="apply-local-tokens-btn" class="secondary" style="padding:8px 14px; font-size:0.85em; border-radius:4px; border:none; cursor:pointer; margin-left:8px;">Apply brand_tokens.local.json</button>
+            <p style="font-size:0.8em;color:#aaa;margin-top:6px;">Rotates every portal link at once (except the internal admin account). Existing links stop working immediately. Optional: upload <code>brand_tokens.local.json</code> (from the example file) and use Apply.</p>
         </div>
 
         <div class="log-table-container">
@@ -1523,6 +1558,23 @@ document.addEventListener('DOMContentLoaded', () => {
             else { alert('Error: ' + result.message); }
         } catch (e) { alert('Error: ' + e.message); }
     };
+
+    const applyLocalBtn = document.getElementById('apply-local-tokens-btn');
+    if (applyLocalBtn) applyLocalBtn.addEventListener('click', async () => {
+        const msg = 'Apply tokens from brand_tokens.local.json on the server?\n\nAccounts without a valid token in the file will be auto-generated if generate_missing is true. Existing links stop working for updated accounts.';
+        if (!confirm(msg)) return;
+        try {
+            const resp = await adminMutate('admin.php?action=apply_brand_tokens_local');
+            const result = await resp.json();
+            if (result.status === 'success') {
+                alert(result.message);
+                brandAccountsLoaded = false;
+                loadBrandAccounts();
+            } else {
+                alert('Error: ' + (result.message || 'Unknown error'));
+            }
+        } catch (e) { alert('Error: ' + e.message); }
+    });
 
     const regenAllBtn = document.getElementById('regen-all-tokens-btn');
     if (regenAllBtn) regenAllBtn.addEventListener('click', async () => {

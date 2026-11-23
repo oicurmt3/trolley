@@ -631,19 +631,12 @@ function regenerateBrandToken(PDO $db, int $accountId) {
  * @return int Number of accounts updated, or -1 on failure
  */
 function regenerateAllBrandTokens(PDO $db): int {
-    try {
-        $stmt = $db->query("SELECT id FROM brand_accounts WHERE token != 'ADMIN_INTERNAL'");
-        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        $count = 0;
-        foreach ($rows as $row) {
-            if (regenerateBrandToken($db, (int)$row['id']) !== false) {
-                $count++;
-            }
-        }
-        return $count;
-    } catch (PDOException $e) {
+    require_once __DIR__ . '/includes/brand_token_rotation.php';
+    $result = rotateAllBrandPortalTokensGenerated($db);
+    if ($result['errors'] !== [] && $result['updated'] === 0) {
         return -1;
     }
+    return $result['updated'];
 }
 
 

@@ -7,7 +7,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased] - 2026-11 (GitHub sync / hardening)
 
 ### Added
-- Admin CSRF (`X-Admin-CSRF` / login form), login throttling (`data/admin_login_throttle.json`), **Regenerate all brand tokens**
+- `migrate_20261123.php` (CLI, idempotent schema + `schema_migrations` ledger)
+- `rotate_brand_tokens.php` CLI and `brand_tokens.local.example.json` for controlled token rotation
+- Admin CSRF (`X-Admin-CSRF` / login form), login throttling (`data/admin_login_throttle.json`), **Regenerate all brand tokens** / **Apply brand_tokens.local.json**
+- `UPLOAD_CHECKLIST.md` — cPanel upload guide for owners
 - `includes/admin_security.php`, shared `favicon.svg`, skip links and landmark `<main>` on key pages
 - Git sync from live site snapshot (2026-10-20): SQLite storage, admin panel, brand portals, `api_logs.php`, consolidated `map_brand.html`
 - `config.local.example.php` for admin bcrypt hash (real hash only on server in `config.local.php`)

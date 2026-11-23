@@ -1,0 +1,14 @@
+{
+  "_readme": "Copy to brand_tokens.local.json on the server (gitignored). Each token must be 64 hex characters. Omit the token field or leave REPLACE_* to auto-generate when generate_missing is true.",
+  "generate_missing": true,
+  "accounts": [
+    { "id": 1, "brand_name": "Coles", "token": "REPLACE_WITH_64_CHARACTER_HEX_OR_DELETE_KEY_TO_GENERATE" },
+    { "id": 2, "brand_name": "Woolworths", "token": "REPLACE_WITH_64_CHARACTER_HEX_OR_DELETE_KEY_TO_GENERATE" },
+    { "id": 3, "brand_name": "Aldi", "token": "REPLACE_WITH_64_CHARACTER_HEX_OR_DELETE_KEY_TO_GENERATE" },
+    { "id": 4, "brand_name": "IGA", "token": "REPLACE_WITH_64_CHARACTER_HEX_OR_DELETE_KEY_TO_GENERATE" },
+    { "id": 5, "brand_name": "Kmart", "token": "REPLACE_WITH_64_CHARACTER_HEX_OR_DELETE_KEY_TO_GENERATE" },
+    { "id": 6, "brand_name": "Big W", "token": "REPLACE_WITH_64_CHARACTER_HEX_OR_DELETE_KEY_TO_GENERATE" },
+    { "id": 7, "brand_name": "Bunnings", "token": "REPLACE_WITH_64_CHARACTER_HEX_OR_DELETE_KEY_TO_GENERATE" },
+    { "id": 8, "brand_name": "Spudshed", "token": "REPLACE_WITH_64_CHARACTER_HEX_OR_DELETE_KEY_TO_GENERATE" }
+  ]
+}

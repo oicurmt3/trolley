@@ -2,6 +2,8 @@
 
 Use this when deploying from the GitHub branch `cursor/live-sync-and-hardening-4807` to the live `trolley/` folder on sandgroper.net. **Do not upload secrets, the SQLite database, or APK files.**
 
+For a **machine-followable** ordered deploy (exact file lists, smoke tests, rollback), use **`DEPLOY_MANIFEST.md`** (target path: `/home/perthrel/sandgroper.net/trolley/`).
+
 ---
 
 ## 1. Backup first

@@ -41,6 +41,24 @@ if ($checkOnly) {
     exit(migrationIsApplied($db, '20261123') ? 0 : 1);
 }
 
+$dbPath = __DIR__ . '/trolley_data.db';
+if (is_file($dbPath) && !migrationIsApplied($db, '20261123')) {
+    $backupDir = __DIR__ . '/backups';
+    if (!is_dir($backupDir)) {
+        if (!@mkdir($backupDir, 0755, true) && !is_dir($backupDir)) {
+            fwrite(STDERR, "ERROR: Could not create backups/ directory for database copy.\n");
+            exit(2);
+        }
+    }
+    $stamp = gmdate('YmdHis');
+    $backupPath = $backupDir . '/trolley_data_pre_20261123_' . $stamp . '.db';
+    if (!@copy($dbPath, $backupPath)) {
+        fwrite(STDERR, "ERROR: Could not copy trolley_data.db to backups/. Aborting migration.\n");
+        exit(2);
+    }
+    echo "Database backup: backups/trolley_data_pre_20261123_{$stamp}.db\n";
+}
+
 $steps = runMigration20261123($db);
 echo "Migration 20261123 complete.\n";
 foreach ($steps as $line) {

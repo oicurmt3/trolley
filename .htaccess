@@ -3,10 +3,11 @@
 # Security, caching, and access control rules
 # =============================================================================
 
-# --- Force HTTPS ---
+# --- Force HTTPS (cPanel / reverse-proxy safe) ---
 RewriteEngine On
 RewriteCond %{HTTPS} off
-RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+RewriteCond %{HTTP:X-Forwarded-Proto} !https [NC]
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
 # Legacy brand map URLs -> consolidated map_brand.html
 RewriteRule ^map_coles\.html$ map_brand.html?brand=Coles [R=302,L,QSA]
@@ -31,12 +32,8 @@ RewriteRule ^map_other\.html$ map_brand.html?brand=Other [R=302,L,QSA]
     </IfModule>
 </FilesMatch>
 
-# --- Block access to geocache and backups directories ---
-<IfModule mod_authz_core.c>
-    <DirectoryMatch "(geocache|backups)">
-        Require all denied
-    </DirectoryMatch>
-</IfModule>
+# --- Block web access to private directories (DirectoryMatch is not allowed in .htaccess on many hosts) ---
+RewriteRule ^(?:geocache|backups|data|includes)(?:/|$) - [F,L]
 
 # --- Block developer documentation from the web ---
 <FilesMatch "\.md$">
@@ -50,6 +47,10 @@ RewriteRule ^map_other\.html$ map_brand.html?brand=Other [R=302,L,QSA]
 </FilesMatch>
 
 # --- Security Headers ---
+<IfModule mod_php.c>
+    php_flag expose_php Off
+</IfModule>
+
 <IfModule mod_headers.c>
     Header unset X-Powered-By
     Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"

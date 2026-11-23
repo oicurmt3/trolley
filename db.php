@@ -625,6 +625,27 @@ function regenerateBrandToken(PDO $db, int $accountId) {
     }
 }
 
+/**
+ * Rotate portal tokens for every brand account except the fixed ADMIN_INTERNAL row.
+ *
+ * @return int Number of accounts updated, or -1 on failure
+ */
+function regenerateAllBrandTokens(PDO $db): int {
+    try {
+        $stmt = $db->query("SELECT id FROM brand_accounts WHERE token != 'ADMIN_INTERNAL'");
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $count = 0;
+        foreach ($rows as $row) {
+            if (regenerateBrandToken($db, (int)$row['id']) !== false) {
+                $count++;
+            }
+        }
+        return $count;
+    } catch (PDOException $e) {
+        return -1;
+    }
+}
+
 
 // ==========================================================================
 // COLLECTION FUNCTIONS

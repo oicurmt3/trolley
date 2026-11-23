@@ -23,6 +23,13 @@ ini_set('session.use_strict_mode', 1);
 
 session_start();
 
+if (function_exists('header_remove')) {
+    header_remove('X-Powered-By');
+}
+
+require_once __DIR__ . '/includes/admin_security.php';
+$adminCsrfToken = admin_ensure_csrf_token();
+
 // =============================================================================
 // CONFIGURATION
 // =============================================================================
@@ -63,16 +70,25 @@ if ($isAuthenticated && isset($_SESSION['admin_user_agent'])) {
 
 // Handle login
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['admin_password']) && !$isAuthenticated) {
-    if ($adminConfigMissing) {
+    $throttle = admin_login_throttle_status();
+    if ($throttle['locked']) {
+        $mins = (int)ceil(($throttle['retry_after'] ?? ADMIN_LOGIN_LOCKOUT_SECONDS) / 60);
+        $loginError = 'Too many failed login attempts. Try again in about ' . $mins . ' minute(s).';
+    } elseif (!admin_validate_csrf($_POST['admin_csrf'] ?? null)) {
+        $loginError = 'Invalid security token. Please reload this page and try again.';
+    } elseif ($adminConfigMissing) {
         $loginError = 'Admin is not configured. Create config.local.php on the server (see config.local.example.php and DEPLOYMENT.md).';
     } elseif (password_verify($_POST['admin_password'], $adminPasswordHash)) {
-        // Regenerate session ID to prevent session fixation attacks
+        admin_login_clear_failures();
         session_regenerate_id(true);
         $_SESSION['admin_authenticated'] = true;
         $_SESSION['admin_login_time'] = time();
         $_SESSION['admin_user_agent'] = $_SERVER['HTTP_USER_AGENT'] ?? '';
+        $_SESSION['admin_csrf_token'] = bin2hex(random_bytes(32));
+        $adminCsrfToken = $_SESSION['admin_csrf_token'];
         $isAuthenticated = true;
     } else {
+        admin_login_record_failure();
         $loginError = 'Invalid password.';
         $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
         error_log("PHP Security: Failed admin login attempt from IP $ip at " . gmdate('Y-m-d H:i:s') . " UTC");
@@ -104,6 +120,7 @@ if ($isAuthenticated && isset($_GET['action'])) {
 
     // --- Delete a log entry ---
     if ($_GET['action'] === 'delete' && isset($_GET['id'])) {
+        admin_api_require_csrf();
         header('Content-Type: application/json');
         require_once __DIR__ . '/db.php';
         $db = getDatabase();
@@ -184,6 +201,7 @@ if ($isAuthenticated && isset($_GET['action'])) {
 
     // --- Create brand account ---
     if ($_GET['action'] === 'create_brand' && isset($_GET['brand_name'])) {
+        admin_api_require_csrf();
         header('Content-Type: application/json');
         require_once __DIR__ . '/db.php';
         $db = getDatabase();
@@ -203,6 +221,7 @@ if ($isAuthenticated && isset($_GET['action'])) {
 
     // --- Toggle brand account active/inactive ---
     if ($_GET['action'] === 'toggle_brand' && isset($_GET['id']) && isset($_GET['active'])) {
+        admin_api_require_csrf();
         header('Content-Type: application/json');
         require_once __DIR__ . '/db.php';
         $db = getDatabase();
@@ -220,6 +239,7 @@ if ($isAuthenticated && isset($_GET['action'])) {
 
     // --- Delete brand account ---
     if ($_GET['action'] === 'delete_brand' && isset($_GET['id'])) {
+        admin_api_require_csrf();
         header('Content-Type: application/json');
         require_once __DIR__ . '/db.php';
         $db = getDatabase();
@@ -236,6 +256,7 @@ if ($isAuthenticated && isset($_GET['action'])) {
 
     // --- Regenerate brand token ---
     if ($_GET['action'] === 'regen_token' && isset($_GET['id'])) {
+        admin_api_require_csrf();
         header('Content-Type: application/json');
         require_once __DIR__ . '/db.php';
         $db = getDatabase();
@@ -247,6 +268,25 @@ if ($isAuthenticated && isset($_GET['action'])) {
             echo json_encode(['status' => 'success', 'message' => 'Token regenerated.', 'token' => $newToken]);
         } else {
             echo json_encode(['status' => 'error', 'message' => 'Failed to regenerate token.']);
+        }
+        exit;
+    }
+
+    // --- Regenerate ALL brand tokens (excludes ADMIN_INTERNAL) ---
+    if ($_GET['action'] === 'regen_all_tokens') {
+        admin_api_require_csrf();
+        header('Content-Type: application/json');
+        require_once __DIR__ . '/db.php';
+        $db = getDatabase();
+        if ($db === null) {
+            echo json_encode(['status' => 'error', 'message' => 'Database unavailable.']);
+            exit;
+        }
+        $count = regenerateAllBrandTokens($db);
+        if ($count < 0) {
+            echo json_encode(['status' => 'error', 'message' => 'Failed to regenerate tokens.']);
+        } else {
+            echo json_encode(['status' => 'success', 'message' => 'Regenerated tokens for ' . $count . ' brand account(s).', 'count' => $count]);
         }
         exit;
     }
@@ -286,6 +326,7 @@ if ($isAuthenticated && isset($_GET['action'])) {
 
     // --- Reverse a collection (via API, uses reportId) ---
     if ($_GET['action'] === 'reverse_collection' && isset($_GET['id'])) {
+        admin_api_require_csrf();
         header('Content-Type: application/json');
         require_once __DIR__ . '/db.php';
         $db = getDatabase();
@@ -303,6 +344,7 @@ if ($isAuthenticated && isset($_GET['action'])) {
 
     // --- Admin: mark a report as collected (creates collection without brand account) ---
     if ($_GET['action'] === 'mark_collected' && isset($_GET['id'])) {
+        admin_api_require_csrf();
         header('Content-Type: application/json');
         require_once __DIR__ . '/db.php';
         $db = getDatabase();
@@ -372,6 +414,7 @@ if ($isAuthenticated && isset($_GET['action'])) {
 
     // --- Save brand contacts ---
     if ($_GET['action'] === 'save_brand_contacts' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+        admin_api_require_csrf();
         header('Content-Type: application/json');
         $input = json_decode(file_get_contents('php://input'), true);
         if (!is_array($input)) { echo json_encode(['status' => 'error', 'message' => 'Invalid data']); exit; }
@@ -397,6 +440,7 @@ if ($isAuthenticated && isset($_GET['action'])) {
 
     // --- Save LGA contacts ---
     if ($_GET['action'] === 'save_lga_contacts' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+        admin_api_require_csrf();
         header('Content-Type: application/json');
         $input = json_decode(file_get_contents('php://input'), true);
         if (!is_array($input)) { echo json_encode(['status' => 'error', 'message' => 'Invalid data']); exit; }
@@ -564,7 +608,8 @@ if ($isAuthenticated && isset($_GET['action'])) {
             <p class="login-error"><?php echo htmlspecialchars($loginError); ?></p>
         <?php endif; ?>
         <form method="POST">
-            <input type="password" name="admin_password" placeholder="Admin password" required autofocus>
+            <input type="hidden" name="admin_csrf" value="<?php echo htmlspecialchars($adminCsrfToken, ENT_QUOTES, 'UTF-8'); ?>">
+            <input type="password" name="admin_password" placeholder="Admin password" required autofocus autocomplete="current-password">
             <button type="submit" class="primary" style="margin-top:5px;">Login</button>
         </form>
         <a href="index.html" class="back-link" style="margin-top:20px;">Back to Report</a>
@@ -674,6 +719,10 @@ if ($isAuthenticated && isset($_GET['action'])) {
                 <button type="button" id="create-brand-btn" style="padding:6px 12px; font-size:0.85em; border-radius:4px; border:none; cursor:pointer; background-color:#28a745; color:white;">Create</button>
             </div>
         </div>
+        <div style="margin-bottom:15px;">
+            <button type="button" id="regen-all-tokens-btn" class="destructive" style="padding:8px 14px; font-size:0.85em; border-radius:4px; border:none; cursor:pointer;">Regenerate all brand tokens</button>
+            <p style="font-size:0.8em;color:#aaa;margin-top:6px;">Rotates every portal link at once (except the internal admin account). Existing links stop working immediately.</p>
+        </div>
 
         <div class="log-table-container">
             <table>
@@ -736,9 +785,20 @@ if ($isAuthenticated && isset($_GET['action'])) {
         <pre class="error-log-pre" id="error-log-content">Loading...</pre>
     </div>
 
+<script>window.ADMIN_CSRF = <?php echo json_encode($adminCsrfToken, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;</script>
 <script>
 'use strict';
 document.addEventListener('DOMContentLoaded', () => {
+
+    const ADMIN_CSRF = window.ADMIN_CSRF || '';
+
+    function adminMutate(url, options) {
+        options = options || {};
+        const headers = Object.assign({}, options.headers || {});
+        headers['X-Admin-CSRF'] = ADMIN_CSRF;
+        options.headers = headers;
+        return fetch(url, options);
+    }
 
     // --- Tab switching ---
     const tabBtns = document.querySelectorAll('.tab-btn');
@@ -1188,7 +1248,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (act === 'delete') {
             if (!confirm('Delete report #' + id + '? This cannot be undone.')) return;
             try {
-                const resp = await fetch('admin.php?action=delete&id=' + id);
+                const resp = await adminMutate('admin.php?action=delete&id=' + id);
                 const result = await resp.json();
                 if (result.status === 'success') { logsLoaded = false; loadLogs(); loadStats(); }
                 else { alert('Error: ' + result.message); }
@@ -1198,7 +1258,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (act === 'uncollect') {
             try {
-                const resp = await fetch('admin.php?action=reverse_collection&id=' + id + '&notes=Uncollected%20by%20admin');
+                const resp = await adminMutate('admin.php?action=reverse_collection&id=' + id + '&notes=Uncollected%20by%20admin');
                 const result = await resp.json();
                 if (result.status === 'success') { logsLoaded = false; loadLogs(); loadStats(); }
                 else { alert('Error: ' + result.message); }
@@ -1208,7 +1268,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (act === 'collect') {
             try {
-                const resp = await fetch('admin.php?action=mark_collected&id=' + id);
+                const resp = await adminMutate('admin.php?action=mark_collected&id=' + id);
                 const result = await resp.json();
                 if (result.status === 'success') { logsLoaded = false; loadLogs(); loadStats(); }
                 else { alert('Error: ' + result.message); }
@@ -1254,7 +1314,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function saveBrandContacts() {
         try {
-            const resp = await fetch('admin.php?action=save_brand_contacts', {
+            const resp = await adminMutate('admin.php?action=save_brand_contacts', {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(brandContactsData)
             });
@@ -1321,7 +1381,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function saveLgaContacts() {
         try {
-            const resp = await fetch('admin.php?action=save_lga_contacts', {
+            const resp = await adminMutate('admin.php?action=save_lga_contacts', {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(lgaContactsData)
             });
@@ -1415,7 +1475,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!confirm('Create portal account "' + brandName + '"?')) return;
 
         try {
-            const resp = await fetch('admin.php?action=create_brand&brand_name=' + encodeURIComponent(brandName));
+            const resp = await adminMutate('admin.php?action=create_brand&brand_name=' + encodeURIComponent(brandName));
             const result = await resp.json();
             if (result.status === 'success') {
                 alert('Account created: ' + brandName + '\n\nPortal link:\n' + window.location.origin + '/trolley/brand_portal.php?token=' + result.account.token);
@@ -1432,7 +1492,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.toggleBrand = async function(id, active) {
         if (!confirm(active ? 'Activate this account?' : 'Suspend this account?')) return;
         try {
-            const resp = await fetch('admin.php?action=toggle_brand&id=' + id + '&active=' + active);
+            const resp = await adminMutate('admin.php?action=toggle_brand&id=' + id + '&active=' + active);
             const result = await resp.json();
             if (result.status === 'success') { brandAccountsLoaded = false; loadBrandAccounts(); }
             else { alert('Error: ' + result.message); }
@@ -1443,7 +1503,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.regenToken = async function(id) {
         if (!confirm('Regenerate access token? The old link will stop working.')) return;
         try {
-            const resp = await fetch('admin.php?action=regen_token&id=' + id);
+            const resp = await adminMutate('admin.php?action=regen_token&id=' + id);
             const result = await resp.json();
             if (result.status === 'success') {
                 alert('New token generated. New portal link:\n' + window.location.origin + '/trolley/brand_portal.php?token=' + result.token);
@@ -1457,12 +1517,29 @@ document.addEventListener('DOMContentLoaded', () => {
     window.deleteBrand = async function(id) {
         if (!confirm('Delete this brand account permanently? This cannot be undone.')) return;
         try {
-            const resp = await fetch('admin.php?action=delete_brand&id=' + id);
+            const resp = await adminMutate('admin.php?action=delete_brand&id=' + id);
             const result = await resp.json();
             if (result.status === 'success') { brandAccountsLoaded = false; loadBrandAccounts(); }
             else { alert('Error: ' + result.message); }
         } catch (e) { alert('Error: ' + e.message); }
     };
+
+    const regenAllBtn = document.getElementById('regen-all-tokens-btn');
+    if (regenAllBtn) regenAllBtn.addEventListener('click', async () => {
+        const msg = 'Regenerate tokens for ALL brand portal accounts?\n\nEvery existing portal link will stop working. You will need to copy and send new links to each brand.';
+        if (!confirm(msg)) return;
+        try {
+            const resp = await adminMutate('admin.php?action=regen_all_tokens');
+            const result = await resp.json();
+            if (result.status === 'success') {
+                alert(result.message || ('Regenerated ' + (result.count || 0) + ' token(s).'));
+                brandAccountsLoaded = false;
+                loadBrandAccounts();
+            } else {
+                alert('Error: ' + (result.message || 'Unknown error'));
+            }
+        } catch (e) { alert('Error: ' + e.message); }
+    });
 
 
 });

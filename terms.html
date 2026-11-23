@@ -4,58 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Terms and Conditions - Trolley Report</title>
-     <style>
-        /* Styles copied from index.html for consistency */
-        :root {
-            --bg-color: #1a1a1a;
-            --text-color: #e0e0e0;
-            --card-bg: #2c2c2c;
-            --border-color: #444;
-            --input-bg: #333;
-            --input-text: #e0e0e0;
-            --button-bg: #007bff;
-            --button-text: #ffffff;
-            --button-hover-bg: #0056b3;
-            --button-secondary-bg: #555;
-            --button-secondary-hover-bg: #777;
-            --error-color: #dc3545;
-            --link-color: #00aaff; /* Example link color */
-            --link-hover-color: #0077cc; /* Example link hover color */
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; }
-        body { display: flex; flex-direction: column; align-items: center; padding: 15px; background-color: var(--bg-color); color: var(--text-color); }
-        .container { width: 100%; max-width: 800px; /* Adjusted max-width for content pages */ margin: 20px auto; padding: 20px 30px 30px 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); background-color: var(--card-bg); border: 1px solid var(--border-color); }
-
-        /* Content page specific styles */
-        h1, h2, h3 { color: var(--text-color); margin-top: 1.5em; margin-bottom: 0.5em; }
-        h1 { font-size: 2em; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-top: 0.5em;}
-        h2 { font-size: 1.5em; }
-        h3 { font-size: 1.2em; }
-        p { margin-bottom: 1em; }
-        ul { margin-left: 20px; margin-bottom: 1em; }
-        li { margin-bottom: 0.5em; }
-        strong, b { font-weight: bold; color: var(--text-color); } /* Ensure strong text is visible */
-        a { color: var(--link-color); text-decoration: none; }
-        a:hover { color: var(--link-hover-color); text-decoration: underline; }
-        hr { border: 0; border-top: 1px solid var(--border-color); margin: 2em 0; }
-        .warning { color: #ffcc00; /* Yellow warning color for dark theme */ font-weight: bold; }
-        .contact-info { margin-top: 15px; padding: 15px; background-color: var(--input-bg); border: 1px solid var(--border-color); border-radius: 4px; }
-        .back-link { display: inline-block; margin-top: 20px; padding: 10px 15px; background-color: var(--button-secondary-bg); color: var(--button-text); border-radius: 5px; text-decoration: none; transition: background-color 0.2s ease; }
-        .back-link:hover { background-color: var(--button-secondary-hover-bg); text-decoration: none; color: var(--button-text); }
-
-        /* Basic responsiveness */
-        @media (max-width: 768px) {
-            body { padding: 10px; }
-            .container { padding: 15px; margin: 10px auto; }
-            h1 { font-size: 1.6em; }
-            h2 { font-size: 1.3em; }
-            h3 { font-size: 1.1em; }
-        }
-    </style>
+     <link rel="stylesheet" href="styles.css">
+<style>
+    /* --- terms.html page-specific styles --- */
+    body { padding: 15px; }
+    .container { max-width: 800px; margin: 20px auto; padding: 20px 30px 30px 30px; }
+    @media (max-width: 768px) {
+        body { padding: 10px; }
+        .container { padding: 15px; margin: 10px auto; }
+    }
+</style>
 </head>
 <body>
-    <div class="container">
+    <div class="container content-page">
         <h1>Terms and Conditions for Trolley Report</h1>
         <p><strong>Last Updated:</strong> 24 May 2025</p>
 

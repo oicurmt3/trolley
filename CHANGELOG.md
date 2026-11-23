@@ -1,0 +1,90 @@
+# Changelog -- WA Trolley Report
+
+All notable changes to this project are documented here.
+Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+
+
+## [1.3] - 2025-05 (Current)
+
+### Added
+- **LGA email integration** -- two-step suburb-to-LGA lookup (via `suburb_lga_mapping.json` and `lga_contact_details.json`) enables emailing local councils after submission
+- **LGA contact details** for 30 Perth metropolitan councils with official email addresses
+- **Suburb-to-LGA mapping** covering ~359 suburbs across Perth metropolitan area
+- **Email prompt modal** -- after successful submission, presents buttons to email brand owners and/or the relevant LGA
+- **Manual copy fallback** -- if `mailto:` link fails to open an email client, textarea with copy-to-clipboard buttons is shown
+- **Bunnings** added as a reportable brand with dedicated brand colours and map page
+- **Spudshed** added as a reportable brand with dedicated brand colours and map page
+- **Per-brand condition tracking** -- each selected brand gets its own condition selector (Good, Needs Cleaning, Rusty, Damaged Wheel, Bent Frame, Broken Handle, Child Seat Issue, Other)
+- **Brand-specific map pages** -- `map_coles.html`, `map_woolworths.html`, `map_aldi.html`, `map_iga.html`, `map_kmart.html`, `map_bigw.html`, `map_bunnings.html`, `map_spudshed.html`, `map_other.html`
+- **Marker clustering** on all map pages using Leaflet.markercluster plugin
+- **Sortable columns** in log viewer (brand, timestamp) with ascending/descending toggle
+- **Pagination** in log viewer (30 entries per page)
+- **Detail row expansion** -- clicking a brand toggle in the log viewer reveals condition and comment details
+- **Server-side UTC timestamp** (`serverTimestampUTC`) added to each log entry for consistent ordering
+- **Nominatim User-Agent** updated to `TrolleyReportApp/1.3` with contact email per usage policy
+- **FAQ page** (`faq.html`) with 9 common questions and answers
+- **Privacy Policy** (`privacy.html`) covering data collection, storage, and contact information
+- **Terms and Conditions** (`terms.html`) covering usage, disclaimers, and liability
+- **APK download link** in footer for Android app variant
+
+### Changed
+- Rate limit increased from 10 to 20 submissions per 12-hour window
+- Cookie names updated to `trolley_submissions_v2` and `trolley_first_submission_v2`
+- Email body generation includes Google Maps link instead of raw coordinates
+- Email body includes LGA name (when emailing brand) and all brand conditions (when emailing LGA)
+- Log viewer uses abbreviated brand codes (CO, WO, AL, IG, KM, BI, BU, SP, OT) for compact display
+- Map popup content includes suburb/state and conditions
+- Error logging improved with more descriptive messages and context
+
+### Fixed
+- File locking (`LOCK_EX`) on JSON write to prevent race conditions with concurrent submissions
+- Timestamp parsing handles both ISO 8601 and `DD/MM/YYYY, H:MM AM/PM` formats for backward compatibility
+- Form validation highlights both the input group border and its label in red on error
+- Condition sections properly cleared when a brand is deselected
+
+### Security
+- HTML output escaping in log viewer using `<`/`>` entity replacement
+- `escapeHtml()` function used in map popups to prevent XSS via log data
+- Comments textarea enforces 200-character limit (client-side)
+
+### Known Issues
+- Nominatim API intermittently returns 403 (access blocked) or 509 (bandwidth exceeded) -- submissions succeed but suburb/state/LGA fields are `null`
+- CORS set to `*` (should be restricted to production domain)
+- No server-side rate limiting
+- No CSRF token on form submissions
+- `lga_emails.json` (legacy file) is unused by `log_trolley.php` but remains in the project
+
+
+## [1.2] - 2025-04
+
+### Added
+- Multi-brand selection (users can report multiple brands per sighting)
+- Reverse geocoding via Nominatim API to determine suburb and state
+- Server-enriched log data returned in API response
+- Comments field with character counter (200 char limit)
+- Error state styling (red borders and labels) for form validation
+
+### Changed
+- Submission flow refactored to use `fetch()` with JSON payload instead of `FormData`
+- Log data structure updated to include nested `conditions` object
+
+
+## [1.1] - 2025-04
+
+### Added
+- Interactive map view (`map_view.html`) using Leaflet.js with OpenStreetMap tiles
+- Cookie-based rate limiting (10 submissions per 12 hours)
+- Dark theme with CSS custom properties
+
+### Changed
+- Layout optimised for mobile devices with responsive breakpoints
+
+
+## [1.0] - 2025-04
+
+### Added
+- Initial release
+- Single-brand trolley reporting form with GPS location capture
+- JSON flat-file storage (`trolley_logs.json`)
+- Basic log viewer (`view_logs.php`) with tabular display
+- Brands supported: Coles, Woolworths, Aldi, IGA, Kmart, Big W, Other

@@ -1,0 +1,77 @@
+# =============================================================================
+# .htaccess -- WA Trolley Report
+# Security, caching, and access control rules
+# =============================================================================
+
+# --- Force HTTPS ---
+RewriteEngine On
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# --- Block access to sensitive files ---
+# Error log, rate limit data, legacy files, and this .htaccess itself
+<FilesMatch "^(error_log|rate_limits\.json|lga_emails\.json|test\.html|\.htaccess|backup\.sh|trolley_data\.db|db\.php|migrate_to_sqlite\.php|config\.local\.php)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order deny,allow
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# --- Block access to geocache and backups directories ---
+<IfModule mod_authz_core.c>
+    <DirectoryMatch "(geocache|backups)">
+        Require all denied
+    </DirectoryMatch>
+</IfModule>
+
+# --- Security Headers ---
+<IfModule mod_headers.c>
+    # Prevent MIME type sniffing
+    Header set X-Content-Type-Options "nosniff"
+
+    # Clickjacking protection
+    Header set X-Frame-Options "DENY"
+
+    # XSS protection (legacy browsers)
+    Header set X-XSS-Protection "1; mode=block"
+
+    # Referrer policy
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+
+    # Permissions policy - restrict unused browser APIs
+    Header set Permissions-Policy "camera=(), microphone=(), payment=(), usb=(), geolocation=(self)"
+
+    # Content Security Policy
+    Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com; style-src 'self' 'unsafe-inline' https://unpkg.com; img-src 'self' https://*.tile.openstreetmap.org https://unpkg.com https://raw.githubusercontent.com data:; connect-src 'self'; font-src 'self'; frame-ancestors 'none'"
+
+    # Prevent search engines indexing data pages
+    <FilesMatch "\.(json)$">
+        Header set X-Robots-Tag "noindex, nofollow"
+    </FilesMatch>
+</IfModule>
+
+# --- Compression ---
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE application/json text/html text/css application/javascript
+</IfModule>
+
+# --- Cache Control ---
+<IfModule mod_headers.c>
+    # Static assets: cache for 1 hour
+    <FilesMatch "\.(html|css|js)$">
+        Header set Cache-Control "public, max-age=3600"
+    </FilesMatch>
+
+    # Data file: no cache (changes on every submission)
+    <FilesMatch "trolley_logs\.json$">
+        Header set Cache-Control "no-cache, must-revalidate"
+    </FilesMatch>
+
+    # Mapping files: cache for 24 hours (rarely change)
+    <FilesMatch "(suburb_lga_mapping|lga_contact_details)\.json$">
+        Header set Cache-Control "public, max-age=86400"
+    </FilesMatch>
+</IfModule>

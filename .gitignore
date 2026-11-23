@@ -1,0 +1,20 @@
+# Secrets and local config
+config.local.php
+config*.local.php
+
+# Database and runtime data
+trolley_data.db
+*.db
+error_log
+rate_limits.json
+backups/
+geocache/
+
+# Binaries (owner keeps APK copies locally)
+*.apk
+*.zip
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*~

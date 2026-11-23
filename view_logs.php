@@ -241,48 +241,34 @@ tr.detail-row td { background-color: var(--detail-row-bg); white-space: normal; 
         updateTable();
     }
 
-    /** en-AU date label (Australia/Perth), e.g. "3 Nov 2026" */
-    function formatFilterDateAu(ymd) {
+    /** Date filter hint label, zero-padded dd/mm/yyyy */
+    function formatFilterDateDdMmYyyy(ymd) {
         if (!ymd) return '';
         const parts = ymd.split('-');
         if (parts.length !== 3) return ymd;
-        const d = new Date(Date.UTC(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]), 12, 0, 0));
-        return d.toLocaleDateString('en-AU', { timeZone: 'Australia/Perth', day: 'numeric', month: 'short', year: 'numeric' });
+        const dd = String(parts[2]).padStart(2, '0');
+        const mm = String(parts[1]).padStart(2, '0');
+        const yyyy = parts[0];
+        return dd + '/' + mm + '/' + yyyy;
     }
 
     function buildDateRangeHintText() {
         if (dateFromFilter && dateToFilter) {
-            return 'From ' + formatFilterDateAu(dateFromFilter) + ' to ' + formatFilterDateAu(dateToFilter);
+            return 'From ' + formatFilterDateDdMmYyyy(dateFromFilter) + ' to ' + formatFilterDateDdMmYyyy(dateToFilter);
         }
         if (dateFromFilter) {
-            return 'From ' + formatFilterDateAu(dateFromFilter);
+            return 'From ' + formatFilterDateDdMmYyyy(dateFromFilter);
         }
         if (dateToFilter) {
-            return 'Up to ' + formatFilterDateAu(dateToFilter);
+            return 'Up to ' + formatFilterDateDdMmYyyy(dateToFilter);
         }
         return '';
-    }
-
-    function buildFilterCountHintText() {
-        if (activeBrandFilter !== 'all' || dateFromFilter || dateToFilter) {
-            return filteredLogs.length + ' of ' + allLogs.length + ' reports';
-        }
-        return allLogs.length + ' reports';
     }
 
     function updateFilterDateHint() {
         const hint = document.getElementById('filter-date-hint');
         if (!hint) return;
-        const range = buildDateRangeHintText();
-        const count = buildFilterCountHintText();
-        const parts = [];
-        if (range) {
-            parts.push(range);
-        }
-        if (count) {
-            parts.push(count);
-        }
-        hint.textContent = parts.join(' · ');
+        hint.textContent = buildDateRangeHintText();
     }
 
     function updateDateButtonStates() {

@@ -112,16 +112,28 @@ tr.detail-row td { background-color: var(--detail-row-bg); white-space: normal; 
                     <button type="button" class="brand-filter-btn" data-brand="Other" aria-label="Filter other brands" style="padding:5px 10px; font-size:0.85em; border-radius:4px; border:none; cursor:pointer; background-color:#555; color:#ccc;">OT</button>
                 </div>
                 </fieldset>
-                <fieldset style="border:none; padding:0; margin:10px 0 0 0;">
+                <fieldset class="filter-date-fieldset" style="border:none; padding:0; margin:10px 0 0 0;">
                 <legend class="visually-hidden">Filter reports by date range</legend>
-                <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
-                    <label for="date-from" style="font-size:0.85em; font-weight:bold;">From</label>
-                    <input type="date" id="date-from" name="filter_date_from">
-                    <label for="date-to" style="font-size:0.85em; font-weight:bold;">To</label>
-                    <input type="date" id="date-to" name="filter_date_to">
-                    <button type="button" id="clear-dates-btn" aria-label="Clear date filters">Clear dates</button>
-                    <span id="filter-count" aria-live="polite"></span>
+                <div class="filter-date-row">
+                    <div class="filter-date-pair">
+                        <label for="date-from" class="filter-date-icon-label" title="From date">
+                            <span class="visually-hidden">From date</span>
+                            <svg class="filter-date-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                        </label>
+                        <input type="date" id="date-from" name="filter_date_from" title="From date">
+                    </div>
+                    <div class="filter-date-pair">
+                        <label for="date-to" class="filter-date-icon-label" title="To date">
+                            <span class="visually-hidden">To date</span>
+                            <svg class="filter-date-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                        </label>
+                        <input type="date" id="date-to" name="filter_date_to" title="To date">
+                    </div>
+                    <button type="button" id="clear-dates-btn" class="filter-date-clear" aria-label="Clear dates" title="Clear dates">
+                        <svg class="filter-date-clear-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
                 </div>
+                <span id="filter-count" class="filter-date-count" aria-live="polite"></span>
                 </fieldset>
             </div>
 

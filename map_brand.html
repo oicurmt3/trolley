@@ -24,6 +24,8 @@
 <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"
  integrity="sha256-WL6HHfYfbFEkZOFdsJQeY7lJG/E5airjvqbznghUzRw="
  crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="map_my_location.css" />
+    <script src="map_my_location.js"></script>
 
     <link rel="stylesheet" href="styles.css">
     <style>
@@ -269,6 +271,7 @@
 
         const markerClusterGroup = L.markerClusterGroup();
         map.addLayer(markerClusterGroup);
+        attachMapMyLocationControl(map);
         setTimeout(() => { map.invalidateSize(); }, 200);
 
 

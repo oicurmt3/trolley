@@ -24,6 +24,8 @@
 <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"
  integrity="sha256-WL6HHfYfbFEkZOFdsJQeY7lJG/E5airjvqbznghUzRw="
  crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="map_my_location.css" />
+    <script src="map_my_location.js"></script>
 
     <link rel="stylesheet" href="styles.css">
     <style>
@@ -104,8 +106,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            console.log("DOM Ready, initializing map...");
-
             // Fix Leaflet default icon paths (known CDN issue)
             delete L.Icon.Default.prototype._getIconUrl;
             L.Icon.Default.mergeOptions({
@@ -122,31 +122,27 @@
             const initialZoom = 9; // Zoom level for initial view
 
             const map = L.map('map').setView(initialCenter, initialZoom);
-            console.log("Map initialized");
 
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
                 attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
-            console.log("Tile layer added");
 
             // ** NEW: Initialize MarkerClusterGroup **
             const markerClusterGroup = L.markerClusterGroup();
-            map.addLayer(markerClusterGroup); // Add the group to the map
-            console.log("MarkerClusterGroup added to map");
+            map.addLayer(markerClusterGroup);
+            attachMapMyLocationControl(map);
 
             // Invalidate map size after a short delay to ensure proper rendering
-            setTimeout(() => { map.invalidateSize(); console.log("Map size invalidated."); }, 200);
+            setTimeout(() => { map.invalidateSize(); }, 200);
 
             async function loadMarkers() {
-                 console.log("Loading markers...");
                 try {
                     // Fetch log data
                     const response = await fetch('api_logs.php');
                     if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
                     const logs = await response.json();
                     if (!Array.isArray(logs)) throw new Error("Invalid data format received.");
-                     console.log(`Fetched ${logs.length} logs.`);
 
                     // ** Clear previous markers from the cluster group **
                     markerClusterGroup.clearLayers();
@@ -247,8 +243,6 @@
                             console.warn(`Skipping log entry ${index} with invalid coordinates:`, log);
                         }
                     });
-                     console.log(`Added ${markersFound} markers to cluster group.`);
-
                     // Handle cases with no markers
                     if (markersFound === 0) {
                          if (mapElement) mapElement.innerHTML = '<p style="text-align:center; padding-top: 20px;">No trolley locations found in logs.</p>';
@@ -258,8 +252,7 @@
                         // ** Fit bounds using the markerClusterGroup **
                         const bounds = markerClusterGroup.getBounds();
                         if (bounds.isValid()) {
-                            map.fitBounds(bounds, { padding: [50, 50], maxZoom: 16 }); // Add padding and maxZoom
-                            console.log("Map bounds fit to marker cluster group.");
+                            map.fitBounds(bounds, { padding: [50, 50], maxZoom: 16 });
                         } else {
                             console.warn("Marker cluster bounds are not valid, cannot fit bounds. Resetting view.");
                             map.setView(initialCenter, initialZoom); // Fallback view

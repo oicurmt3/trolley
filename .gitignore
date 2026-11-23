@@ -1,0 +1,16 @@
+# Secrets and local config
+config.php
+config*.php
+
+# Logs and dumps
+error_log
+*.log
+*.sql
+
+# Rate-limit state (writable on server)
+data/rate_limit/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*~

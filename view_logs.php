@@ -268,6 +268,13 @@ tr.detail-row td { background-color: var(--detail-row-bg); white-space: normal; 
     </div>
 
 <script>
+    function escapeHtml(text) {
+        if (text === null || text === undefined) return '';
+        const str = String(text);
+        const map = {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'};
+        return str.replace(/[&<>"']/g, function (m) { return map[m]; });
+    }
+
     // --- State Abbreviation Mapping ---
     const stateAbbreviations = { /* ... */
         "Western Australia": "WA", "South Australia": "SA", "New South Wales": "NSW",
@@ -462,16 +469,56 @@ tr.detail-row td { background-color: var(--detail-row-bg); white-space: normal; 
          if (existingDetailRow) { return; } // If it was already open, just close it
          const logData = allLogs.find(log => log._rowId === targetRowId); if (!logData) { console.error("Could not find data for rowId:", targetRowId); alert("Error: Could not retrieve details."); return; }
          try {
-             const detailRow = document.createElement('tr'); detailRow.id = `detail-${targetRowId}-${brand}`; detailRow.classList.add('detail-row');
-             const detailCell = document.createElement('td'); detailCell.colSpan = 3;
+             const detailRow = document.createElement('tr');
+             detailRow.id = `detail-${targetRowId}-${brand}`;
+             detailRow.classList.add('detail-row');
+             const detailCell = document.createElement('td');
+             detailCell.colSpan = 3;
+
+             const wrapper = document.createElement('div');
+             wrapper.className = 'detail-content';
+
+             const heading = document.createElement('h4');
+             heading.textContent = `Details for ${brand} Trolley`;
+             wrapper.appendChild(heading);
+
              const conditions = (typeof logData.conditions === 'object' && logData.conditions !== null) ? logData.conditions : {};
-             const brandConditions = conditions[brand] || []; const comments = logData.comments || '';
-             let detailHtml = '<div class="detail-content">'; detailHtml += `<h4>Details for ${brand} Trolley</h4>`;
-             if (brandConditions.length > 0) { const conditionsText = brandConditions.join(', '); const escapedConditionsText = conditionsText.replace(/</g, "<").replace(/>/g, ">"); detailHtml += `<span class="conditions_yes"><strong>Condition (${brand}):</strong> ${escapedConditionsText}</span><br>`; }
-             else { detailHtml += `<span class="no-details">No specific conditions reported for ${brand} trolley.</span><br>`; }
-             if (comments) { const escapedComments = comments.replace(/</g, "<").replace(/>/g, ">"); detailHtml += `<span class="add_comments" style="display:block;"><strong>General Comments:</strong> ${escapedComments.replace(/\n/g, '<br>')}</span>`; }
-             else { detailHtml += '<span class="no-details">No general comments submitted.</span>'; }
-             detailHtml += '</div>'; detailCell.innerHTML = detailHtml; detailRow.appendChild(detailCell);
+             const brandConditions = conditions[brand] || [];
+             const comments = logData.comments || '';
+
+             if (brandConditions.length > 0) {
+                 const condSpan = document.createElement('span');
+                 condSpan.className = 'conditions_yes';
+                 const condStrong = document.createElement('strong');
+                 condStrong.textContent = `Condition (${brand}):`;
+                 condSpan.appendChild(condStrong);
+                 condSpan.appendChild(document.createTextNode(' ' + brandConditions.join(', ')));
+                 wrapper.appendChild(condSpan);
+             } else {
+                 const noCond = document.createElement('span');
+                 noCond.className = 'no-details';
+                 noCond.textContent = `No specific conditions reported for ${brand} trolley.`;
+                 wrapper.appendChild(noCond);
+             }
+
+             if (comments) {
+                 const commSpan = document.createElement('span');
+                 commSpan.className = 'add_comments';
+                 commSpan.style.display = 'block';
+                 const commStrong = document.createElement('strong');
+                 commStrong.textContent = 'General Comments:';
+                 commSpan.appendChild(commStrong);
+                 commSpan.appendChild(document.createTextNode(' ' + comments));
+                 wrapper.appendChild(commSpan);
+             } else {
+                 const noComm = document.createElement('span');
+                 noComm.className = 'no-details';
+                 noComm.textContent = 'No general comments submitted.';
+                 wrapper.appendChild(noComm);
+             }
+
+             detailCell.appendChild(wrapper);
+             detailRow.appendChild(detailCell);
              mainRow.parentNode.insertBefore(detailRow, mainRow.nextSibling);
          } catch (error) { console.error("Error occurred during detail row creation/insertion:", error); alert("An error occurred while trying to show details."); }
       }

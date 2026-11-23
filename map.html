@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abandoned Trolleys</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css"
+     integrity="sha384-lPzjPsFQL6te2x+VxmV6q1DpRxpRk0tmnl2cpwAO5y04ESyc752tnEWPKDfl1olr"
+     crossorigin=""/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css"
+     integrity="sha384-5kMSQJ6S4Qj5i09mtMNrWpSi8iXw230pKU76xTmrpezGnNJQzj0NzXjQLLg+jE7k"
+     crossorigin=""/>
+    <link rel="stylesheet" href="map_my_location.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"
+     integrity="sha384-RLIyj5q1b5XJTn0tqUhucRZe40nFTocRP91R/NkRJHwAe4XxnTV77FXy/vGLiec2"
+     crossorigin=""></script>
+    <script src="js/escape_html.js"></script>
+    <script src="map_my_location.js"></script>
+    <style>
+        :root {
+            --bg-color: #1a1a1a; --text-color: #e0e0e0; --card-bg: #2c2c2c; --border-color: #444;
+            --button-bg: #007bff; --button-hover-bg: #0056b3; --button-text: #ffffff;
+            --highlight: #ff9800; --detail-row-bg: #4a4a4a;
+            --coles-bg: #ed1c22; --coles-hover-bg: #c8191e;
+            --woolworths-bg: #54b848; --woolworths-hover-bg: #47a03d;
+            --aldi-bg: #00005F; --aldi-hover-bg: #00004a;
+            --iga-bg: #30302f; --iga-hover-bg: #20201f;
+            --kmart-bg: #E92A28; --kmart-hover-bg: #c72321;
+            --bigw-bg: #0046C8; --bigw-hover-bg: #0037a0;
+            --bunnings-bg: #0d5257; --bunnings-hover-bg: #0b494e;
+            --spudshed-bg: #a6cf4d; --spudshed-color: #8b380a; --spudshed-hover-bg: #84a53d;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { height: 100%; }
+        body {
+            min-height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6; display: flex; flex-direction: column; align-items: center; padding: 5px;
+            background-color: var(--bg-color); color: var(--text-color);
+        }
+        .container {
+            width: 100%; max-width: 1200px; margin: 10px auto; padding: 15px; border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); background-color: var(--card-bg);
+            border: 1px solid var(--border-color); display: flex; flex-direction: column; flex-grow: 1;
+        }
+        h1 { color: var(--text-color); margin-bottom: 15px; font-size: 1.8em; text-align: center; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;}
+        h1 span { display: block; font-size: 0.5em; font-weight: normal; }
+        #map { width: 100%; height: 400px; border-radius: 5px; border: 1px solid var(--border-color); margin-bottom: 20px; flex-shrink: 0; }
+        .table-section { overflow-x: auto; flex-grow: 1; display: flex; flex-direction: column; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+        th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border-color); white-space: nowrap; font-size: 1em; }
+        th { background-color: #444; position: sticky; top: 0; color: var(--highlight); z-index: 1; }
+        th.sortable { cursor: pointer; }
+        th.sortable:hover { background-color: #555; }
+        td { background-color: var(--card-bg); vertical-align: middle; }
+        tr.detail-row td { background-color: var(--detail-row-bg); white-space: normal; }
+        .sortable::after { content: var(--sort-icon, " \2195"); font-size: 1em; opacity: 0.8; margin-left: 4px; }
+        .map-btn { padding: 5px 8px; background-color: var(--button-bg); color: var(--button-text); border: none; border-radius: 4px; cursor: pointer; text-decoration: none; display: inline-block; font-size: 1em; text-align: center; line-height: 1.2; min-width: 70px; }
+        .map-btn:hover { background-color: var(--button-hover-bg); }
+        .brand-button-group { display: flex; flex-wrap: wrap; gap: 4px; }
+        .brand-toggle { padding: 4px 6px; border-radius: 4px; color: #fff; border: none; cursor: pointer; font-size: 1em; min-width: 40px; text-align: center; display: inline-block; }
+        .brand-toggle[data-brand="Coles"] { background-color: var(--coles-bg); }
+        .brand-toggle[data-brand="Woolworths"] { background-color: var(--woolworths-bg); }
+        .brand-toggle[data-brand="Aldi"] { background-color: var(--aldi-bg); }
+        .brand-toggle[data-brand="IGA"] { background-color: var(--iga-bg); }
+        .brand-toggle[data-brand="Kmart"] { background-color: var(--kmart-bg); }
+        .brand-toggle[data-brand="BigW"] { background-color: var(--bigw-bg); }
+        .brand-toggle[data-brand="Bunnings"] { background-color: var(--bunnings-bg); }
+        .brand-toggle[data-brand="Spudshed"] { background-color: var(--spudshed-bg); color: var(--spudshed-color); }
+        .brand-toggle[data-brand="Other"] { background-color: #6c757d; }
+        .detail-content { padding: 8px; background-color: var(--detail-row-bg); }
+        .detail-content h4 { margin-top: 0; margin-bottom: 8px; color: var(--highlight); font-size: 1em; }
+        .detail-content span { display: block; margin-bottom: 5px; font-size: 0.9em; line-height: 1.4;}
+        .detail-content strong { color: var(--highlight); margin-right: 5px; }
+        .no-details { font-style: italic; color: #aaa; }
+        .pagination { margin: 15px 0 0 0; text-align: center; flex-shrink: 0; }
+        .pagination button, .pagination span { vertical-align: middle; margin: 0 4px; }
+        .pagination button { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9em; background-color: var(--button-bg); color: var(--button-text); }
+        .pagination button:disabled { background-color: #666; cursor: not-allowed; opacity: 0.7; }
+        .pagination button:hover:not(:disabled) { background-color: var(--button-hover-bg); }
+        .loading-message, .error-loading { text-align: center; padding: 20px; font-size: 1.1em; }
+        .bottom-message { font-size: 0.8em; color: #aaa; text-align: center; margin-top: 10px; }
+        .back-link-container { text-align: center; margin-top: 20px; padding-top: 15px; border-top: 1px dashed var(--border-color); }
+        .back-link { display: inline-block; padding: 10px 15px; background-color: var(--button-bg); color: var(--button-text); border-radius: 5px; text-decoration: none; margin: 5px; }
+        .back-link:hover { opacity: 0.9; color: var(--button-text); }
+        .marker-cluster-small { background-color: rgba(181, 226, 140, 0.6); }
+        .marker-cluster-small div { background-color: rgba(110, 204, 57, 0.6); }
+        .marker-cluster-medium { background-color: rgba(241, 211, 87, 0.6); }
+        .marker-cluster-medium div { background-color: rgba(240, 194, 12, 0.6); }
+        .marker-cluster-large { background-color: rgba(253, 156, 115, 0.6); }
+        .marker-cluster-large div { background-color: rgba(241, 128, 23, 0.6); }
+        .marker-cluster div { width: 30px; height: 30px; margin-left: 5px; margin-top: 5px; text-align: center; border-radius: 15px; font: 12px "Helvetica Neue", Arial, Helvetica, sans-serif; color: #fff; line-height: 30px; text-shadow: 1px 1px 1px #000; }
+        .marker-cluster { border-radius: 50%; box-shadow: 0 0 5px rgba(0,0,0,0.5); }
+        @media (max-width: 768px) {
+            #map { height: 300px; }
+            table { font-size: 0.85em; }
+            th, td { padding: 6px 8px; white-space: normal; }
+        }
+    </style>
+    <script>
+        (function () {
+            var pages = {
+                coles: { brand: 'Coles', pageTitle: 'Coles Trolleys', pageSubtitle: 'Report phone: 1800 876 553', emoji: ' \uD83D\uDECD' },
+                woolworths: { brand: 'Woolworths', pageTitle: 'Woolworths Trolleys', pageSubtitle: 'Phone Report: 1800 641 497' },
+                aldi: { brand: 'Aldi', pageTitle: 'Aldi Trolleys', pageSubtitle: '' },
+                iga: { brand: 'IGA', pageTitle: 'IGA Trolleys', pageSubtitle: 'Phone Report: 0297413000' },
+                kmart: { brand: 'Kmart', pageTitle: 'Kmart Trolleys', pageSubtitle: 'Phone Report: 1800 876 553' },
+                bigw: { brand: 'BigW', pageTitle: 'Big W Trolleys', pageSubtitle: 'Phone Report: 1800 641 497' },
+                bunnings: { brand: 'Bunnings', pageTitle: 'Bunnings Trolleys', pageSubtitle: 'Report: 1300 554 777' },
+                spudshed: { brand: 'Spudshed', pageTitle: 'Spudshed Trolleys', pageSubtitle: 'Phone Report: (08) 9446 5736' },
+                other: { brand: 'Other', pageTitle: 'Other Trolleys', pageSubtitle: 'Phone Report: as per brand' }
+            };
+            var slug = (new URLSearchParams(window.location.search).get('brand') || '').toLowerCase().trim();
+            var page = pages[slug];
+            if (!page) {
+                window.location.replace('map_view.html');
+                return;
+            }
+            window.TROLLEY_MAP_CONFIG = page;
+            document.addEventListener('DOMContentLoaded', function () {
+                document.title = 'Abandoned Trolleys - ' + page.brand;
+                var h1 = document.getElementById('page-heading');
+                var subtitle = document.getElementById('page-subtitle');
+                if (h1) {
+                    h1.appendChild(document.createTextNode(page.pageTitle + (page.emoji || '')));
+                }
+                if (subtitle && page.pageSubtitle) {
+                    subtitle.textContent = page.pageSubtitle;
+                } else if (subtitle) {
+                    subtitle.style.display = 'none';
+                }
+            });
+        })();
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1><span id="page-heading"></span><span id="page-subtitle"></span></h1>
+        <div id="map"></div>
+        <div class="table-section">
+            <div id="loading" class="loading-message">Loading data...</div>
+            <div id="table-container" style="display: none;">
+                <table id="logs-table">
+                    <thead>
+                        <tr>
+                            <th>Brand</th>
+                            <th class="sortable" data-sort="timestamp">Date</th>
+                            <th>Location</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body"></tbody>
+                </table>
+                <p class="bottom-message">*Location accuracy depends on device GPS.</p>
+                <div class="pagination">
+                    <button id="prev-page" type="button" disabled>Previous</button>
+                    <span id="page-info">Page 1 of 1</span>
+                    <button id="next-page" type="button" disabled>Next</button>
+                </div>
+            </div>
+            <div id="error-loading" class="loading-message error-loading" style="display: none;"></div>
+        </div>
+        <div class="back-link-container">
+            <a href="index.html" class="back-link">Report</a>
+            <a href="map_view.html" class="back-link">Map</a>
+            <a href="view_logs.php" class="back-link">List</a>
+        </div>
+    </div>
+    <script src="map_brand_page.js"></script>
+</body>
+</html>

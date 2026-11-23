@@ -485,7 +485,7 @@
                 </div>
             </div>
 
-            <p class="disclaimer">Not affilliated with/endorsed by any shopping brand or LGA.<br /><a href="/trolley/privacy.html" target="_blank">Privacy</a> • <a href="/trolley/terms.html" target="_blank">Terms</a> • <a href="/trolley/faq.html" target="_blank">FAQs</a> • <a href="https://sandgroper.net" target="_blank">Apps</a> • <a href="https://sandgroper.net/trolley/trolleyfinder.apk" target="_blank">Download</a></p>
+            <p class="disclaimer">Not affiliated with/endorsed by any shopping brand or LGA.<br /><a href="privacy.html" target="_blank" rel="noopener noreferrer">Privacy</a> • <a href="terms.html" target="_blank" rel="noopener noreferrer">Terms</a> • <a href="faq.html" target="_blank" rel="noopener noreferrer">FAQs</a> • <a href="https://sandgroper.net" target="_blank" rel="noopener noreferrer">Apps</a></p>
         </main>
     </div>
 <script>
@@ -520,7 +520,7 @@
             "IGA": "hostmaster@metcash.com;privacy@metcash.com",
             "Kmart": "info@wesfarmers.com.au",
             "Bunnings": "support@bunnings.com.au;info@bunnings.com.au;scamwatch@bunnings.com.au;info@wesfarmers.com.au;customersupport@bunnings.com.au;privacy@bunnings.com.au",
-            "BigW": ";info@bigw.com.au;support@bigw.com.au;mail@bigw.com.au;hoax@bigw.com.au;privacy@woolworths.com.au",
+            "BigW": "info@bigw.com.au;support@bigw.com.au;mail@bigw.com.au;hoax@bigw.com.au;privacy@woolworths.com.au",
             "Spudshed": "CustomerService@spudshed.com.au", // natasha.kennington@galatibros.com.au
             "Other": "" // No direct email for "Other" brands
         };
@@ -792,7 +792,6 @@
                     body: JSON.stringify(clientLogData),
                 });
                 const result = await response.json();
-                console.log("DEBUG: AJAX Response from log_trolley.php:", result);
 
                 if (response.ok && result.status === 'success' && result.logData) {
                     confirmationMessage.textContent = 'Log submitted successfully! Preparing email options...';
@@ -802,7 +801,6 @@
                     confirmationMessage.style.display = 'block';
 
                     const serverEnrichedLogData = result.logData;
-                    console.log("DEBUG: Data being stored in localStorage for email (from server response):", serverEnrichedLogData);
                     localStorage.setItem('pendingTrolleyEmailSubmission', JSON.stringify(serverEnrichedLogData));
 
                     // Short delay before reload to allow user to see success message
@@ -816,14 +814,14 @@
                     // More specific check if logData is missing but status was success
                     if(result && result.status === 'success' && !result.logData) {
                         errMsg = "Log saved, but server did not return full details for email prompt. Please check logs manually if needed.";
-                        console.error("DEBUG: Server indicated success but logData was missing in response:", result);
+                        console.error("Server indicated success but logData was missing in response:", result);
                     } else if (result) {
-                        console.error("DEBUG: Log submission issue or server did not return expected logData:", result);
+                        console.error("Log submission issue or server did not return expected logData:", result);
                     }
                     throw new Error(errMsg);
                 }
             } catch (error) {
-                console.error("DEBUG: Submission Error Object:", error);
+                console.error("Submission error:", error);
                 confirmationMessage.textContent = `Error: ${error.message}. Data not saved. Please try again.`;
                 confirmationMessage.style.color = 'var(--error-color)';
                 confirmationMessage.style.borderColor = 'var(--error-color)';
@@ -1007,21 +1005,37 @@
 
         function displayTrolleyEmailPrompt(submissionData) {
             if (!submissionData || !emailPromptModal) return;
-            console.log("DEBUG (displayTrolleyEmailPrompt): Data received:", submissionData);
-
             const modalTitle = emailPromptModal.querySelector('.modal-header h2');
             const modalPara = emailPromptModal.querySelector('.modal-body > p');
 
             if(modalTitle) modalTitle.textContent = "Email This Report?";
             if(modalPara) modalPara.innerHTML = "Would you like to email this report to the trolley owner(s) and/or the local council?";
 
-            submissionSummaryModalDiv.innerHTML = `
-                <p><strong>Date:</strong> ${formatDateForEmail(submissionData.timestamp, false)}</p>
-                <p><strong>GPS:</strong> Lat: ${submissionData.latitude}, Lon: ${submissionData.longitude}</p>
-                ${submissionData.suburb && submissionData.state ? `<p><strong>Location:</strong> ${submissionData.suburb}, ${submissionData.state}</p>` : '<p><strong>Approx. Area:</strong> Suburb/State not determined.</p>'}
-                ${submissionData.lgaName ? `<p><strong>LGA:</strong> ${submissionData.lgaName}</p>` : ''}
-                ${submissionData.comments ? `<p><strong>Comment:</strong> ${submissionData.comments.length > 70 ? submissionData.comments.substring(0, 70) + '...' : submissionData.comments}</p>` : ''}
-            `;
+            submissionSummaryModalDiv.textContent = '';
+            function appendSummaryLine(label, value) {
+                const p = document.createElement('p');
+                const strong = document.createElement('strong');
+                strong.textContent = label;
+                p.appendChild(strong);
+                p.appendChild(document.createTextNode(' ' + value));
+                submissionSummaryModalDiv.appendChild(p);
+            }
+            appendSummaryLine('Date:', formatDateForEmail(submissionData.timestamp, false));
+            appendSummaryLine('GPS:', `Lat: ${submissionData.latitude}, Lon: ${submissionData.longitude}`);
+            if (submissionData.suburb && submissionData.state) {
+                appendSummaryLine('Location:', `${submissionData.suburb}, ${submissionData.state}`);
+            } else {
+                appendSummaryLine('Approx. Area:', 'Suburb/State not determined.');
+            }
+            if (submissionData.lgaName) {
+                appendSummaryLine('LGA:', submissionData.lgaName);
+            }
+            if (submissionData.comments) {
+                const commentPreview = submissionData.comments.length > 70
+                    ? submissionData.comments.substring(0, 70) + '...'
+                    : submissionData.comments;
+                appendSummaryLine('Comment:', commentPreview);
+            }
             submissionSummaryModalDiv.style.display = 'block';
 
             emailOptionsContainerModalDiv.innerHTML = ''; // Clear previous options
@@ -1196,16 +1210,13 @@
         if (pendingSubmissionJSON) {
             try {
                 const pendingSubmissionData = JSON.parse(pendingSubmissionJSON);
-                console.log("DEBUG (DOMContentLoaded): Data retrieved from localStorage FOR EMAIL PROMPT:", pendingSubmissionData);
 
                 // Check for essential data for the email prompt
                 if (!pendingSubmissionData.latitude || !pendingSubmissionData.longitude || !pendingSubmissionData.timestamp || !pendingSubmissionData.brands) {
-                    console.warn("DEBUG (DOMContentLoaded): Essential data missing from localStorage, clearing and aborting email prompt.", pendingSubmissionData);
+                    console.warn("Essential data missing from localStorage; aborting email prompt.");
                     localStorage.removeItem('pendingTrolleyEmailSubmission');
                     return; // Abort if critical data is missing
                 }
-
-                console.log(`DEBUG (DOMContentLoaded): Suburb: '${pendingSubmissionData.suburb}', State: '${pendingSubmissionData.state}', LGA Name: '${pendingSubmissionData.lgaName}', LGA Email: '${pendingSubmissionData.lgaEmail}'`);
 
                 // Display the prompt.
                 // Small timeout to ensure DOM is fully ready and any success messages from submission are briefly visible.

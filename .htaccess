@@ -1,0 +1,84 @@
+# --- Block sensitive paths (trolley_logs.json MUST remain public for maps) ---
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Canonical brand map URLs
+    RewriteRule ^map_coles\.html$ map.html?brand=coles [R=302,L,QSA]
+    RewriteRule ^map_woolworths\.html$ map.html?brand=woolworths [R=302,L,QSA]
+    RewriteRule ^map_aldi\.html$ map.html?brand=aldi [R=302,L,QSA]
+    RewriteRule ^map_iga\.html$ map.html?brand=iga [R=302,L,QSA]
+    RewriteRule ^map_kmart\.html$ map.html?brand=kmart [R=302,L,QSA]
+    RewriteRule ^map_bigw\.html$ map.html?brand=bigw [R=302,L,QSA]
+    RewriteRule ^map_bunnings\.html$ map.html?brand=bunnings [R=302,L,QSA]
+    RewriteRule ^map_spudshed\.html$ map.html?brand=spudshed [R=302,L,QSA]
+    RewriteRule ^map_other\.html$ map.html?brand=other [R=302,L,QSA]
+</IfModule>
+
+# Deny dotfiles, logs, includes, and JSON data files except the public feed
+<FilesMatch "^\.">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order deny,allow
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+<Files "error_log">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order deny,allow
+        Deny from all
+    </IfModule>
+</Files>
+
+<FilesMatch "\.(log|bak|backup|old)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order deny,allow
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+<Files "suburb_lga_mapping.json">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order deny,allow
+        Deny from all
+    </IfModule>
+</Files>
+
+<Files "lga_contact_details.json">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order deny,allow
+        Deny from all
+    </IfModule>
+</Files>
+
+<Files "lga_emails.json">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order deny,allow
+        Deny from all
+    </IfModule>
+</Files>
+
+# Security headers (CSP allows Leaflet/unpkg and OSM tiles as used by the app)
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set Content-Security-Policy "default-src 'self'; script-src 'self' https://unpkg.com 'unsafe-inline'; style-src 'self' https://unpkg.com 'unsafe-inline'; img-src 'self' data: https://*.tile.openstreetmap.org https://unpkg.com https://www.openstreetmap.org; connect-src 'self'; font-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'"
+</IfModule>

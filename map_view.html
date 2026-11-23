@@ -7,14 +7,21 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
      crossorigin=""/>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css"
+     integrity="sha384-lPzjPsFQL6te2x+VxmV6q1DpRxpRk0tmnl2cpwAO5y04ESyc752tnEWPKDfl1olr"
+     crossorigin=""/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css"
+     integrity="sha384-5kMSQJ6S4Qj5i09mtMNrWpSi8iXw230pKU76xTmrpezGnNJQzj0NzXjQLLg+jE7k"
+     crossorigin=""/>
     <link rel="stylesheet" href="map_my_location.css" />
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
      crossorigin=""></script>
-    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"
+     integrity="sha384-RLIyj5q1b5XJTn0tqUhucRZe40nFTocRP91R/NkRJHwAe4XxnTV77FXy/vGLiec2"
+     crossorigin=""></script>
+    <script src="js/escape_html.js"></script>
     <script src="map_my_location.js"></script>
 
     <style>
@@ -213,15 +220,15 @@
         <div id="map"></div> <div class="brand-links-container">
              <h2>Brand Maps</h2>
              <div class="brand-links">
-                 <a href="map_coles.html" class="brand-link-button brand-coles">CO</a>
-                 <a href="map_woolworths.html" class="brand-link-button brand-woolworths">WO</a>
-                 <a href="map_aldi.html" class="brand-link-button brand-aldi">AL</a>
-                 <a href="map_iga.html" class="brand-link-button brand-iga">IG</a>
-                 <a href="map_kmart.html" class="brand-link-button brand-kmart">KM</a>
-                 <a href="map_bigw.html" class="brand-link-button brand-bigw">BI</a>
-                 <a href="map_bunnings.html" class="brand-link-button brand-bunnings">BU</a>
-                 <a href="map_spudshed.html" class="brand-link-button brand-spudshed">SP</a>
-                 <a href="map_other.html" class="brand-link-button brand-other">Other</a>
+                 <a href="map.html?brand=coles" class="brand-link-button brand-coles">CO</a>
+                 <a href="map.html?brand=woolworths" class="brand-link-button brand-woolworths">WO</a>
+                 <a href="map.html?brand=aldi" class="brand-link-button brand-aldi">AL</a>
+                 <a href="map.html?brand=iga" class="brand-link-button brand-iga">IG</a>
+                 <a href="map.html?brand=kmart" class="brand-link-button brand-kmart">KM</a>
+                 <a href="map.html?brand=bigw" class="brand-link-button brand-bigw">BI</a>
+                 <a href="map.html?brand=bunnings" class="brand-link-button brand-bunnings">BU</a>
+                 <a href="map.html?brand=spudshed" class="brand-link-button brand-spudshed">SP</a>
+                 <a href="map.html?brand=other" class="brand-link-button brand-other">Other</a>
              </div>
         </div>
 
@@ -233,41 +240,42 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            console.log("DOM Ready, initializing map...");
             const mapElement = document.getElementById('map');
             if (!mapElement) { console.error("Map container element not found!"); return; }
 
-            // Define initial map center and zoom level
-            const initialCenter = [-31.9523, 115.8613]; // Perth approx center
-            const initialZoom = 9; // Zoom level for initial view
+            const initialCenter = [-31.9523, 115.8613];
+            const initialZoom = 9;
 
             const map = L.map('map').setView(initialCenter, initialZoom);
-            console.log("Map initialized");
 
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
-                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
-            console.log("Tile layer added");
 
-            // ** NEW: Initialize MarkerClusterGroup **
             const markerClusterGroup = L.markerClusterGroup();
-            map.addLayer(markerClusterGroup); // Add the group to the map
-            console.log("MarkerClusterGroup added to map");
+            map.addLayer(markerClusterGroup);
             attachMapMyLocationControl(map);
 
-            // Invalidate map size after a short delay to ensure proper rendering
-            setTimeout(() => { map.invalidateSize(); console.log("Map size invalidated."); }, 200);
+            setTimeout(() => { map.invalidateSize(); }, 200);
+
+            function showMapStatusMessage(message, isError) {
+                mapElement.textContent = '';
+                const p = document.createElement('p');
+                p.style.textAlign = 'center';
+                p.style.paddingTop = '20px';
+                if (isError) p.style.color = 'red';
+                p.textContent = message;
+                mapElement.appendChild(p);
+            }
 
             async function loadMarkers() {
-                 console.log("Loading markers...");
                 try {
                     // Fetch log data
                     const response = await fetch('trolley_logs.json?_=' + new Date().getTime());
                     if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
                     const logs = await response.json();
                     if (!Array.isArray(logs)) throw new Error("Invalid data format received.");
-                     console.log(`Fetched ${logs.length} logs.`);
 
                     // ** Clear previous markers from the cluster group **
                     markerClusterGroup.clearLayers();
@@ -304,19 +312,16 @@
                             console.warn(`Skipping log entry ${index} with invalid coordinates:`, log);
                         }
                     });
-                     console.log(`Added ${markersFound} markers to cluster group.`);
 
-                    // Handle cases with no markers
                     if (markersFound === 0) {
-                         if (mapElement) mapElement.innerHTML = '<p style="text-align:center; padding-top: 20px;">No trolley locations found in logs.</p>';
+                         showMapStatusMessage('No trolley locations found in logs.', false);
                          // Reset to default view if no markers
                          map.setView(initialCenter, initialZoom);
                     } else {
                         // ** Fit bounds using the markerClusterGroup **
                         const bounds = markerClusterGroup.getBounds();
                         if (bounds.isValid()) {
-                            map.fitBounds(bounds, { padding: [50, 50], maxZoom: 16 }); // Add padding and maxZoom
-                            console.log("Map bounds fit to marker cluster group.");
+                            map.fitBounds(bounds, { padding: [50, 50], maxZoom: 16 });
                         } else {
                             console.warn("Marker cluster bounds are not valid, cannot fit bounds. Resetting view.");
                             map.setView(initialCenter, initialZoom); // Fallback view
@@ -326,7 +331,7 @@
 
                 } catch (error) {
                     console.error("Error loading map markers:", error);
-                    if (mapElement) mapElement.innerHTML = `<p style="text-align:center; padding-top: 20px; color: red;">Error loading map data: ${error.message}</p>`;
+                    showMapStatusMessage('Error loading map data: ' + error.message, true);
                 }
             }
 
@@ -355,13 +360,6 @@
                   // Return unique conditions, joined by comma
                   return [...new Set(allConditions)].join(', ');
              }
-             function escapeHtml(text) {
-                 // ... (keep the existing function) ...
-                 if (!text) return '';
-                 const map = {'&': '&amp;','<': '&lt;','>': '&gt;','"': '&quot;',"'": '&#039;'};
-                 return text.replace(/[&<>"']/g, m => map[m]);
-             }
-
             // Load markers on initial page load
             loadMarkers();
         });

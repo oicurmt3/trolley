@@ -161,6 +161,8 @@ Upload:
 
 **Cache headers in this file:** HTML/PHP use `Cache-Control: no-cache` (revalidate). Versioned static assets (`.css`, `.js`, `.svg`, `.png`, `.ico`, `.webmanifest`) use long `max-age` + `immutable` — pair with `?v=` in page markup and bump `TROLLEY_ASSET_VERSION` when those files change.
 
+**Hotfix (SQLite WAL):** If `trolley_data.db-wal` / `.db-shm` were reachable over HTTP, upload **only** the root `.htaccess` (phase 4.8) — no app file changes required. Smoke: `GET` those paths should return **403**. The `backups/` directory remains blocked via `RewriteRule`.
+
 **Exception:** If HTTP→HTTPS returns **500** due to old broken rules, you may upload **only** `.htaccess` early to fix redirects, then continue other files — restore full file set before smoke tests.
 
 ---

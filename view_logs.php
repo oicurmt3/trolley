@@ -328,30 +328,53 @@ tr.detail-row td { background-color: var(--detail-row-bg); white-space: normal; 
 
     function wireHiddenDateInput(input, btn) {
         if (!input || !btn) return;
-        input.addEventListener('change', () => {
-            returnFocusToDateButton(input, btn);
-        });
-        input.addEventListener('blur', () => {
-            returnFocusToDateButton(input, btn);
-        });
+        const refocusBtn = () => returnFocusToDateButton(input, btn);
+
+        input.addEventListener('change', refocusBtn);
+        input.addEventListener('blur', refocusBtn);
+        input.addEventListener('cancel', refocusBtn);
         input.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                returnFocusToDateButton(input, btn);
+                refocusBtn();
+                return;
+            }
+            const redirectKeys = ['Tab', 'Enter', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+            if (redirectKeys.includes(e.key)) {
+                if (e.key === 'Tab') {
+                    e.preventDefault();
+                }
+                refocusBtn();
+            }
+        });
+        input.addEventListener('keyup', (e) => {
+            if (e.key === 'Escape') {
+                refocusBtn();
+            }
+        });
+        input.addEventListener('focus', () => {
+            input._datePickerTriggerBtn = btn;
+            if (input._preferButtonFocus) {
+                requestAnimationFrame(() => refocusBtn());
             }
         });
     }
 
-    function openNativeDatePicker(input) {
+    function openNativeDatePicker(input, triggerBtn) {
         if (!input) return;
-        input.focus({ preventScroll: true });
+        input._preferButtonFocus = true;
         if (typeof input.showPicker === 'function') {
             try {
                 input.showPicker();
+                if (triggerBtn) {
+                    triggerBtn.focus({ preventScroll: true });
+                }
                 return;
             } catch (err) {
                 /* security / gesture — fall through */
             }
         }
+        input._preferButtonFocus = false;
+        input.focus({ preventScroll: true });
         input.click();
     }
 
@@ -379,11 +402,11 @@ tr.detail-row td { background-color: var(--detail-row-bg); white-space: normal; 
         const clearDatesBtn = document.getElementById('clear-dates-btn');
 
         if (dateFromBtn && dateFrom) {
-            dateFromBtn.addEventListener('click', () => openNativeDatePicker(dateFrom));
+            dateFromBtn.addEventListener('click', () => openNativeDatePicker(dateFrom, dateFromBtn));
             wireHiddenDateInput(dateFrom, dateFromBtn);
         }
         if (dateToBtn && dateTo) {
-            dateToBtn.addEventListener('click', () => openNativeDatePicker(dateTo));
+            dateToBtn.addEventListener('click', () => openNativeDatePicker(dateTo, dateToBtn));
             wireHiddenDateInput(dateTo, dateToBtn);
         }
         if (dateFrom) {

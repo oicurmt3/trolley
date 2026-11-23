@@ -112,16 +112,28 @@ tr.detail-row td { background-color: var(--detail-row-bg); white-space: normal; 
                     <button type="button" class="brand-filter-btn" data-brand="Other" aria-label="Filter other brands" style="padding:5px 10px; font-size:0.85em; border-radius:4px; border:none; cursor:pointer; background-color:#555; color:#ccc;">OT</button>
                 </div>
                 </fieldset>
-                <fieldset style="border:none; padding:0; margin:10px 0 0 0;">
+                <fieldset class="filter-date-fieldset" style="border:none; padding:0; margin:10px 0 0 0;">
                 <legend class="visually-hidden">Filter reports by date range</legend>
-                <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
-                    <label for="date-from" style="font-size:0.85em; font-weight:bold;">From</label>
-                    <input type="date" id="date-from" name="filter_date_from">
-                    <label for="date-to" style="font-size:0.85em; font-weight:bold;">To</label>
-                    <input type="date" id="date-to" name="filter_date_to">
-                    <button type="button" id="clear-dates-btn" aria-label="Clear date filters">Clear dates</button>
-                    <span id="filter-count" aria-live="polite"></span>
+                <div class="filter-date-row">
+                    <div class="filter-date-trigger-wrap">
+                        <button type="button" id="date-from-btn" class="filter-date-icon-btn" aria-label="From date" title="From date" aria-pressed="false">
+                            <svg class="filter-date-btn-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                            <span class="filter-date-active-dot" aria-hidden="true"></span>
+                        </button>
+                        <input type="date" id="date-from" name="filter_date_from" class="filter-date-native-input" tabindex="-1" aria-hidden="true">
+                    </div>
+                    <div class="filter-date-trigger-wrap">
+                        <button type="button" id="date-to-btn" class="filter-date-icon-btn" aria-label="To date" title="To date" aria-pressed="false">
+                            <svg class="filter-date-btn-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                            <span class="filter-date-active-dot" aria-hidden="true"></span>
+                        </button>
+                        <input type="date" id="date-to" name="filter_date_to" class="filter-date-native-input" tabindex="-1" aria-hidden="true">
+                    </div>
+                    <button type="button" id="clear-dates-btn" class="filter-date-icon-btn filter-date-clear" aria-label="Clear dates" title="Clear dates">
+                        <svg class="filter-date-btn-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
                 </div>
+                <p id="filter-date-hint" class="filter-date-hint" aria-live="polite"></p>
                 </fieldset>
             </div>
 
@@ -221,19 +233,149 @@ tr.detail-row td { background-color: var(--detail-row-bg); white-space: normal; 
             return true;
         });
 
-        // Update filter count display
-        const filterCount = document.getElementById('filter-count');
-        if (filterCount) {
-            if (activeBrandFilter !== 'all' || dateFromFilter || dateToFilter) {
-                filterCount.textContent = filteredLogs.length + ' of ' + allLogs.length + ' reports';
-            } else {
-                filterCount.textContent = allLogs.length + ' reports';
-            }
-        }
+        updateFilterDateHint();
+        updateDateButtonStates();
 
         sortLogs();
         currentPage = 1;
         updateTable();
+    }
+
+    /** en-AU date label (Australia/Perth), e.g. "3 Nov 2026" */
+    function formatFilterDateAu(ymd) {
+        if (!ymd) return '';
+        const parts = ymd.split('-');
+        if (parts.length !== 3) return ymd;
+        const d = new Date(Date.UTC(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]), 12, 0, 0));
+        return d.toLocaleDateString('en-AU', { timeZone: 'Australia/Perth', day: 'numeric', month: 'short', year: 'numeric' });
+    }
+
+    function buildDateRangeHintText() {
+        if (dateFromFilter && dateToFilter) {
+            return 'From ' + formatFilterDateAu(dateFromFilter) + ' to ' + formatFilterDateAu(dateToFilter);
+        }
+        if (dateFromFilter) {
+            return 'From ' + formatFilterDateAu(dateFromFilter);
+        }
+        if (dateToFilter) {
+            return 'Up to ' + formatFilterDateAu(dateToFilter);
+        }
+        return '';
+    }
+
+    function buildFilterCountHintText() {
+        if (activeBrandFilter !== 'all' || dateFromFilter || dateToFilter) {
+            return filteredLogs.length + ' of ' + allLogs.length + ' reports';
+        }
+        return allLogs.length + ' reports';
+    }
+
+    function updateFilterDateHint() {
+        const hint = document.getElementById('filter-date-hint');
+        if (!hint) return;
+        const range = buildDateRangeHintText();
+        const count = buildFilterCountHintText();
+        const parts = [];
+        if (range) {
+            parts.push(range);
+        }
+        if (count) {
+            parts.push(count);
+        }
+        hint.textContent = parts.join(' · ');
+    }
+
+    function updateDateButtonStates() {
+        const fromBtn = document.getElementById('date-from-btn');
+        const toBtn = document.getElementById('date-to-btn');
+        if (fromBtn) {
+            const active = !!dateFromFilter;
+            fromBtn.classList.toggle('has-value', active);
+            fromBtn.setAttribute('aria-pressed', active ? 'true' : 'false');
+        }
+        if (toBtn) {
+            const active = !!dateToFilter;
+            toBtn.classList.toggle('has-value', active);
+            toBtn.setAttribute('aria-pressed', active ? 'true' : 'false');
+        }
+        syncDateInputConstraints();
+    }
+
+    function syncDateInputConstraints() {
+        const dateFrom = document.getElementById('date-from');
+        const dateTo = document.getElementById('date-to');
+        if (!dateFrom || !dateTo) return;
+        if (dateFrom.value) {
+            dateTo.min = dateFrom.value;
+        } else {
+            dateTo.removeAttribute('min');
+        }
+        if (dateTo.value) {
+            dateFrom.max = dateTo.value;
+        } else {
+            dateFrom.removeAttribute('max');
+        }
+    }
+
+    function returnFocusToDateButton(input, btn) {
+        if (input && typeof input.blur === 'function') {
+            input.blur();
+        }
+        if (btn && typeof btn.focus === 'function') {
+            btn.focus();
+        }
+    }
+
+    function wireHiddenDateInput(input, btn) {
+        if (!input || !btn) return;
+        const refocusBtn = () => returnFocusToDateButton(input, btn);
+
+        input.addEventListener('change', refocusBtn);
+        input.addEventListener('blur', refocusBtn);
+        input.addEventListener('cancel', refocusBtn);
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                refocusBtn();
+                return;
+            }
+            const redirectKeys = ['Tab', 'Enter', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+            if (redirectKeys.includes(e.key)) {
+                if (e.key === 'Tab') {
+                    e.preventDefault();
+                }
+                refocusBtn();
+            }
+        });
+        input.addEventListener('keyup', (e) => {
+            if (e.key === 'Escape') {
+                refocusBtn();
+            }
+        });
+        input.addEventListener('focus', () => {
+            input._datePickerTriggerBtn = btn;
+            if (input._preferButtonFocus) {
+                requestAnimationFrame(() => refocusBtn());
+            }
+        });
+    }
+
+    function openNativeDatePicker(input, triggerBtn) {
+        if (!input) return;
+        input._preferButtonFocus = true;
+        if (typeof input.showPicker === 'function') {
+            try {
+                input.showPicker();
+                if (triggerBtn) {
+                    triggerBtn.focus({ preventScroll: true });
+                }
+                return;
+            } catch (err) {
+                /* security / gesture — fall through */
+            }
+        }
+        input._preferButtonFocus = false;
+        input.focus({ preventScroll: true });
+        input.click();
     }
 
     /** Set up filter button and date input event listeners */
@@ -255,8 +397,18 @@ tr.detail-row td { background-color: var(--detail-row-bg); white-space: normal; 
         // Date range filters
         const dateFrom = document.getElementById('date-from');
         const dateTo = document.getElementById('date-to');
+        const dateFromBtn = document.getElementById('date-from-btn');
+        const dateToBtn = document.getElementById('date-to-btn');
         const clearDatesBtn = document.getElementById('clear-dates-btn');
 
+        if (dateFromBtn && dateFrom) {
+            dateFromBtn.addEventListener('click', () => openNativeDatePicker(dateFrom, dateFromBtn));
+            wireHiddenDateInput(dateFrom, dateFromBtn);
+        }
+        if (dateToBtn && dateTo) {
+            dateToBtn.addEventListener('click', () => openNativeDatePicker(dateTo, dateToBtn));
+            wireHiddenDateInput(dateTo, dateToBtn);
+        }
         if (dateFrom) {
             dateFrom.addEventListener('change', () => {
                 dateFromFilter = dateFrom.value || '';

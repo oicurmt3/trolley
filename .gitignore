@@ -11,10 +11,14 @@ trolley_data.db
 *.db
 error_log
 rate_limits.json
-data/admin_login_throttle.json
-data/
-backups/
-geocache/
+
+# Runtime dirs — ignore contents, track only .htaccess (LiteSpeed deny)
+data/*
+!data/.htaccess
+backups/*
+!backups/.htaccess
+geocache/*
+!geocache/.htaccess
 
 # Binaries (owner keeps APK copies locally)
 *.apk

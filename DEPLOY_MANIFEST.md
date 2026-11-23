@@ -64,10 +64,18 @@ Also do not upload: `*.apk`, `trolleyfinder.apk`, `data/admin_login_throttle.jso
 Upload from repo clone into `/home/perthrel/sandgroper.net/trolley/`.  
 Skip every path listed in Phase 1.
 
-### 4.1 — `includes/` (upload before `admin.php` uses it)
+### 4.1 — Directory deny files (LiteSpeed; upload even if folders already exist on server)
 
 ```
+geocache/.htaccess
+backups/.htaccess
+data/.htaccess
 includes/.htaccess
+```
+
+### 4.2 — `includes/` PHP (upload before `admin.php` uses it)
+
+```
 includes/admin_api.php
 includes/admin_security.php
 includes/app_config.php
@@ -76,7 +84,7 @@ includes/data_files.php
 includes/schema_migrate.php
 ```
 
-### 4.2 — Core PHP APIs and data layer
+### 4.3 — Core PHP APIs and data layer
 
 ```
 db.php
@@ -91,7 +99,7 @@ migrate_20261123.php
 rotate_brand_tokens.php
 ```
 
-### 4.3 — HTML / CSS / JS (public UI)
+### 4.4 — HTML / CSS / JS (public UI)
 
 ```
 index.html
@@ -107,7 +115,7 @@ terms.html
 faq.html
 ```
 
-### 4.4 — Map redirect stubs
+### 4.5 — Map redirect stubs
 
 ```
 map_coles.html
@@ -121,7 +129,7 @@ map_spudshed.html
 map_other.html
 ```
 
-### 4.5 — Reference JSON
+### 4.6 — Reference JSON
 
 ```
 lga_contact_details.json
@@ -132,7 +140,7 @@ These stay **public** (frontend/admin fetch them). Upload only when intentionall
 
 Do **not** upload `brand_contacts.json` or `trolley_logs.json` on an existing site.
 
-### 4.6 — Example templates (safe, no secrets)
+### 4.7 — Example templates (safe, no secrets)
 
 ```
 config.local.example.php
@@ -141,7 +149,7 @@ brand_tokens.local.example.json
 trolley_logs.example.json
 ```
 
-### 4.7 — `.htaccess` **LAST** (among web-accessible deploy files)
+### 4.8 — `.htaccess` **LAST** (among web-accessible deploy files)
 
 Upload:
 
@@ -165,7 +173,11 @@ lga_emails.json
 view_log#2
 view_log2
 trolleyfinder.apk
+geocache/setup.php*
+geocache/migrate_to_sqlite.php*
 ```
+
+Delete any **root-level** `*.php*` backup artifacts (e.g. `setup.php.bak`, `migrate_to_sqlite.php.old`) left from manual edits — not part of the current repo.
 
 Delete **only if** they are old full map pages (not current redirect stubs):
 
@@ -289,6 +301,7 @@ Base: `https://sandgroper.net/trolley/`
 | 11 | `GET map_brand.html?brand=Coles` | **200** |
 | 12 | `HEAD` or `GET` via **http://** same host → trolley | **301** to HTTPS (not **500**) |
 | 13 | `GET admin.php` | **200**, login form (do not brute-force password) |
+| 14 | `GET geocache/` or any `geocache/*.json` | **403** Forbidden |
 
 **Do not:** POST to `log_trolley.php`, open `mailto:` from reporter flow, or send test emails.
 

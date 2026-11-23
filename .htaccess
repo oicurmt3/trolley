@@ -8,6 +8,9 @@ RewriteEngine On
 # URL path prefix for this install (must match public path, NOT the filesystem path).
 RewriteBase /trolley/
 
+# Block private directories (LiteSpeed/cPanel: DirectoryMatch is invalid in .htaccess)
+RewriteRule ^(geocache|backups|data|includes)/ - [F,L]
+
 RewriteCond %{HTTPS} off
 RewriteCond %{HTTP:X-Forwarded-Proto} !https [NC]
 RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
@@ -45,9 +48,6 @@ RewriteRule ^map_other\.html$ /trolley/map_brand.html?brand=Other [R=302,L,QSA]
         Deny from all
     </IfModule>
 </FilesMatch>
-
-# --- Block web access to private directories (DirectoryMatch is not allowed in .htaccess on many hosts) ---
-RewriteRule ^(?:geocache|backups|data|includes)(?:/|$) - [F,L]
 
 # --- Block developer documentation from the web ---
 <FilesMatch "\.md$">

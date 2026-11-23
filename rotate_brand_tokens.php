@@ -167,7 +167,12 @@ if ($fromFile !== null) {
     $result = rotateAllBrandPortalTokensGenerated($db);
 }
 
-echo 'Updated: ' . $result['updated'] . ', skipped: ' . $result['skipped'] . ".\n";
+$summary = brand_rotation_skip_summary($result['skip_reasons']);
+echo 'Rotated: ' . $result['updated'] . ', skipped: ' . $result['skipped'];
+if ($summary !== '') {
+    echo ' (' . $summary . ')';
+}
+echo "\n";
 
 if ($result['errors'] !== []) {
     foreach ($result['errors'] as $err) {

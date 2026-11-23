@@ -626,17 +626,13 @@ function regenerateBrandToken(PDO $db, int $accountId) {
 }
 
 /**
- * Rotate portal tokens for every brand account except the fixed ADMIN_INTERNAL row.
+ * Rotate active portal tokens (skips ADMIN_INTERNAL and inactive; never brand_accounts_old).
  *
- * @return int Number of accounts updated, or -1 on failure
+ * @return array{updated: int, skipped: int, skip_reasons: array<string, int>, errors: list<string>}
  */
-function regenerateAllBrandTokens(PDO $db): int {
+function regenerateAllBrandTokens(PDO $db): array {
     require_once __DIR__ . '/includes/brand_token_rotation.php';
-    $result = rotateAllBrandPortalTokensGenerated($db);
-    if ($result['errors'] !== [] && $result['updated'] === 0) {
-        return -1;
-    }
-    return $result['updated'];
+    return rotateAllBrandPortalTokensGenerated($db);
 }
 
 

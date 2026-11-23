@@ -289,11 +289,23 @@ if ($isAuthenticated && isset($_GET['action'])) {
             echo json_encode(['status' => 'error', 'message' => 'Database unavailable.']);
             exit;
         }
-        $count = regenerateAllBrandTokens($db);
-        if ($count < 0) {
-            echo json_encode(['status' => 'error', 'message' => 'Failed to regenerate tokens.']);
+        require_once __DIR__ . '/includes/brand_token_rotation.php';
+        $result = regenerateAllBrandTokens($db);
+        $summary = brand_rotation_skip_summary($result['skip_reasons']);
+        if ($result['errors'] !== [] && $result['updated'] === 0) {
+            echo json_encode(['status' => 'error', 'message' => 'Failed to regenerate tokens.', 'errors' => $result['errors']]);
         } else {
-            echo json_encode(['status' => 'success', 'message' => 'Regenerated tokens for ' . $count . ' brand account(s).', 'count' => $count]);
+            $message = 'Rotated ' . $result['updated'] . ', skipped ' . $result['skipped'];
+            if ($summary !== '') {
+                $message .= ' (' . $summary . ')';
+            }
+            echo json_encode([
+                'status' => 'success',
+                'message' => $message,
+                'count' => $result['updated'],
+                'skipped' => $result['skipped'],
+                'skip_reasons' => $result['skip_reasons'],
+            ]);
         }
         exit;
     }
@@ -1602,7 +1614,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const resp = await adminPost('regen_all_tokens', {});
             const result = await resp.json();
             if (result.status === 'success') {
-                alert(result.message || ('Regenerated ' + (result.count || 0) + ' token(s).'));
+                alert(result.message || ('Rotated ' + (result.count || 0) + ' token(s).'));
                 brandAccountsLoaded = false;
                 loadBrandAccounts();
             } else {

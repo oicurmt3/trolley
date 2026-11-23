@@ -1,3 +1,6 @@
+<?php
+require_once __DIR__ . '/includes/asset_version.php';
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,8 +8,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="View logged abandoned shopping trolleys">
     <title>Trolley List - Reported Abandoned Trolleys in WA</title>
-    <link rel="icon" href="favicon.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="<?php echo trolley_asset_href('favicon.svg'); ?>" type="image/svg+xml">
+    <link rel="stylesheet" href="<?php echo trolley_asset_href('styles.css'); ?>">
 <style>
 /* --- view_logs.php page-specific styles --- */
 body { padding: 5px; }
@@ -93,8 +96,10 @@ tr.detail-row td { background-color: var(--detail-row-bg); white-space: normal; 
 
             <!-- Filter Controls -->
             <div id="filter-bar" style="margin-bottom:15px; padding:10px; background-color:#333; border-radius:5px; border:1px solid var(--border-color);">
+                <fieldset style="border:none; padding:0; margin:0;">
+                <legend class="visually-hidden">Filter reports by brand</legend>
                 <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
-                    <label style="font-size:0.85em; font-weight:bold; margin-right:5px;">Filter:</label>
+                    <span style="font-size:0.85em; font-weight:bold; margin-right:5px;">Filter:</span>
                     <button type="button" class="brand-filter-btn active" data-brand="all" aria-label="Show all brands" style="padding:5px 10px; font-size:0.85em; border-radius:4px; border:none; cursor:pointer; background-color:var(--button-bg); color:var(--button-text); font-weight:bold;">All</button>
                     <button type="button" class="brand-filter-btn" data-brand="Coles" aria-label="Filter Coles" style="padding:5px 10px; font-size:0.85em; border-radius:4px; border:none; cursor:pointer; background-color:var(--coles-bg); color:white;">CO</button>
                     <button type="button" class="brand-filter-btn" data-brand="Woolworths" aria-label="Filter Woolworths" style="padding:5px 10px; font-size:0.85em; border-radius:4px; border:none; cursor:pointer; background-color:var(--woolworths-bg); color:white;">WO</button>
@@ -106,14 +111,18 @@ tr.detail-row td { background-color: var(--detail-row-bg); white-space: normal; 
                     <button type="button" class="brand-filter-btn" data-brand="Spudshed" aria-label="Filter Spudshed" style="padding:5px 10px; font-size:0.85em; border-radius:4px; border:none; cursor:pointer; background-color:var(--spudshed-bg); color:var(--spudshed-text);">SP</button>
                     <button type="button" class="brand-filter-btn" data-brand="Other" aria-label="Filter other brands" style="padding:5px 10px; font-size:0.85em; border-radius:4px; border:none; cursor:pointer; background-color:#555; color:#ccc;">OT</button>
                 </div>
-                <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-top:10px;">
+                </fieldset>
+                <fieldset style="border:none; padding:0; margin:10px 0 0 0;">
+                <legend class="visually-hidden">Filter reports by date range</legend>
+                <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
                     <label for="date-from" style="font-size:0.85em; font-weight:bold;">From</label>
-                    <input type="date" id="date-from" aria-label="Filter from date">
+                    <input type="date" id="date-from" name="filter_date_from">
                     <label for="date-to" style="font-size:0.85em; font-weight:bold;">To</label>
-                    <input type="date" id="date-to" aria-label="Filter to date">
+                    <input type="date" id="date-to" name="filter_date_to">
                     <button type="button" id="clear-dates-btn" aria-label="Clear date filters">Clear dates</button>
                     <span id="filter-count" aria-live="polite"></span>
                 </div>
+                </fieldset>
             </div>
 
             <table id="logs-table">

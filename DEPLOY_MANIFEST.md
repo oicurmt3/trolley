@@ -159,6 +159,8 @@ Upload:
 
 **Why last:** New rules deny `data/`, `includes/`, `*.local.*`, and CLI scripts. Uploading `.htaccess` before the rest of the tree is in place can cause **403** on half-deployed paths or block you mid-upload. Upload application files and `includes/` first, then switch rules atomically.
 
+**Cache headers in this file:** HTML/PHP use `Cache-Control: no-cache` (revalidate). Versioned static assets (`.css`, `.js`, `.svg`, `.png`, `.ico`, `.webmanifest`) use long `max-age` + `immutable` — pair with `?v=` in page markup and bump `TROLLEY_ASSET_VERSION` when those files change.
+
 **Exception:** If HTTP→HTTPS returns **500** due to old broken rules, you may upload **only** `.htaccess` early to fix redirects, then continue other files — restore full file set before smoke tests.
 
 ---

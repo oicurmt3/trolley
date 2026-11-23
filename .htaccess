@@ -100,9 +100,14 @@ RewriteRule ^map_other\.html$ /trolley/map_brand.html?brand=Other [R=302,L,QSA]
 
 # --- Cache Control ---
 <IfModule mod_headers.c>
-    # Static assets: cache for 1 hour
-    <FilesMatch "\.(html|css|js)$">
-        Header set Cache-Control "public, max-age=3600"
+    # HTML / PHP pages: always revalidate (asset URLs use ?v= busting)
+    <FilesMatch "\.(html|php)$">
+        Header set Cache-Control "no-cache"
+    </FilesMatch>
+
+    # Versioned static assets (?v= in URL): long-lived cache
+    <FilesMatch "\.(css|js|svg|png|ico|webmanifest)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
     </FilesMatch>
 
     # Data file: no cache (changes on every submission)

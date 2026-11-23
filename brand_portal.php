@@ -14,6 +14,7 @@
  */
 
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/includes/asset_version.php';
 
 $db = getDatabase();
 $account = null;
@@ -55,6 +56,7 @@ if ($account) {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
 <title><?php echo $account ? htmlspecialchars($account['brand_name']) . ' Portal' : 'Brand Portal'; ?> - Trolley Report</title>
+<link rel="icon" href="<?php echo trolley_asset_href('favicon.svg'); ?>" type="image/svg+xml">
 
 <?php if ($account): ?>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -78,7 +80,7 @@ if ($account) {
  crossorigin="anonymous"></script>
 <?php endif; ?>
 
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="<?php echo trolley_asset_href('styles.css'); ?>">
     <style>
         /* --- brand_portal.php page-specific styles --- */
         body { padding: 5px; }
@@ -174,7 +176,15 @@ if ($account) {
             .detail-content h4 { font-size: 0.95em; }
             .detail-content span { font-size: 0.85em; }
             .time-part { display: none; }
-            .back-link { padding: 8px 12px; font-size: 0.9em; }
+            .back-link {
+                padding: 8px 12px; font-size: 0.9em;
+                min-height: 44px; box-sizing: border-box;
+                display: inline-flex; align-items: center; justify-content: center;
+            }
+            .pagination button {
+                min-height: 44px; box-sizing: border-box;
+                display: inline-flex; align-items: center; justify-content: center;
+            }
             .stat-grid { grid-template-columns: repeat(2, 1fr); }
         }
 

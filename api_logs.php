@@ -17,6 +17,9 @@
  * Version: 1.5
  */
 
+if (function_exists('header_remove')) {
+    header_remove('X-Powered-By');
+}
 header('Content-Type: application/json');
 header('Cache-Control: no-cache, must-revalidate');
 header('X-Content-Type-Options: nosniff');

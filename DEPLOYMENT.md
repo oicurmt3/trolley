@@ -61,7 +61,9 @@ Never commit the real admin bcrypt hash. On the server:
 2. Paste the hash from your **existing** live `admin.php` before uploading the new `admin.php`
 3. Confirm `config.local.php` is gitignored and denied by `.htaccess`
 
-**Brand portal tokens:** After deploying, rotate any brand portal tokens that may have been exposed by the old public `api_brand_portals.php` endpoint (Admin → Brand accounts → New Token).
+**Brand portal tokens:** After deploying, rotate any brand portal tokens that may have been exposed by the old public `api_brand_portals.php` endpoint. In **Admin → Brand accounts**, use **Regenerate all brand tokens** (confirm dialog) or **New Token** per account, then re-send portal links to each brand.
+
+**Admin CSRF / login throttle:** Deploy `includes/admin_security.php` and ensure the server can write `data/admin_login_throttle.json` (directory `data/` is blocked from HTTP by `.htaccess`). After login, keep the admin tab open or reload if you see CSRF errors on mutations.
 
 ## Environment Variables / Config
 

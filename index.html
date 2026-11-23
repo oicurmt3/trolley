@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Report Abandoned Shopping Trolleys (it only take 3 taps)">
+    <meta name="description" content="Report abandoned shopping trolleys in Western Australia — it only takes 3 taps.">
     <title>WA Trolley Report - Find & Report Abandoned Trolleys</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="styles.css">
 <style>
     /* --- index.html page-specific styles --- */
@@ -148,7 +149,8 @@
         .button-grid button { font-size: 0.85em; padding: 8px; }
         .button-grid button.active { padding: 8px; }
         .condition-section .button-grid button.active { padding: 8px; }
-        #char-counter { margin-top: 0px; font-size: 0.6em; }
+        #char-counter { margin-top: 0px; font-size: 12px; }
+        p.notice { font-size: 12px; }
         .modal-content { width: 95%; margin-top: 10%; padding: 20px; }
         .modal-header { margin: -20px -20px 15px -20px; }
         #manual-email-copy-area-modal textarea { width: calc(100% - 60px); }
@@ -157,27 +159,31 @@
 </style>
 </head>
 <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
     <div class="container">
         <header>
             <h1>WA Trolley Report <icon>🛒</icon><span>Find & Report Abandoned Trolleys in WA</span></h1>
         </header>
-        <main>
+        <main id="main-content">
             <form id="trolley-form">
 
                 <section class="form-group">
-                    <label for="location">Trolley Location*</label>
+                    <label for="get-location-btn">Trolley Location*</label>
                    <p class="notice">You must be at the same location as the trolley when reporting</p>
                     <div class="location-group">
                         <button type="button" id="get-location-btn" class="secondary full-width">Get Trolley Location</button>
                         <span id="location-display"></span>
+                        <p id="location-feedback" class="notice2" role="status" aria-live="polite"></p>
                     </div>
-                    <input type="hidden" id="latitude" name="latitude" required>
-                    <input type="hidden" id="longitude" name="longitude" required>
-                    <input type="hidden" id="timestamp" name="timestamp" required>
+                    <input type="hidden" id="latitude" name="latitude" aria-describedby="location-feedback">
+                    <input type="hidden" id="longitude" name="longitude">
+                    <input type="hidden" id="timestamp" name="timestamp">
                 </section>
 
                 <section class="form-group brand-section required-group" data-group-name="brand">
-                    <label>Trolley Brands*</label>
+                    <fieldset style="border:none;padding:0;margin:0;">
+                    <legend class="visually-hidden">Trolley brands (select at least one)</legend>
+                    <label id="brand-selection-label">Trolley Brands*</label>
                     <div class="button-grid">
                         <button type="button" data-value="Coles">Coles</button>
                         <button type="button" data-value="Woolworths">Woolworths</button>
@@ -190,6 +196,7 @@
                         <button type="button" data-value="Other">Other</button>
                     </div>
                     <input type="hidden" name="brands" class="group-value">
+                    </fieldset>
                 </section>
 
                 <div id="condition-sections-container">
@@ -371,6 +378,7 @@
         const resetFormBtn = document.getElementById('reset-form-btn');
         const getLocationBtn = document.getElementById('get-location-btn');
         const locationDisplay = document.getElementById('location-display');
+        const locationFeedback = document.getElementById('location-feedback');
         const latInput = document.getElementById('latitude');
         const lonInput = document.getElementById('longitude');
         const timestampInput = document.getElementById('timestamp');
@@ -489,6 +497,7 @@
             timestampInput.value = inputTime;
             locationDisplay.innerHTML = `Date/Time: ${displayTime}<br />Lat: ---, Lon: --- (Acquiring...)`;
             locationDisplay.classList.add('visible');
+            if (locationFeedback) locationFeedback.textContent = 'Getting GPS location…';
             latInput.value = ''; lonInput.value = '';
             getLocationBtn.parentElement.classList.remove('error-group');
             const label = getLocationBtn.parentElement.previousElementSibling;
@@ -496,6 +505,7 @@
 
             if (!navigator.geolocation) {
                 locationDisplay.innerHTML = `Date/Time: ${displayTime}<br />Lat: ---, Lon: --- (Geolocation not supported)`;
+                if (locationFeedback) locationFeedback.textContent = 'Geolocation is not supported in this browser.';
                 return;
             }
             navigator.geolocation.getCurrentPosition(
@@ -504,6 +514,7 @@
                     const lon = position.coords.longitude.toFixed(6);
                     latInput.value = lat; lonInput.value = lon;
                     locationDisplay.innerHTML = `Date/Time: ${displayTime}<br />Lat: <span class="latlon">${lat}</span>, Lon: <span class="latlon">${lon}</span>`;
+                    if (locationFeedback) locationFeedback.textContent = 'Location captured. You can submit when the form is complete.';
                 },
                 (error) => {
                     let message = 'Lat: ---, Lon: --- (';
@@ -514,6 +525,7 @@
                         default: message += "Unknown error)"; break;
                     }
                     locationDisplay.innerHTML = `Date/Time: ${displayTime}<br />${message}`;
+                    if (locationFeedback) locationFeedback.textContent = message.replace(/^\s*Lat:[^)]+\)\s*/, '') || 'Could not get location.';
                 },
                 { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
             );
@@ -615,6 +627,7 @@
                 locationGroup.classList.add('error-group');
                 const label = locationGroup.previousElementSibling; // Get the <label>
                  if (label) label.classList.add('error-label');
+                 if (locationFeedback) locationFeedback.textContent = 'Tap “Get Trolley Location” and allow GPS access before submitting.';
             }
 
             // Validate brand selection

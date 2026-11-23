@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Map of reported abandoned shopping trolleys across Western Australia.">
 <title>Trolley Map - Reported Abandoned Trolleys</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
@@ -81,20 +83,22 @@
     </style>
 </head>
 <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
     <div class="container">
+        <main id="main-content">
         <h1>Trolley Map</h1>
         <div id="map"></div> <div class="brand-links-container">
              <h2>Brand Maps</h2>
              <div class="brand-links">
-                 <a href="map_brand.html?brand=Coles" class="brand-link-button brand-coles">CO</a>
-                 <a href="map_brand.html?brand=Woolworths" class="brand-link-button brand-woolworths">WO</a>
-                 <a href="map_brand.html?brand=Aldi" class="brand-link-button brand-aldi">AL</a>
-                 <a href="map_brand.html?brand=IGA" class="brand-link-button brand-iga">IG</a>
-                 <a href="map_brand.html?brand=Kmart" class="brand-link-button brand-kmart">KM</a>
-                 <a href="map_brand.html?brand=BigW" class="brand-link-button brand-bigw">BI</a>
-                 <a href="map_brand.html?brand=Bunnings" class="brand-link-button brand-bunnings">BU</a>
-                 <a href="map_brand.html?brand=Spudshed" class="brand-link-button brand-spudshed">SP</a>
-                 <a href="map_brand.html?brand=Other" class="brand-link-button brand-other">Other</a>
+                 <a href="map_brand.html?brand=Coles" class="brand-link-button brand-coles" title="Coles trolley map" aria-label="Coles trolley map">CO</a>
+                 <a href="map_brand.html?brand=Woolworths" class="brand-link-button brand-woolworths" title="Woolworths trolley map" aria-label="Woolworths trolley map">WO</a>
+                 <a href="map_brand.html?brand=Aldi" class="brand-link-button brand-aldi" title="Aldi trolley map" aria-label="Aldi trolley map">AL</a>
+                 <a href="map_brand.html?brand=IGA" class="brand-link-button brand-iga" title="IGA trolley map" aria-label="IGA trolley map">IG</a>
+                 <a href="map_brand.html?brand=Kmart" class="brand-link-button brand-kmart" title="Kmart trolley map" aria-label="Kmart trolley map">KM</a>
+                 <a href="map_brand.html?brand=BigW" class="brand-link-button brand-bigw" title="Big W trolley map" aria-label="Big W trolley map">BI</a>
+                 <a href="map_brand.html?brand=Bunnings" class="brand-link-button brand-bunnings" title="Bunnings trolley map" aria-label="Bunnings trolley map">BU</a>
+                 <a href="map_brand.html?brand=Spudshed" class="brand-link-button brand-spudshed" title="Spudshed trolley map" aria-label="Spudshed trolley map">SP</a>
+                 <a href="map_brand.html?brand=Other" class="brand-link-button brand-other" title="Other brands trolley map" aria-label="Other brands trolley map">Other</a>
              </div>
         </div>
 
@@ -102,6 +106,7 @@
             <a href="index.html" class="back-link">Report</a>
             <a href="view_logs.php" class="back-link">List</a>
         </div>
+        </main>
     </div>
 
     <script>
@@ -125,7 +130,7 @@
 
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
-                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
 
             // ** NEW: Initialize MarkerClusterGroup **

@@ -54,8 +54,8 @@
     --woolworths-hover-bg: #47a03d;
     --aldi-bg: #00005F;
     --aldi-hover-bg: #00004a;
-    --iga-bg: #D8C69D;
-    --iga-text: #333333;
+    --iga-bg: #c4ad7a;
+    --iga-text: #1a1a1a;
     --iga-hover-bg: #c2b28d;
     --kmart-bg: #E92A28;
     --kmart-hover-bg: #c72321;
@@ -277,14 +277,42 @@ button.full-width { width: 100%; }
 
 
 /* --- Disclaimer (footer text) --- */
-.disclaimer { font-size: 12px; text-align: center; margin-top: 40px; color: #777; }
-.disclaimer a { color: #888; text-decoration: none; }
+.skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    z-index: 10000;
+    padding: 10px 16px;
+    background: var(--button-bg);
+    color: var(--button-text);
+    border-radius: 0 0 6px 0;
+    font-weight: bold;
+}
+.skip-link:focus {
+    left: 0;
+    outline: 2px solid var(--highlight);
+}
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.disclaimer { font-size: 12px; text-align: center; margin-top: 40px; color: #9a9a9a; }
+.disclaimer a { color: #b0b0b0; text-decoration: none; }
+.disclaimer a:hover { color: var(--link-color); }
 
 
 /* --- Responsive Base --- */
 @media (max-width: 768px) {
     body { padding: 5px; }
-    .disclaimer { font-size: 9.5px; margin-top: 30px; }
+    .disclaimer { font-size: 12px; margin-top: 30px; }
     .bottom-message { font-size: 0.6em; }
     .back-link { padding: 8px 12px; font-size: 0.9em; }
 

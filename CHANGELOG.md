@@ -7,6 +7,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased] - 2026-11 (GitHub sync / hardening)
 
 ### Added
+- Admin CSRF (`X-Admin-CSRF` / login form), login throttling (`data/admin_login_throttle.json`), **Regenerate all brand tokens**
+- `includes/admin_security.php`, shared `favicon.svg`, skip links and landmark `<main>` on key pages
 - Git sync from live site snapshot (2026-10-20): SQLite storage, admin panel, brand portals, `api_logs.php`, consolidated `map_brand.html`
 - `config.local.example.php` for admin bcrypt hash (real hash only on server in `config.local.php`)
 - `map_my_location.js` / `.css` — “Go to my location” on `map_view.html` and `map_brand.html`
@@ -14,6 +16,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - GitHub Actions PHP syntax lint workflow
 
 ### Changed
+- `.htaccess`: proxy-safe HTTPS redirect, block `data/` and `includes/` via `RewriteRule` (fixes common 500 from `DirectoryMatch`)
+- Accessibility/contrast QA: location validation feedback, brand filter labels, OSM `https` attribution, WCAG-minded IGA/disclaimer colours
 - XSS fixes: `view_logs.php` detail rows and `index.html` submit summary modal use safe DOM/`textContent`
 - Server rate limit: 25 submissions per hour per hashed IP (existing `rate_limits.json` mechanism)
 - Generic 500 responses from `log_trolley.php` (no log payload on errors)

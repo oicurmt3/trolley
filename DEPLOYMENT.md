@@ -5,11 +5,17 @@ Quick deployment reference. For full detail see [DEPLOYMENT_GUIDE.md](DEPLOYMENT
 
 ## Asset cache busting
 
-Local stylesheets and scripts (`styles.css`, `map_my_location.css`, `map_my_location.js`) are served with a `?v=` query string so browsers pick up changes after deploy.
+Local static assets are served with `?v=<TROLLEY_ASSET_VERSION>` so browsers pick up changes after deploy. This applies to relative `href` / `src` URLs ending in `.css`, `.js`, `.svg`, `.png`, `.ico`, or `.webmanifest` (for example `styles.css`, `favicon.svg`, `map_my_location.js`). External URLs (`https://`, `//`, site-absolute `/…`) are never modified.
 
-1. Bump **`TROLLEY_ASSET_VERSION`** in `includes/asset_version.php` whenever those files change.
-2. PHP pages use `trolley_asset_href()` automatically.
-3. Static `.html` pages: run `php tools/apply_asset_version.php` from the repo root to sync `?v=` on all HTML files (or match the constant manually).
+1. Bump **`TROLLEY_ASSET_VERSION`** in `includes/asset_version.php` whenever any busted asset file changes.
+2. PHP pages: use `trolley_asset_href('path/to/asset.ext')` in templates (preferred).
+3. Static `.html` and any root `.php` pages with literal asset URLs: run from the repo root:
+
+   ```bash
+   php tools/apply_asset_version.php
+   ```
+
+   The script is **idempotent** (replaces an existing `?v=`, never appends a second one). Re-run after bumping the constant.
 
 Do not change the version for unrelated edits (avoids unnecessary cache churn).
 

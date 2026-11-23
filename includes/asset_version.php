@@ -2,8 +2,8 @@
 /**
  * Static asset cache-bust token for local CSS/JS.
  *
- * Bump TROLLEY_ASSET_VERSION whenever styles.css, map_my_location.*, or other
- * cache-busted assets change. See DEPLOYMENT.md (Asset cache busting).
+ * Bump TROLLEY_ASSET_VERSION when any local busted asset changes (CSS, JS,
+ * favicon, images, web manifest). See DEPLOYMENT.md (Asset cache busting).
  */
 
 declare(strict_types=1);

@@ -7,6 +7,19 @@ declare(strict_types=1);
  * @param mixed $contacts
  * @return array<string, array{email: string, phone: string}>
  */
+function normalize_mailto_recipients(string $emailField): string
+{
+    $parts = preg_split('/[;,]+/', $emailField) ?: [];
+    $clean = [];
+    foreach ($parts as $part) {
+        $part = trim($part);
+        if ($part !== '' && filter_var($part, FILTER_VALIDATE_EMAIL)) {
+            $clean[] = $part;
+        }
+    }
+    return implode(',', $clean);
+}
+
 function reporter_safe_brand_contacts($contacts): array
 {
     if (!is_array($contacts)) {
@@ -17,8 +30,9 @@ function reporter_safe_brand_contacts($contacts): array
         if (!is_string($brand) || !is_array($info)) {
             continue;
         }
+        $emailRaw = isset($info['email']) ? (string) $info['email'] : '';
         $safe[$brand] = [
-            'email' => isset($info['email']) ? (string) $info['email'] : '',
+            'email' => normalize_mailto_recipients($emailRaw),
             'phone' => isset($info['phone']) ? (string) $info['phone'] : '',
         ];
     }

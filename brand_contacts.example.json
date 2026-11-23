@@ -12,7 +12,7 @@
         "phone": ""
     },
     "IGA": {
-        "email": "hostmaster@metcash.com;privacy@metcash.com",
+        "email": "hostmaster@metcash.com,privacy@metcash.com",
         "phone": "0297413000"
     },
     "Kmart": {
@@ -24,7 +24,7 @@
         "phone": "1800 641 497"
     },
     "Bunnings": {
-        "email": "support@bunnings.com.au;info@bunnings.com.au;scamwatch@bunnings.com.au;info@wesfarmers.com.au;customersupport@bunnings.com.au;privacy@bunnings.com.au",
+        "email": "support@bunnings.com.au,info@bunnings.com.au,scamwatch@bunnings.com.au,info@wesfarmers.com.au,customersupport@bunnings.com.au,privacy@bunnings.com.au",
         "phone": "1300 554 777"
     },
     "Spudshed": {

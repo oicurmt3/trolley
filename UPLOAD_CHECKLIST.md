@@ -113,7 +113,9 @@ On an existing live site, **keep** the current `brand_contacts.json` — do not 
 
 ### 5.2c Brand portal links (reporters)
 
-Reporter `mailto:` emails **never** include portal tokens. After token rotation, email each brand its new portal URL from **Admin → Brand accounts** (Copy link). There is no server-sent brand email in this app.
+Reporter `mailto:` emails **never** include portal tokens. There is **no** server `mail()` path in this release. After token rotation, the **owner** copies each brand’s portal URL from **Admin → Brand accounts** and sends it privately (not via the reporter form). Automatic server-sent email is a possible **future** feature.
+
+**Public JSON:** `lga_contact_details.json` and `suburb_lga_mapping.json` remain web-accessible by design.
 
 ### 5.3 Database migration (no manual DB editing)
 

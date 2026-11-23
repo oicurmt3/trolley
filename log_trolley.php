@@ -269,7 +269,7 @@ if (!empty($referer)) {
 
 // --- Server-Side Rate Limiting ---
 if (!checkRateLimit($rateLimitFilePath, $rateLimitMaxRequests, $rateLimitWindowSeconds)) {
-    sendJsonResponse('error', 'Submission limit reached (20 per 12 hours). Please try again later.', 429);
+    sendJsonResponse('error', 'Submission limit reached (25 per hour). Please try again later.', 429);
 }
 
 // --- Get & Decode JSON Data ---
@@ -278,9 +278,9 @@ if (empty($jsonPayload)) {
     sendJsonResponse('error', 'No data received.', 400);
 }
 
-// Limit payload size (prevent abuse via large payloads)
+// Limit payload size — 10_000 bytes fits all legitimate submissions
 if (strlen($jsonPayload) > 10000) {
-    sendJsonResponse('error', 'Request payload too large.', 413);
+    sendJsonResponse('error', 'Request payload too large (maximum 10,000 bytes).', 413);
 }
 
 $logDataFromClient = json_decode($jsonPayload, true);
@@ -323,11 +323,13 @@ if ($latitude < -90.0 || $latitude > 90.0 || $longitude < -180.0 || $longitude >
     sendJsonResponse('error', 'Coordinates out of valid GPS range.', 400);
 }
 
-// Optional: Restrict to approximate Australian bounds (loose)
-// Latitude: -10 to -45, Longitude: 110 to 155
-if ($latitude < -45.0 || $latitude > -10.0 || $longitude < 110.0 || $longitude > 155.0) {
-    error_log("PHP Warning: Coordinates outside Australian bounds: $latitude, $longitude. Allowing submission but flagging.");
-    // We allow it but log it -- could be legitimate (e.g., near borders)
+// Western Australia bounds (approximate)
+$waLatMin = -35.5;
+$waLatMax = -13.5;
+$waLonMin = 112.5;
+$waLonMax = 129.5;
+if ($latitude < $waLatMin || $latitude > $waLatMax || $longitude < $waLonMin || $longitude > $waLonMax) {
+    sendJsonResponse('error', 'Location must be within Western Australia. Move to the trolley and try again.', 400);
 }
 
 // Sanitise latitude/longitude to string with 6 decimal places
@@ -356,32 +358,38 @@ $logDataFromClient['brands'] = $sanitisedBrands;
 if (isset($logDataFromClient['conditions']) && is_array($logDataFromClient['conditions'])) {
     $sanitisedConditions = [];
     foreach ($logDataFromClient['conditions'] as $brand => $conditionArray) {
-        // Only accept conditions for valid brands that were submitted
-        if (!in_array($brand, $sanitisedBrands, true)) {
+        if (!is_string($brand) || !in_array($brand, $sanitisedBrands, true)) {
             continue;
         }
-        if (is_array($conditionArray)) {
-            $validBrandConditions = [];
-            foreach ($conditionArray as $condition) {
-                if (is_string($condition) && in_array($condition, $validConditions, true)) {
-                    $validBrandConditions[] = $condition;
-                }
+        if (!is_array($conditionArray)) {
+            sendJsonResponse('error', 'Invalid conditions format for ' . $brand . '.', 400);
+        }
+        $validBrandConditions = [];
+        foreach ($conditionArray as $condition) {
+            if (!is_string($condition) || !in_array($condition, $validConditions, true)) {
+                sendJsonResponse('error', 'Invalid condition value for ' . $brand . '.', 400);
             }
-            if (!empty($validBrandConditions)) {
-                $sanitisedConditions[$brand] = $validBrandConditions;
-            }
+            $validBrandConditions[] = $condition;
+        }
+        if ($validBrandConditions !== []) {
+            $sanitisedConditions[$brand] = $validBrandConditions;
         }
     }
     $logDataFromClient['conditions'] = $sanitisedConditions;
 } else {
-    // Remove conditions if not a valid array
     unset($logDataFromClient['conditions']);
 }
 
-// --- Sanitise comments (server-side enforcement) ---
+// --- Comments (max 200 characters; reject, do not truncate) ---
 if (isset($logDataFromClient['comments'])) {
+    if (!is_string($logDataFromClient['comments'])) {
+        sendJsonResponse('error', 'Comments must be plain text.', 400);
+    }
+    if (mb_strlen($logDataFromClient['comments']) > 200) {
+        sendJsonResponse('error', 'Comments must be 200 characters or fewer.', 400);
+    }
     $logDataFromClient['comments'] = sanitiseString($logDataFromClient['comments'], 200);
-    if (empty($logDataFromClient['comments'])) {
+    if ($logDataFromClient['comments'] === '') {
         unset($logDataFromClient['comments']);
     }
 } else {

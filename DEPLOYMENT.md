@@ -65,6 +65,8 @@ Never commit the real admin bcrypt hash. On the server:
 
 **CORS:** Set `cors_allowed_origins` in `config.local.php` (see `config.local.example.php`). Defaults: `https://sandgroper.net` and `https://www.sandgroper.net`.
 
+**Public mapping JSON:** `lga_contact_details.json` and `suburb_lga_mapping.json` are intentionally served to the browser for LGA lookup; do not add them to the deny list unless you change the app to load them another way.
+
 **Admin CSRF / login throttle:** Deploy `includes/admin_security.php` and ensure the server can write `data/admin_login_throttle.json` (directory `data/` is blocked from HTTP by `.htaccess`). After login, keep the admin tab open or reload if you see CSRF errors on mutations.
 
 **Database migration:** After uploading files, run `php migrate_20261123.php` once from cPanel Terminal (see `UPLOAD_CHECKLIST.md`). No manual editing of `trolley_data.db` is required.
@@ -81,7 +83,8 @@ Most configuration is inline in source files. Key values to update for a new dep
 | CORS origin                  | `log_trolley.php` | `*` (should be restricted)                                    |
 | Map default centre           | `map_view.html`   | `[-31.9523, 115.8613]` (Perth)                                |
 | Brand email addresses        | `index.html`      | Hardcoded `brandEmailAddresses` object                        |
-| Submission rate limit         | `index.html`      | 20 per 12 hours (cookie-based)                                |
+| Submission rate limit (server)| `log_trolley.php` | 25 submissions per hour per hashed IP (`rate_limits.json`)   |
+| POST body size cap            | `log_trolley.php` | 10,000 bytes (not 64 KiB)                                    |
 | Comment character limit       | `index.html`      | 200 characters                                                |
 
 

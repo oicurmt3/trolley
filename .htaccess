@@ -5,20 +5,23 @@
 
 # --- Force HTTPS (cPanel / reverse-proxy safe) ---
 RewriteEngine On
+# URL path prefix for this install (must match public path, NOT the filesystem path).
+RewriteBase /trolley/
+
 RewriteCond %{HTTPS} off
 RewriteCond %{HTTP:X-Forwarded-Proto} !https [NC]
 RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-# Legacy brand map URLs -> consolidated map_brand.html
-RewriteRule ^map_coles\.html$ map_brand.html?brand=Coles [R=302,L,QSA]
-RewriteRule ^map_woolworths\.html$ map_brand.html?brand=Woolworths [R=302,L,QSA]
-RewriteRule ^map_aldi\.html$ map_brand.html?brand=Aldi [R=302,L,QSA]
-RewriteRule ^map_iga\.html$ map_brand.html?brand=IGA [R=302,L,QSA]
-RewriteRule ^map_kmart\.html$ map_brand.html?brand=Kmart [R=302,L,QSA]
-RewriteRule ^map_bigw\.html$ map_brand.html?brand=BigW [R=302,L,QSA]
-RewriteRule ^map_bunnings\.html$ map_brand.html?brand=Bunnings [R=302,L,QSA]
-RewriteRule ^map_spudshed\.html$ map_brand.html?brand=Spudshed [R=302,L,QSA]
-RewriteRule ^map_other\.html$ map_brand.html?brand=Other [R=302,L,QSA]
+# Legacy brand map URLs -> consolidated map (absolute path avoids filesystem Location leaks)
+RewriteRule ^map_coles\.html$ /trolley/map_brand.html?brand=Coles [R=302,L,QSA]
+RewriteRule ^map_woolworths\.html$ /trolley/map_brand.html?brand=Woolworths [R=302,L,QSA]
+RewriteRule ^map_aldi\.html$ /trolley/map_brand.html?brand=Aldi [R=302,L,QSA]
+RewriteRule ^map_iga\.html$ /trolley/map_brand.html?brand=IGA [R=302,L,QSA]
+RewriteRule ^map_kmart\.html$ /trolley/map_brand.html?brand=Kmart [R=302,L,QSA]
+RewriteRule ^map_bigw\.html$ /trolley/map_brand.html?brand=BigW [R=302,L,QSA]
+RewriteRule ^map_bunnings\.html$ /trolley/map_brand.html?brand=Bunnings [R=302,L,QSA]
+RewriteRule ^map_spudshed\.html$ /trolley/map_brand.html?brand=Spudshed [R=302,L,QSA]
+RewriteRule ^map_other\.html$ /trolley/map_brand.html?brand=Other [R=302,L,QSA]
 
 # --- Block access to sensitive files ---
 # Error log, rate limit data, legacy files, and this .htaccess itself

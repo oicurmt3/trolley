@@ -4,6 +4,12 @@
 **Source branch:** `cursor/live-sync-and-hardening-4807`  
 **Secrets:** Never commit or upload `config.local.php`, `brand_tokens.local.json`, or password hashes.
 
+**Email / portal (decision):** Reporter emails are **client `mailto:` only** — no server `mail()` in this release. Portal links are **not** sent to reporters; the owner copies each brand’s portal URL from **Admin → Brand accounts** and sends it privately. Automatic server-sent email may be a **future** feature.
+
+**Public reference JSON:** `lga_contact_details.json` and `suburb_lga_mapping.json` remain **web-readable** (used for council lookup / admin). They are not in the `.htaccess` deny list.
+
+**`.htaccess`:** `RewriteBase /trolley/` must match this install path (not the filesystem path) so legacy `map_*.html` redirects emit `https://<host>/trolley/map_brand.html?brand=…`.
+
 This manifest is separate from `UPLOAD_CHECKLIST.md` (human-oriented). Follow steps in order.
 
 ---
@@ -115,12 +121,14 @@ map_spudshed.html
 map_other.html
 ```
 
-### 4.5 — Reference JSON (only if intentionally updating council mapping)
+### 4.5 — Reference JSON
 
 ```
 lga_contact_details.json
 suburb_lga_mapping.json
 ```
+
+These stay **public** (frontend/admin fetch them). Upload only when intentionally replacing mapping data.
 
 Do **not** upload `brand_contacts.json` or `trolley_logs.json` on an existing site.
 

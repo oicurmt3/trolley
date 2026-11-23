@@ -406,13 +406,19 @@
             "Coles": "ccccontactus@coles.com.au",
             "Woolworths": "info@trolleytracker.com.au",
             "Aldi": "customer@service.aldi.com.au",
-            "IGA": "hostmaster@metcash.com;privacy@metcash.com",
+            "IGA": "hostmaster@metcash.com,privacy@metcash.com",
             "Kmart": "info@wesfarmers.com.au",
-            "Bunnings": "support@bunnings.com.au;info@bunnings.com.au;scamwatch@bunnings.com.au;info@wesfarmers.com.au;customersupport@bunnings.com.au;privacy@bunnings.com.au",
+            "Bunnings": "support@bunnings.com.au,info@bunnings.com.au,scamwatch@bunnings.com.au,info@wesfarmers.com.au,customersupport@bunnings.com.au,privacy@bunnings.com.au",
             "BigW": "info@trolleytracker.com.au",
             "Spudshed": "CustomerService@spudshed.com.au",
             "Other": ""
         };
+        /** RFC 6068: multiple mailto recipients use comma separation */
+        function mailtoRecipients(emailField) {
+            if (!emailField) return '';
+            return emailField.split(/[;,]+/).map(s => s.trim()).filter(Boolean).join(',');
+        }
+
         async function fetchCsrfToken() {
             try {
                 const response = await fetch('log_trolley.php', {
@@ -426,7 +432,7 @@
                     if (data.brandContacts) {
                         const serverEmails = {};
                         for (const [key, info] of Object.entries(data.brandContacts)) {
-                            serverEmails[key] = info.email || '';
+                            serverEmails[key] = mailtoRecipients(info.email || '');
                         }
                         brandEmailAddresses = serverEmails;
                     }
@@ -733,7 +739,7 @@
                     if (result.brandContacts) {
                         const serverEmails = {};
                         for (const [key, info] of Object.entries(result.brandContacts)) {
-                            serverEmails[key] = info.email || '';
+                            serverEmails[key] = mailtoRecipients(info.email || '');
                         }
                         brandEmailAddresses = serverEmails;
                     }
@@ -1008,7 +1014,7 @@
                             const suburbForSubject = submissionData.suburb || '[Suburb]';
                             const subject = `Abandoned ${brand} Trolley in ${suburbForSubject} ${dateForSubject}`;
                             const body = generateTrolleyEmailBody(brand, submissionData, "Brand");
-                            const mailtoLink = `mailto:${brandEmailAddresses[brand]}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                            const mailtoLink = `mailto:${mailtoRecipients(brandEmailAddresses[brand])}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
                             window.location.href = mailtoLink;
                             showManualCopyUI(brand, brandEmailAddresses[brand], subject, body, "Brand");

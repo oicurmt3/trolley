@@ -120,6 +120,57 @@ button.thirdly:hover { background-color: var(--button-thirdly-hover-bg); color: 
 button.full-width { width: 100%; }
 
 
+/* --- Form controls (admin / portal / list filters) --- */
+.app-input,
+#filter-bar input[type="date"] {
+    box-sizing: border-box;
+    min-height: 44px;
+    padding: 10px 12px;
+    font-size: 0.95em;
+    font-family: inherit;
+    line-height: 1.35;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    background-color: var(--input-bg);
+    color: var(--input-text);
+    color-scheme: dark;
+    max-width: 100%;
+}
+.app-input::placeholder,
+#filter-bar input[type="date"]::placeholder {
+    color: #999;
+}
+.app-input:focus,
+#filter-bar input[type="date"]:focus {
+    outline: 2px solid var(--highlight);
+    outline-offset: 1px;
+    border-color: var(--highlight);
+}
+#filter-bar input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.85;
+    filter: invert(0.85);
+    padding: 2px;
+}
+#filter-bar input[type="date"]::-webkit-datetime-edit {
+    padding: 0;
+}
+#filter-bar fieldset + fieldset > div {
+    row-gap: 12px;
+    column-gap: 12px;
+}
+@media (max-width: 768px) {
+    #filter-bar input[type="date"] {
+        font-size: 16px;
+        flex: 1 1 9.5rem;
+        min-width: 9rem;
+    }
+    #filter-bar fieldset + fieldset label {
+        flex: 0 0 auto;
+    }
+}
+
+
 /* --- Back Link (used on content pages) --- */
 .back-link {
     display: inline-block;

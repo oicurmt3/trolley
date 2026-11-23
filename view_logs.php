@@ -209,6 +209,56 @@ tr.detail-row td { background-color: var(--detail-row-bg); white-space: normal; 
     let dateFromFilter = ''; // YYYY-MM-DD or empty
     let dateToFilter = '';   // YYYY-MM-DD or empty
 
+    const PERTH_TZ = 'Australia/Perth';
+    const perthYmdFormatter = new Intl.DateTimeFormat('en-CA', {
+        timeZone: PERTH_TZ,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+    });
+
+    /** Same parsing as table date/time display (ISO + naive fallback). */
+    function parseLogTimestamp(isoTimestamp) {
+        if (!isoTimestamp) return null;
+        try {
+            const date = new Date(isoTimestamp);
+            if (!isNaN(date.getTime())) return date;
+            const alternativeDate = new Date(String(isoTimestamp).replace('T', ' ').replace(/-/g, '/'));
+            if (!isNaN(alternativeDate.getTime())) return alternativeDate;
+        } catch (e) {
+            console.error('Timestamp parse error for:', isoTimestamp, e);
+        }
+        return null;
+    }
+
+    /** Calendar date in Australia/Perth as YYYY-MM-DD (for date-range filter). */
+    function perthCalendarYmd(isoTimestamp) {
+        if (!isoTimestamp) return '';
+        const date = parseLogTimestamp(isoTimestamp);
+        if (date) {
+            const parts = perthYmdFormatter.formatToParts(date);
+            let year = '';
+            let month = '';
+            let day = '';
+            for (const p of parts) {
+                if (p.type === 'year') year = p.value;
+                else if (p.type === 'month') month = p.value;
+                else if (p.type === 'day') day = p.value;
+            }
+            if (year && month && day) {
+                return year + '-' + month + '-' + day;
+            }
+        }
+        const s = String(isoTimestamp);
+        return /^\d{4}-\d{2}-\d{2}/.test(s) ? s.substring(0, 10) : '';
+    }
+
+    function attachPerthFilterDate(log) {
+        const ts = log.serverTimestampUTC || log.timestamp || '';
+        log._perthDateYmd = perthCalendarYmd(ts);
+        return log;
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         fetchLogs();
         setupFilterListeners();
@@ -224,8 +274,7 @@ tr.detail-row td { background-color: var(--detail-row-bg); white-space: normal; 
             }
             // Date range filter
             if (dateFromFilter || dateToFilter) {
-                const ts = log.serverTimestampUTC || log.timestamp || '';
-                const logDate = ts.substring(0, 10); // YYYY-MM-DD
+                const logDate = log._perthDateYmd || '';
                 if (!logDate) return false;
                 if (dateFromFilter && logDate < dateFromFilter) return false;
                 if (dateToFilter && logDate > dateToFilter) return false;
@@ -433,7 +482,10 @@ tr.detail-row td { background-color: var(--detail-row-bg); white-space: normal; 
              if (!response.ok) { throw new Error(`HTTP error! Status: ${response.status}`); }
              let data = await response.json();
              if (!Array.isArray(data)) { throw new Error("Invalid data format received."); }
-             data = data.map((log, index) => { log._rowId = generateStableRowId(log, index); return log; });
+             data = data.map((log, index) => {
+                 log._rowId = generateStableRowId(log, index);
+                 return attachPerthFilterDate(log);
+             });
              allLogs = data;
              sortLogs(); // Initial sort
              filteredLogs = allLogs.slice(); // Start with all logs
@@ -453,23 +505,17 @@ tr.detail-row td { background-color: var(--detail-row-bg); white-space: normal; 
     function formatDisplayDate(isoTimestamp) { /* ... */
          if (!isoTimestamp) return 'N/A';
          try {
-             const date = new Date(isoTimestamp);
-             if (isNaN(date.getTime())) {
-                  const alternativeDate = new Date(isoTimestamp.replace('T', ' ').replace(/-/g, '/'));
-                  return !isNaN(alternativeDate.getTime()) ? alternativeDate.toLocaleString('en-AU', { timeZone: 'Australia/Perth', dateStyle: 'short' }) : isoTimestamp;
-             }
-             return date.toLocaleString('en-AU', { timeZone: 'Australia/Perth', dateStyle: 'short' });
+             const date = parseLogTimestamp(isoTimestamp);
+             if (!date) return String(isoTimestamp);
+             return date.toLocaleString('en-AU', { timeZone: PERTH_TZ, dateStyle: 'short' });
          } catch (e) { console.error("Date formatting error for:", isoTimestamp, e); return isoTimestamp; }
      }
      function formatDisplayTime(isoTimestamp) { /* ... */
          if (!isoTimestamp) return '';
          try {
-             const date = new Date(isoTimestamp);
-              if (isNaN(date.getTime())) {
-                  const alternativeDate = new Date(isoTimestamp.replace('T', ' ').replace(/-/g, '/'));
-                  return !isNaN(alternativeDate.getTime()) ? alternativeDate.toLocaleString('en-AU', { timeZone: 'Australia/Perth', timeStyle: 'short', hour12: true }) : '';
-              }
-              return date.toLocaleString('en-AU', { timeZone: 'Australia/Perth', timeStyle: 'short', hour12: true });
+             const date = parseLogTimestamp(isoTimestamp);
+             if (!date) return '';
+             return date.toLocaleString('en-AU', { timeZone: PERTH_TZ, timeStyle: 'short', hour12: true });
          } catch (e) { console.error("Time formatting error for:", isoTimestamp, e); return ''; }
      }
 

@@ -50,8 +50,8 @@ $lgaContactsFilePath = $logDirectory . '/lga_contact_details.json';
 
 // Rate limiting config
 $rateLimitFilePath = $logDirectory . '/rate_limits.json';
-$rateLimitMaxRequests = 20;        // Max submissions per window
-$rateLimitWindowSeconds = 43200;   // 12 hours in seconds
+$rateLimitMaxRequests = 25;        // Max submissions per window (per hashed IP)
+$rateLimitWindowSeconds = 3600;    // 1 hour
 
 // Geocode cache config
 $geocacheDirPath = $logDirectory . '/geocache';
@@ -81,7 +81,7 @@ $validConditions = [
 function sendJsonResponse($status, $message, $httpStatusCode = 200, $returnedData = null) {
     http_response_code($httpStatusCode);
     $response = ['status' => $status, 'message' => $message];
-    if ($returnedData !== null) {
+    if ($returnedData !== null && $status === 'success') {
         $response['logData'] = $returnedData;
     }
     echo json_encode($response);
@@ -484,25 +484,8 @@ if ($cachedGeo !== null) {
 // ==========================================================================
 
 if ($suburbName) {
-    $lgaIdentifier = null;
-
-    // Step 1: Get LGA identifier from suburb mapping
-    if (file_exists($suburbLgaMapFilePath)) {
-        $suburbMapJson = file_get_contents($suburbLgaMapFilePath);
-        $suburbLgaList = json_decode($suburbMapJson, true);
-        if (json_last_error() === JSON_ERROR_NONE && is_array($suburbLgaList)) {
-            foreach ($suburbLgaList as $mappingEntry) {
-                if (isset($mappingEntry['Suburb']) && strcasecmp($mappingEntry['Suburb'], $suburbName) == 0) {
-                    $lgaIdentifier = $mappingEntry['LGAKey'] ?? null;
-                    break;
-                }
-            }
-        } else {
-            error_log("PHP Warning: Suburb-LGA mapping file '$suburbLgaMapFilePath' might be corrupted. JSON Error: " . json_last_error_msg());
-        }
-    } else {
-        error_log("PHP Warning: Suburb-LGA mapping file not found at: " . $suburbLgaMapFilePath);
-    }
+    require_once __DIR__ . '/db.php';
+    $lgaIdentifier = getSuburbLgaKeyByName($suburbName);
 
     // Step 2: Get LGA details from contact details file
     if ($lgaIdentifier && file_exists($lgaContactsFilePath)) {
@@ -522,7 +505,7 @@ if ($suburbName) {
     } elseif ($lgaIdentifier && !file_exists($lgaContactsFilePath)) {
         error_log("PHP Warning: LGA contacts file not found at: " . $lgaContactsFilePath);
     } elseif (!$lgaIdentifier) {
-        error_log("PHP Info: No LGAKey found for suburb '$suburbName' in '$suburbLgaMapFilePath'.");
+        error_log("PHP Info: No LGAKey found for suburb '$suburbName'.");
     }
 }
 
@@ -555,7 +538,7 @@ require_once __DIR__ . '/db.php';
 $db = getDatabase();
 if ($db === null) {
     error_log("PHP Error: Could not connect to SQLite database.");
-    sendJsonResponse('error', 'Server error: Database unavailable.', 500, $finalLogEntry);
+    sendJsonResponse('error', 'Server error: Database unavailable.', 500);
 }
 
 // --- Check for nearby duplicate reports (within 50m, last 7 days) ---
@@ -564,7 +547,7 @@ $nearbyDuplicates = findNearbyDuplicates($db, $latitude, $longitude, 50, 604800)
 // Insert the new report
 $newId = insertReport($db, $finalLogEntry);
 if ($newId === false) {
-    sendJsonResponse('error', 'Server error: Failed to save log data.', 500, $finalLogEntry);
+    sendJsonResponse('error', 'Server error: Failed to save log data.', 500);
 }
 $finalLogEntry['id'] = $newId;
 

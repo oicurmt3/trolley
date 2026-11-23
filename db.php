@@ -839,4 +839,35 @@ function getReportById(PDO $db, int $id) {
         return null;
     }
 }
+
+/**
+ * Cached suburb name (case-insensitive) => LGAKey lookup from suburb_lga_mapping.json.
+ */
+function getSuburbLgaKeyByName(string $suburbName): ?string
+{
+    static $index = null;
+    if ($index === null) {
+        $index = [];
+        $path = __DIR__ . '/suburb_lga_mapping.json';
+        if (is_readable($path)) {
+            $json = file_get_contents($path);
+            if ($json !== false) {
+                $list = json_decode($json, true);
+                if (is_array($list)) {
+                    foreach ($list as $row) {
+                        if (!isset($row['Suburb'], $row['LGAKey']) || !is_string($row['Suburb']) || !is_string($row['LGAKey'])) {
+                            continue;
+                        }
+                        $key = strtolower($row['Suburb']);
+                        if (!isset($index[$key])) {
+                            $index[$key] = $row['LGAKey'];
+                        }
+                    }
+                }
+            }
+        }
+    }
+    $lookup = strtolower($suburbName);
+    return $index[$lookup] ?? null;
+}
 ?>

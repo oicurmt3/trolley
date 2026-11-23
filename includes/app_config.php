@@ -9,6 +9,7 @@ function app_config_defaults(): array
             'https://sandgroper.net',
             'https://www.sandgroper.net',
         ],
+        'site_public_base' => 'https://sandgroper.net/trolley',
     ];
 }
 
@@ -36,6 +37,9 @@ function loadAppConfig(): array
                 if ($origins !== []) {
                     $config['cors_allowed_origins'] = $origins;
                 }
+            }
+            if (!empty($local['site_public_base']) && is_string($local['site_public_base'])) {
+                $config['site_public_base'] = rtrim($local['site_public_base'], '/');
             }
         }
     }

@@ -13,8 +13,17 @@ on:
 jobs:
   php-lint:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: ['8.1', '8.3']
     steps:
       - uses: actions/checkout@v4
-      - name: Lint PHP files
+      - name: Set up PHP ${{ matrix.php-version }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          coverage: none
+      - name: Lint PHP files (syntax, PHP ${{ matrix.php-version }})
         run: |
-          find . -name '*.php' -print0 | xargs -0 -r php -l
+          find . -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -r php -l

@@ -2,18 +2,16 @@
 /**
  * rotate_brand_tokens.php — CLI brand portal token rotation
  *
- * Reads optional assignments from brand_tokens.local.json (gitignored) or generates
- * new random tokens. Never logs token values.
+ * Never prints token values to stdout/stderr (export file only, mode 0600).
  *
  * Usage:
  *   php rotate_brand_tokens.php --generate
+ *   php rotate_brand_tokens.php --generate --export /home/user/trolley_private/portals.json
+ *   php rotate_brand_tokens.php --generate --export /path/file.json --force
  *   php rotate_brand_tokens.php --from-file /path/to/brand_tokens.local.json
  *   php rotate_brand_tokens.php --dry-run --generate
  *
- * Optional: write new tokens to an output file (gitignored) for offline distribution:
- *   php rotate_brand_tokens.php --generate --export brand_tokens.generated.json
- *
- * Web access denied via .htaccess.
+ * Web access denied via .htaccess. Uses __DIR__ for all app paths (cron-safe).
  */
 declare(strict_types=1);
 
@@ -26,12 +24,89 @@ if (PHP_SAPI !== 'cli') {
     exit(1);
 }
 
+chdir(__DIR__);
+
+require_once __DIR__ . '/includes/app_config.php';
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/includes/brand_token_rotation.php';
+
+/**
+ * @return string
+ */
+function rotate_portal_token_prefix(): string
+{
+    $cfg = loadAppConfig();
+    $base = isset($cfg['site_public_base']) && is_string($cfg['site_public_base'])
+        ? $cfg['site_public_base']
+        : 'https://sandgroper.net/trolley';
+    return rtrim($base, '/') . '/brand_portal.php?token=';
+}
+
+/**
+ * Write brand → portal_url map. Tokens appear only inside portal_url in the file.
+ *
+ * @return int 0 on success, non-zero on failure
+ */
+function rotate_write_portal_export(PDO $db, string $exportPath, bool $force): int
+{
+    if ($exportPath === '') {
+        fwrite(STDERR, "ERROR: Export path is empty.\n");
+        return 5;
+    }
+
+    if (is_file($exportPath) && !$force) {
+        fwrite(STDERR, "ERROR: Export file exists; use --force to overwrite.\n");
+        return 5;
+    }
+
+    $exportDir = dirname($exportPath);
+    if (!is_dir($exportDir)) {
+        if (!@mkdir($exportDir, 0700, true) && !is_dir($exportDir)) {
+            fwrite(STDERR, "ERROR: Could not create export directory.\n");
+            return 6;
+        }
+    }
+
+    $prefix = rotate_portal_token_prefix();
+    $accounts = fetchRotatableBrandAccounts($db);
+    $payload = [
+        'exported_at' => gmdate('c'),
+        'brand_portal_links' => [],
+    ];
+    foreach ($accounts as $row) {
+        $payload['brand_portal_links'][] = [
+            'id' => (int) $row['id'],
+            'brand_name' => (string) $row['brand_name'],
+            'portal_url' => $prefix . (string) $row['token'],
+        ];
+    }
+
+    $json = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    if ($json === false) {
+        fwrite(STDERR, "ERROR: Could not encode export JSON.\n");
+        return 7;
+    }
+
+    $oldUmask = umask(0077);
+    $written = @file_put_contents($exportPath, $json . "\n", LOCK_EX);
+    umask($oldUmask);
+
+    if ($written === false) {
+        fwrite(STDERR, "ERROR: Could not write export file.\n");
+        return 7;
+    }
+
+    if (!@chmod($exportPath, 0600)) {
+        fwrite(STDERR, "WARN: Export written but chmod 0600 failed.\n");
+    }
+
+    return 0;
+}
 
 $args = $argv ?? [];
 $dryRun = in_array('--dry-run', $args, true);
 $generate = in_array('--generate', $args, true);
+$force = in_array('--force', $args, true);
 $fromFile = null;
 $exportPath = null;
 
@@ -42,6 +117,18 @@ foreach ($args as $i => $arg) {
     if ($arg === '--export' && isset($args[$i + 1])) {
         $exportPath = $args[$i + 1];
     }
+}
+
+if ($fromFile !== null && $fromFile !== '' && $fromFile[0] !== '/') {
+    $fromFile = __DIR__ . '/' . $fromFile;
+}
+
+if ($exportPath !== null && $exportPath !== '' && $exportPath[0] !== '/') {
+    $exportPath = __DIR__ . '/' . $exportPath;
+}
+
+if ($exportPath !== null && !$generate && $fromFile === null) {
+    $generate = true;
 }
 
 if (!$generate && $fromFile === null) {
@@ -62,8 +149,10 @@ if ($db === null) {
 
 if ($dryRun) {
     $count = count(fetchRotatableBrandAccounts($db));
-    echo "Dry run: would rotate {$count} brand account(s) (excluding ADMIN_INTERNAL).\n";
-    echo $fromFile ? "Source: {$fromFile}\n" : "Source: auto-generate\n";
+    echo "Dry run: would rotate {$count} brand account(s).\n";
+    if ($exportPath !== null) {
+        echo "Dry run: would write export after rotation.\n";
+    }
     exit(0);
 }
 
@@ -79,28 +168,24 @@ if ($fromFile !== null) {
 }
 
 echo 'Updated: ' . $result['updated'] . ', skipped: ' . $result['skipped'] . ".\n";
+
 if ($result['errors'] !== []) {
     foreach ($result['errors'] as $err) {
         fwrite(STDERR, "WARN: {$err}\n");
     }
 }
 
-if ($exportPath !== null && $result['updated'] > 0) {
-    $accounts = fetchRotatableBrandAccounts($db);
-    $export = ['exported_at' => gmdate('c'), 'accounts' => []];
-    foreach ($accounts as $row) {
-        $export['accounts'][] = [
-            'id' => (int) $row['id'],
-            'brand_name' => (string) $row['brand_name'],
-            'token' => (string) $row['token'],
-        ];
-    }
-    $written = file_put_contents($exportPath, json_encode($export, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-    if ($written === false) {
-        fwrite(STDERR, "WARN: Could not write export file.\n");
-    } else {
-        echo "Wrote token export to {$exportPath} (keep private; do not commit).\n";
-    }
+if ($result['updated'] < 1) {
+    fwrite(STDERR, "ERROR: No accounts updated.\n");
+    exit(4);
 }
 
-exit($result['errors'] !== [] && $result['updated'] === 0 ? 4 : 0);
+if ($exportPath !== null) {
+    $exportCode = rotate_write_portal_export($db, $exportPath, $force);
+    if ($exportCode !== 0) {
+        exit($exportCode);
+    }
+    echo 'Export written: ' . $exportPath . "\n";
+}
+
+exit(0);

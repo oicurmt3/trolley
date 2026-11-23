@@ -10,11 +10,16 @@
  *   php migrate_20261123.php
  *   php migrate_20261123.php --check   # exit 0 if applied, 1 if pending
  *
+ * Cron (cPanel PHP 8.1 CLI — use absolute script path, not cwd):
+ *   /opt/cpanel/ea-php81/root/usr/bin/php /home/perthrel/sandgroper.net/trolley/migrate_20261123.php
+ *
  * Web access is denied via .htaccess; this file refuses HTTP even if misconfigured.
  *
  * Version: 1.0
  */
 declare(strict_types=1);
+
+chdir(__DIR__);
 
 if (PHP_SAPI !== 'cli') {
     if (!headers_sent()) {

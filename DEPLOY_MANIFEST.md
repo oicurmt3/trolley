@@ -192,27 +192,40 @@ Create `data/` if missing: `mkdir data && chmod 755 data`
 
 ## Phase 7 — MIGRATION (idempotent; backs up DB first)
 
-**Method:** CLI only (HTTP must **403**).
+**No SSH on this host:** run via **one-shot cPanel Cron** using the **PHP 8.1 CLI** binary (web PHP may be 8.3).
+
+**Probe CLI PHP (once):**
 
 ```bash
-cd /home/perthrel/sandgroper.net/trolley
-php migrate_20261123.php
+/opt/cpanel/ea-php81/root/usr/bin/php -v
 ```
+
+If that path differs, use cPanel **MultiPHP Manager** / **Select PHP Version** → **PHP 8.1** → note the CLI path shown for “ea-php81”, or run `which php` from a Cron test job.
+
+**One-shot Cron command** (copy exactly; absolute script path — scripts call `chdir(__DIR__)` internally):
+
+```text
+/opt/cpanel/ea-php81/root/usr/bin/php /home/perthrel/sandgroper.net/trolley/migrate_20261123.php
+```
+
+- Schedule: once, ~2 minutes from now (or “run once” if your cPanel supports it).
+- Read Cron **email/output log**: expect lines on **stdout** only (counts/steps), exit **0** on success, non-zero on failure.
+- **Remove or disable** the Cron job immediately after a successful run.
+
+**Check only (no DB changes):**
+
+```text
+/opt/cpanel/ea-php81/root/usr/bin/php /home/perthrel/sandgroper.net/trolley/migrate_20261123.php --check
+```
+
+Exit `0` = already applied, `1` = pending.
 
 **Behavior:**
 
 - If migration `20261123` not yet applied: copies `trolley_data.db` → `backups/trolley_data_pre_20261123_<UTCstamp>.db`, then runs schema steps.
-- If already applied: prints already applied; **no** schema change; safe to re-run.
+- If already applied: safe no-op message; re-run is idempotent.
 
-**Check only (no changes):**
-
-```bash
-php migrate_20261123.php --check
-```
-
-Exit `0` = applied, `1` = pending.
-
-There is **no** authenticated web URL for migration (by design).
+HTTP access to `migrate_20261123.php` must remain **403**.
 
 ---
 
@@ -220,27 +233,40 @@ There is **no** authenticated web URL for migration (by design).
 
 Pick **one** (after migration):
 
-**A — Admin UI (recommended)**
+**A — Admin UI**
 
 1. Open `https://sandgroper.net/trolley/admin.php` and log in.
 2. Brand accounts → **Regenerate all brand tokens** → confirm  
-   **or** upload `brand_tokens.local.json` on server only → **Apply brand_tokens.local.json** → confirm.
-3. Copy each portal URL from admin and email brands privately (not via reporter form).
+   **or** **Apply brand_tokens.local.json** (server file only).
+3. Copy each portal URL from admin; email brands privately.
 
-**B — CLI**
+**B — Cron CLI (no SSH)**
 
-```bash
-cd /home/perthrel/sandgroper.net/trolley
-php rotate_brand_tokens.php --generate
+Create export directory **outside webroot** (owner-only):
+
+```text
+mkdir -p /home/perthrel/trolley_private
+chmod 700 /home/perthrel/trolley_private
 ```
 
-Optional predefined tokens:
+**One-shot Cron command** (generate tokens, update DB, write portal-link map; stdout shows counts + export path only — **never tokens**):
 
-```bash
-php rotate_brand_tokens.php --from-file brand_tokens.local.json
+```text
+/opt/cpanel/ea-php81/root/usr/bin/php /home/perthrel/sandgroper.net/trolley/rotate_brand_tokens.php --generate --export /home/perthrel/trolley_private/brand_portal_links.json
 ```
 
-Tokens are **not** written to `error_log`. Do not commit `brand_tokens.local.json`.
+- File mode **0600** (umask applied on write). Refuses to overwrite unless you add `--force`.
+- JSON contains `brand_portal_links[]` with `brand_name` + `portal_url` per account (for owner distribution).
+- Optional: set `site_public_base` in `config.local.php` if the public URL is not `https://sandgroper.net/trolley`.
+- **Remove** the Cron job after success. Download the export via SFTP/File Manager; do not place under `public_html`.
+
+**Predefined tokens from file:**
+
+```text
+/opt/cpanel/ea-php81/root/usr/bin/php /home/perthrel/sandgroper.net/trolley/rotate_brand_tokens.php --from-file /home/perthrel/sandgroper.net/trolley/brand_tokens.local.json --export /home/perthrel/trolley_private/brand_portal_links.json
+```
+
+Tokens are **not** printed to Cron stdout/stderr or `error_log` by these scripts.
 
 ---
 

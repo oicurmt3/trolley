@@ -25,4 +25,11 @@ return [
         'https://sandgroper.net',
         'https://www.sandgroper.net',
     ],
+
+    /**
+     * site_public_base (optional)
+     * Public HTTPS URL of this install without trailing slash.
+     * Used by CLI token export (portal link map) — not shown to reporters.
+     */
+    'site_public_base' => 'https://sandgroper.net/trolley',
 ];

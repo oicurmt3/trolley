@@ -6,6 +6,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased] - 2026-11 (GitHub sync / hardening)
 
+### Fixed / Ops
+- PHP CI matrix 8.1 + 8.3; cron-safe CLI (`chdir(__DIR__)`); token export `--export` with 0600, no token output on stdout
+- Deploy manifest: cPanel ea-php81 one-shot cron commands
+
 ### Fixed (QA round 1)
 - Map legacy redirects: `RewriteBase /trolley/`, absolute `/trolley/map_brand.html` targets
 - `log_trolley.php`: WA bounds 400, invalid conditions/comments 400 (no silent strip), 25/hour rate-limit message, 10 KB body cap

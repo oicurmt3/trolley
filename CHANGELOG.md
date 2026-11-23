@@ -32,6 +32,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 - `view_logs.php`: icon-only From/To/Clear date filter row; selected range and counts in en-AU hint text below the toolbar
+- `view_logs.php`: date filter a11y (focus return to icon buttons, `aria-hidden` inputs, min/max sync); `html { scrollbar-gutter: stable }`
 - Admin state-changing actions require **POST** + CSRF (no GET mutations); CORS origins from `config.local.php`
 - HSTS `max-age` only (no `includeSubDomains` / preload); block `*.local.json` / `*.local.php` in `.htaccess`
 - `trolley_logs.json` / `brand_contacts.json` untracked — use `*.example.json`; reporter APIs strip non-email fields from brand contacts

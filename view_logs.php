@@ -120,14 +120,14 @@ tr.detail-row td { background-color: var(--detail-row-bg); white-space: normal; 
                             <svg class="filter-date-btn-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                             <span class="filter-date-active-dot" aria-hidden="true"></span>
                         </button>
-                        <input type="date" id="date-from" name="filter_date_from" class="filter-date-native-input" aria-label="From date" tabindex="-1">
+                        <input type="date" id="date-from" name="filter_date_from" class="filter-date-native-input" tabindex="-1" aria-hidden="true">
                     </div>
                     <div class="filter-date-trigger-wrap">
                         <button type="button" id="date-to-btn" class="filter-date-icon-btn" aria-label="To date" title="To date" aria-pressed="false">
                             <svg class="filter-date-btn-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                             <span class="filter-date-active-dot" aria-hidden="true"></span>
                         </button>
-                        <input type="date" id="date-to" name="filter_date_to" class="filter-date-native-input" aria-label="To date" tabindex="-1">
+                        <input type="date" id="date-to" name="filter_date_to" class="filter-date-native-input" tabindex="-1" aria-hidden="true">
                     </div>
                     <button type="button" id="clear-dates-btn" class="filter-date-icon-btn filter-date-clear" aria-label="Clear dates" title="Clear dates">
                         <svg class="filter-date-btn-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -298,6 +298,47 @@ tr.detail-row td { background-color: var(--detail-row-bg); white-space: normal; 
             toBtn.classList.toggle('has-value', active);
             toBtn.setAttribute('aria-pressed', active ? 'true' : 'false');
         }
+        syncDateInputConstraints();
+    }
+
+    function syncDateInputConstraints() {
+        const dateFrom = document.getElementById('date-from');
+        const dateTo = document.getElementById('date-to');
+        if (!dateFrom || !dateTo) return;
+        if (dateFrom.value) {
+            dateTo.min = dateFrom.value;
+        } else {
+            dateTo.removeAttribute('min');
+        }
+        if (dateTo.value) {
+            dateFrom.max = dateTo.value;
+        } else {
+            dateFrom.removeAttribute('max');
+        }
+    }
+
+    function returnFocusToDateButton(input, btn) {
+        if (input && typeof input.blur === 'function') {
+            input.blur();
+        }
+        if (btn && typeof btn.focus === 'function') {
+            btn.focus();
+        }
+    }
+
+    function wireHiddenDateInput(input, btn) {
+        if (!input || !btn) return;
+        input.addEventListener('change', () => {
+            returnFocusToDateButton(input, btn);
+        });
+        input.addEventListener('blur', () => {
+            returnFocusToDateButton(input, btn);
+        });
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                returnFocusToDateButton(input, btn);
+            }
+        });
     }
 
     function openNativeDatePicker(input) {
@@ -339,9 +380,11 @@ tr.detail-row td { background-color: var(--detail-row-bg); white-space: normal; 
 
         if (dateFromBtn && dateFrom) {
             dateFromBtn.addEventListener('click', () => openNativeDatePicker(dateFrom));
+            wireHiddenDateInput(dateFrom, dateFromBtn);
         }
         if (dateToBtn && dateTo) {
             dateToBtn.addEventListener('click', () => openNativeDatePicker(dateTo));
+            wireHiddenDateInput(dateTo, dateToBtn);
         }
         if (dateFrom) {
             dateFrom.addEventListener('change', () => {
